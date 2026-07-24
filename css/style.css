@@ -29,6 +29,10 @@
 
   --display:"Instrument Sans","Segoe UI",system-ui,sans-serif;
   --body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  /* per-part lettering, driven by the control room (Look & feel) */
+  --f-nav:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --f-btn:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --z-head:1;--z-nav:1;--z-btn:1;
 
   --wrap:1440px;
   --gut:clamp(20px,4vw,64px);
@@ -57,10 +61,10 @@ section[id]{scroll-margin-top:clamp(76px,6.4vw,98px)}
 
 /* ============ type ============ */
 h1,h2{font-family:var(--display);font-weight:400;line-height:1.03;letter-spacing:-.035em}
-h3{font-family:var(--body);font-weight:700;line-height:1.22;letter-spacing:-.015em}
-h1{font-size:clamp(2.5rem,5vw,3.35rem);letter-spacing:-.045em}
-h2{font-size:clamp(1.7rem,2.7vw,2.5rem)}
-h3{font-size:clamp(1.05rem,1.05vw,1.2rem)}
+h3{font-family:var(--display);font-weight:700;line-height:1.22;letter-spacing:-.015em}
+h1{font-size:calc(clamp(2.5rem,5vw,3.35rem) * var(--z-head));letter-spacing:-.045em}
+h2{font-size:calc(clamp(1.7rem,2.7vw,2.5rem) * var(--z-head))}
+h3{font-size:calc(clamp(1.05rem,1.05vw,1.2rem) * var(--z-head))}
 p{text-wrap:pretty}
 .lede{font-size:clamp(1rem,1vw,1.12rem);color:var(--muted);max-width:58ch}
 .eyebrow{
@@ -82,7 +86,7 @@ p{text-wrap:pretty}
   background:var(--bg);
   background-image:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 60%);
   color:var(--fg);
-  font-family:var(--display);font-weight:700;font-size:.98rem;letter-spacing:.005em;
+  font-family:var(--f-btn);font-weight:700;font-size:calc(.98rem * var(--z-btn));letter-spacing:.005em;
   padding:.92rem 1.6rem;border-radius:100px;border:0;cursor:pointer;
   text-decoration:none;white-space:nowrap;
   transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,background .22s,color .22s;
@@ -113,7 +117,7 @@ p{text-wrap:pretty}
 .btn--ghost:hover{background:rgba(255,255,255,.13);box-shadow:none}
 .btn--ink{--bg:var(--plum);--fg:#fff;box-shadow:0 10px 24px -12px rgba(46,26,74,.8)}
 .btn--ink:hover{box-shadow:0 16px 30px -12px rgba(46,26,74,.9)}
-.btn--lg{padding:1.1rem 2rem;font-size:1.05rem}
+.btn--lg{padding:1.1rem 2rem;font-size:calc(1.05rem * var(--z-btn))}
 
 /* ============ header ============ */
 .head{
@@ -135,7 +139,7 @@ p{text-wrap:pretty}
 /* top nav links styled as clean pill buttons */
 .nav a{
   position:relative;
-  font-family:var(--display);font-weight:500;font-size:.92rem;color:#fff;
+  font-family:var(--f-nav);font-weight:500;font-size:calc(.92rem * var(--z-nav));color:#fff;
   text-decoration:none;line-height:1;
   padding:.55rem .95rem;border-radius:100px;
   opacity:.9;
@@ -143,7 +147,7 @@ p{text-wrap:pretty}
 }
 .nav a:hover,.nav a:focus-visible{opacity:1;background:rgba(255,255,255,.16);outline:0}
 .nav a[aria-current="page"]{opacity:1;background:rgba(255,255,255,.24);font-weight:600}
-.head .btn{padding:.68rem 1.25rem;font-size:.9rem}
+.head .btn{padding:.68rem 1.25rem;font-size:calc(.9rem * var(--z-btn))}
 
 /* language switcher — segmented pill */
 .lang{

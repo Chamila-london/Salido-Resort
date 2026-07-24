@@ -689,12 +689,14 @@ function literalSpan(txt, idx, open, close){
 }
 function readDict(js){
   const m=/var\s+I18N\s*=\s*/.exec(js); if(!m) return null;
-  const sp=literalSpan(js, m.index+m[0].length-1, '{','}'); if(!sp) return null;
+  const bstart=js.indexOf('{', m.index+m[0].length-1); if(bstart<0) return null;
+  const sp=literalSpan(js, bstart, '{','}'); if(!sp) return null;
   try{ return {span:sp, obj: JSON.parse(js.slice(sp[0],sp[1]))}; }catch(e){ return null; }
 }
 function readExtra(js){
   const m=/var\s+EXTRA\s*=\s*/.exec(js); if(!m) return null;
-  const sp=literalSpan(js, m.index+m[0].length-1, '[',']'); if(!sp) return null;
+  const bstart=js.indexOf('[', m.index+m[0].length-1); if(bstart<0) return null;
+  const sp=literalSpan(js, bstart, '[',']'); if(!sp) return null;
   try{ return {span:sp, obj: (new Function('return '+js.slice(sp[0],sp[1])))()}; }catch(e){ return null; }
 }
 function writeBack(){
@@ -866,6 +868,7 @@ function renderRail(){
     const items=g.kinds.reduce((n,k)=>n+$$(KINDS[k].sel, S.doc.querySelector(KINDS[k].box)).length,0);
     mk(g.id, g.title, items?items+' items':g.fields.length);
   });
+  mk('_words','All wording', wordFields().length+' labels');
   grp('Design');
   mk('_look','Look & feel');
   mk('_photos','Photo library', imgNames().length);
@@ -878,6 +881,7 @@ function show(id){
   $$('#rail button').forEach(b=>b.setAttribute('aria-current', b.dataset.v===id?'true':'false'));
   const m=$('#main'); m.innerHTML='';
   if(id==='_home') return viewHome(m);
+  if(id==='_words') return viewWords(m);
   if(id==='_look') return viewLook(m);
   if(id==='_photos') return viewPhotos(m);
   if(id==='_contact') return viewContact(m);
@@ -1183,34 +1187,36 @@ function viewLook(m){
   cc.appendChild(warn);
   left.appendChild(cc);
 
-  /* ---- type ---- */
+  /* ---- type (font + size for each part) ---- */
   const tc=document.createElement('div'); tc.className='card';
-  tc.innerHTML='<div class="card__t"><h3>Lettering</h3></div>';
-  const mkSel=(tok,label)=>{
-    const cur=tokGet(tok,'');
-    const wrap=document.createElement('label'); wrap.className='f';
-    wrap.innerHTML='<span>'+esc(label)+'</span>';
-    const sel=document.createElement('select');
-    FACES.forEach(([v,t])=>{
-      const o=document.createElement('option'); o.value=v; o.textContent=t;
-      if(cur.replace(/\s/g,'')===v.replace(/\s/g,'')) o.selected=true;
-      sel.appendChild(o);
-    });
-    sel.addEventListener('change',()=>{ tokSet(tok,sel.value); paintPreview(); });
-    wrap.appendChild(sel); tc.appendChild(wrap);
+  tc.innerHTML='<div class="card__t"><h3>Lettering</h3><span class="hint" style="margin-left:auto">font &amp; size for each part</span></div>';
+  const partRow=(title,note,fontTok,sizeTok,smin,smax)=>{
+    const box=document.createElement('div'); box.style.cssText='padding:.75rem 0;border-top:1px solid var(--line)';
+    box.innerHTML='<div style="font-weight:600">'+esc(title)+'</div>'+(note?'<p class="hint" style="margin:.1rem 0 .55rem">'+esc(note)+'</p>':'<div style="height:.55rem"></div>');
+    /* font */
+    const fw=document.createElement('label'); fw.className='f'; fw.style.marginBottom='.55rem';
+    fw.innerHTML='<span>Font</span>';
+    const sel=document.createElement('select'); const cur=tokGet(fontTok,'');
+    FACES.forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t;
+      if(cur.replace(/\s/g,'')===v.replace(/\s/g,'')) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ tokSet(fontTok,sel.value); paintPreview(); });
+    fw.appendChild(sel); box.appendChild(fw);
+    /* size */
+    const zw=document.createElement('label'); zw.className='f'; zw.style.marginBottom='0';
+    zw.innerHTML='<span>Size</span>';
+    const rng=document.createElement('input'); rng.type='range'; rng.className='rng';
+    rng.min=String(smin); rng.max=String(smax); rng.step='1';
+    rng.value=String(Math.round((parseFloat(tokGet(sizeTok,'1'))||1)*100));
+    const lbl=document.createElement('div'); lbl.className='rlbl';
+    const paint=()=>lbl.innerHTML='<span>Smaller</span><span><b>'+rng.value+'%</b></span><span>Larger</span>';
+    rng.addEventListener('input',()=>{ tokSet(sizeTok,(rng.value/100).toFixed(2)); paint(); paintPreview(); });
+    paint(); zw.appendChild(rng); zw.appendChild(lbl); box.appendChild(zw);
+    tc.appendChild(box);
   };
-  mkSel('display','Headings');
-  mkSel('body','Body writing');
-
-  const fsWrap=document.createElement('label'); fsWrap.className='f';
-  fsWrap.innerHTML='<span>Size of the writing</span>';
-  const fs=document.createElement('input'); fs.type='range'; fs.className='rng';
-  fs.min='90'; fs.max='120'; fs.step='1';
-  fs.value=String(Math.round(parseFloat(tokGet('fs','1'))*100));
-  const fsl=document.createElement('div'); fsl.className='rlbl';
-  const fsn=()=>fsl.innerHTML='<span>Smaller</span><span><b>'+fs.value+'%</b></span><span>Larger</span>';
-  fs.addEventListener('input',()=>{ tokSet('fs',(fs.value/100).toFixed(2)); fsn(); paintPreview(); });
-  fsn(); fsWrap.appendChild(fs); fsWrap.appendChild(fsl); tc.appendChild(fsWrap);
+  partRow('Menu links','The links across the top of the page','f-nav','z-nav',80,130);
+  partRow('Buttons','“Book now”, “See the gallery”, “Send”…','f-btn','z-btn',80,130);
+  partRow('Headings','Section titles and card titles','display','z-head',80,140);
+  partRow('Body writing','The ordinary paragraphs','body','fs',90,120);
 
   const rWrap=document.createElement('label'); rWrap.className='f'; rWrap.style.marginBottom='0';
   rWrap.innerHTML='<span>Roundness of corners</span>';
@@ -1259,20 +1265,16 @@ function viewLook(m){
 function paintPreview(){
   const p=$('#lfPrev'); if(!p) return;
   const g=n=>tokGet(n,'');
-  const fs=parseFloat(tokGet('fs','1'))||1;
+  const num=(n,d)=>parseFloat(tokGet(n,String(d)))||d;
+  const fs=num('fs',1), zHead=num('z-head',1), zNav=num('z-nav',1), zBtn=num('z-btn',1);
   const rad=parseInt(tokGet('r','20'),10)||20;
   p.style.background=g('paper'); p.style.borderRadius=Math.min(rad,20)+'px';
-  $('#lfBar').style.background=g('plum');
-  $('#lfPill').style.background=g('violet-fill');
+  const bar=$('#lfBar'); bar.style.background=g('plum'); bar.style.fontFamily=g('f-nav'); bar.style.fontSize=(0.82*zNav)+'rem';
+  const pill=$('#lfPill'); pill.style.background=g('violet-fill'); pill.style.fontFamily=g('f-btn'); pill.style.fontSize=(0.82*zBtn)+'rem';
   $('#lfEb').style.color=g('violet-text');
-  $('#lfH').style.color=g('ink');
-  $('#lfH').style.fontFamily=g('display');
-  $('#lfH').style.fontSize=(1.5*fs)+'rem';
-  $('#lfP').style.color=g('muted');
-  $('#lfP').style.fontFamily=g('body');
-  $('#lfP').style.fontSize=(0.8*fs)+'rem';
-  const b=$('#lfBtn');
-  b.style.background=g('violet-fill'); b.style.borderRadius='99px';
+  $('#lfH').style.color=g('ink'); $('#lfH').style.fontFamily=g('display'); $('#lfH').style.fontSize=(1.5*zHead)+'rem';
+  $('#lfP').style.color=g('muted'); $('#lfP').style.fontFamily=g('body'); $('#lfP').style.fontSize=(0.8*fs)+'rem';
+  const b=$('#lfBtn'); b.style.background=g('violet-fill'); b.style.borderRadius='99px'; b.style.fontFamily=g('f-btn'); b.style.fontSize=(0.85*zBtn)+'rem';
 }
 function checkContrast(){
   const w=$('#cWarn'); if(!w) return;
@@ -1285,6 +1287,74 @@ function checkContrast(){
   w.hidden=false;
   w.innerHTML='<b>Hard to read.</b> '+esc(bad.join(', '))+
     ' — too faint for people with weaker eyesight, and Google marks a site down for it. Darken the colour, or use “Put the design back”.';
+}
+
+/* ================= all wording, 3 languages, grouped by section ================= */
+const WORD_GROUPS=[
+  ['nav','Menu'],['cta','Buttons'],['hero','Hero (top of page)'],['about','About'],
+  ['fac','Facilities'],['att','Kandy attractions'],['spot','Attraction pop-up'],
+  ['get','Getting to Kandy'],['gal','Gallery'],['con','Contact & form'],
+  ['not','Notice board'],['foot','Footer']
+];
+function wordFields(){
+  const seen=new Set(), out=[];
+  $$('[data-i18n],[data-i18n-html],[data-i18n-ph]',S.doc).forEach(e=>{
+    let key,kind;
+    if(e.hasAttribute('data-i18n-ph')){ key=e.getAttribute('data-i18n-ph'); kind='ph'; }
+    else if(e.hasAttribute('data-i18n-html')){ key=e.getAttribute('data-i18n-html'); kind='html'; }
+    else { key=e.getAttribute('data-i18n'); kind='text'; }
+    if(!key||seen.has(key)) return; seen.add(key);
+    out.push({el:e,key:key,kind:kind});
+  });
+  return out;
+}
+function viewWords(m){
+  head(m,'All wording','Type the English, Sinhala and Tamil for every fixed label on the site — the menu, buttons, section titles and footer. Leave Sinhala or Tamil empty and it shows the English instead.');
+  const fields=wordFields();
+  if(!fields.length){ const c=document.createElement('div'); c.className='card';
+    c.innerHTML='<p class="hint">No labels were found on the page.</p>'; m.appendChild(c); return; }
+  const buckets={}; fields.forEach(f=>{ const g=f.key.split('.')[0]; (buckets[g]=buckets[g]||[]).push(f); });
+  const order=WORD_GROUPS.map(g=>g[0]);
+  const titleOf=g=>{ const h=WORD_GROUPS.find(x=>x[0]===g); return h?h[1]:g; };
+  const groups=Object.keys(buckets).sort((a,b)=>{
+    let ia=order.indexOf(a), ib=order.indexOf(b); if(ia<0)ia=99; if(ib<0)ib=99;
+    return (ia-ib) || a.localeCompare(b);
+  });
+  let firstOpen=true;
+  groups.forEach(g=>{
+    const det=document.createElement('details'); det.className='card'; det.style.padding='0'; det.open=firstOpen; firstOpen=false;
+    const sum=document.createElement('summary');
+    sum.style.cssText='padding:1rem 1.15rem;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:.5rem';
+    sum.innerHTML=esc(titleOf(g))+' <span class="k">'+buckets[g].length+'</span>';
+    det.appendChild(sum);
+    const body=document.createElement('div'); body.style.padding='0 1.15rem 1.1rem';
+    buckets[g].forEach(f=>{
+      const en=fieldGet(f,'en');
+      const long=(en.length>60)||/\n/.test(en)||f.kind==='html';
+      const blk=document.createElement('div'); blk.style.cssText='padding:.8rem 0;border-top:1px solid var(--line)';
+      const cap=document.createElement('div'); cap.style.marginBottom='.4rem';
+      cap.innerHTML='<b>'+esc(f.key.split('.').pop())+'</b> <span class="k">'+esc(f.key)+'</span>'+
+        (f.kind==='ph'?' <span class="k">placeholder</span>':f.kind==='html'?' <span class="k">has tags</span>':'');
+      blk.appendChild(cap);
+      const mk=(lang,label,ph)=>{
+        const w=document.createElement('label'); w.className='f'; w.style.marginBottom='.5rem';
+        w.innerHTML='<span>'+esc(label)+'</span>';
+        const inp=document.createElement(long?'textarea':'input');
+        inp.className='fi'; inp.value=fieldGet(f,lang);
+        inp.style.cssText='width:100%;border:1px solid var(--line);border-radius:10px;padding:.55rem .7rem;background:#fff';
+        if(long) inp.style.minHeight='70px';
+        if(lang!=='en'){ inp.setAttribute('lang',lang); if(!inp.value) inp.placeholder=ph; }
+        inp.addEventListener('input',()=>fieldSet(f,lang,inp.value));
+        w.appendChild(inp); blk.appendChild(w);
+      };
+      mk('en','English','');
+      mk('si','සිංහල','Empty = shows English');
+      mk('ta','தமிழ்','Empty = shows English');
+      if(f.kind==='html'){ const p=document.createElement('p'); p.className='hint'; p.textContent='Keep the < > tags — they hold a line break or a link.'; blk.appendChild(p); }
+      body.appendChild(blk);
+    });
+    det.appendChild(body); m.appendChild(det);
+  });
 }
 
 /* ================= items list ================= */

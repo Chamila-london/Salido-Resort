@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://salidoresort.pages.dev/sitemap.xml
+Sitemap: https://salido-resort.pages.dev/sitemap.xml

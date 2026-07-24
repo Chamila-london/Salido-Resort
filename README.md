@@ -30,7 +30,7 @@ GitHub Desktop → **Fetch origin** → copy this folder's contents into your cl
    **Build output directory: `/`**.
 5. **Save and Deploy**.
 
-You get an address like `https://salidoresort.pages.dev`.
+You get an address like `https://salido-resort.pages.dev`.
 
 ### 3 · Add the five settings
 Your Pages project → **Settings** → **Variables and secrets** → add for
@@ -48,7 +48,7 @@ Then **Deployments** → **Retry deployment** on the latest one. Settings only r
 the server code on a fresh deployment.
 
 ### 4 · Sign in
-`https://salidoresort.pages.dev/admin/` — same username and password, same buttons.
+`https://salido-resort.pages.dev/admin/` — same username and password, same buttons.
 
 ### 5 · When you are happy
 Tell people the new address. Netlify can stay as a spare, or you can delete the
@@ -88,7 +88,7 @@ per publish is the limit; add several photos over several publishes.
 the three dots → **Revert**.
 
 **Your own domain.** Buy the name (about USD 11 a year at Porkbun or Cloudflare),
-add it in your host's dashboard, then change `salidoresort.pages.dev` in
+add it in your host's dashboard, then change `salido-resort.pages.dev` in
 `robots.txt`, `sitemap.xml` and the four tags near the top of `index.html`.
 After that you can move hosts whenever you like and nobody notices.
 
