@@ -9,7 +9,7 @@
 /* ============ tokens ============ */
 :root{
   --stylesheet-loaded:yes;
-  --fs:1;          /* text size, driven by the control room */   /* index.html checks this — do not remove */
+  --fs:1.00;          /* text size, driven by the control room */   /* index.html checks this — do not remove */
   --paper:#FAF8FD;
   --lavender:#EDE7F8;
   --lavender-2:#E2D7F4;
@@ -32,8 +32,8 @@
 
   --wrap:1440px;
   --gut:clamp(20px,4vw,64px);
-  --r:20px;
-  --r-lg:30px;
+  --r:36px;
+  --r-lg:54px;
   --shadow:0 1px 2px rgba(23,16,43,.04),0 8px 22px -12px rgba(46,26,74,.20),0 22px 48px -26px rgba(46,26,74,.20);
   --shadow-lg:0 2px 6px rgba(23,16,43,.05),0 22px 50px -22px rgba(46,26,74,.32),0 52px 100px -44px rgba(46,26,74,.30);
   --ring:0 0 0 1px rgba(46,26,74,.05);
