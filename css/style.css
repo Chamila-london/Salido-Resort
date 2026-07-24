@@ -8,7 +8,8 @@
 @font-face{font-family:'Cormorant';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/cormorant-500.woff) format('woff')}
 /* ============ tokens ============ */
 :root{
-  --stylesheet-loaded:yes;   /* index.html checks this — do not remove */
+  --stylesheet-loaded:yes;
+  --fs:1;          /* text size, driven by the control room */   /* index.html checks this — do not remove */
   --paper:#FAF8FD;
   --lavender:#EDE7F8;
   --lavender-2:#E2D7F4;
@@ -41,7 +42,7 @@
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   background:var(--paper);color:var(--ink);
-  font-family:var(--body);font-size:clamp(16px,.42vw + 15px,18px);line-height:1.62;
+  font-family:var(--body);font-size:calc(clamp(16px,.42vw + 15px,18px) * var(--fs));line-height:1.62;
   -webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 img,svg{display:block;max-width:100%}
