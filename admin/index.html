@@ -150,7 +150,8 @@ dialog::backdrop{background:rgba(24,15,36,.55)}
   .rail .n{margin-left:.35rem}
   .main{padding:1.1rem .9rem 4rem}
   .item{flex-wrap:wrap}
-  .item__acts{flex-direction:row;width:100%}
+  .item__acts{flex-direction:row;flex-wrap:wrap;width:100%}
+  .main{min-width:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -685,7 +686,8 @@ const KINDS={
   tile:{ box:'#facilities .bento', sel:'.tile', name:'facility tile', add:'Add a facility' },
   gal :{ box:'#gallery .lux-gallery', sel:'figure', name:'gallery photo', add:'Add a photo' },
   spot:{ box:'#attractions .rail', sel:'.spot', name:'Kandy attraction', add:'Add an attraction' },
-  room:{ box:'#rooms .rooms', sel:'.room', name:'room card', add:'Add a room' }
+  room:{ box:'#rooms .rooms', sel:'.room', name:'room card', add:'Add a room' },
+  notice:{ box:'#notices .notices', sel:'.notice', name:'notice', add:'Add a notice' }
 };
 const ICONS=[['i-ac','Air conditioning'],['i-bath','Bathroom'],['i-wifi','Wi-Fi'],['i-hot','Hot water'],
              ['i-leaf','Nature / garden'],['i-bbq','BBQ'],['i-car','Parking'],['i-pin','Location'],
@@ -699,10 +701,10 @@ function nearestGroup(el){
   if(el.closest('#spotModal')) return '_modal';
   return '_other';
 }
-const GROUP_TITLES={_header:'Header & menu',top:'Hero (top of page)',about:'About',facilities:'Facilities',
+const GROUP_TITLES={_header:'Header & menu',top:'Hero (top of page)',notices:'Notice board',about:'About',facilities:'Facilities',
   rooms:'Rooms',gallery:'Gallery',attractions:'Kandy attractions',getting:'Getting to Kandy',
   contact:'Contact',_footer:'Footer',_modal:'Attraction pop-up',_other:'Other text'};
-const ORDER=['_header','top','about','facilities','rooms','gallery','attractions','getting','contact','_footer','_modal','_other'];
+const ORDER=['_header','top','notices','about','facilities','rooms','gallery','attractions','getting','contact','_footer','_modal','_other'];
 
 function buildModel(){
   const d=S.doc, map=new Map();
@@ -819,6 +821,7 @@ function viewGroup(m,g){
   const lang=S.lang, ln={en:'English',si:'Sinhala',ta:'Tamil'}[lang];
   head(m,g.title,'Editing the '+ln+' version. '+(lang==='en'?'English is what the page shows by default.':'Leave a box empty to fall back to English.'));
 
+  if(g.id==='notices') boardSwitch(m);
   g.kinds.forEach(k=> itemsBlock(m,k));
 
   /* text that lives inside a card is edited on the card, not listed twice */
@@ -850,6 +853,27 @@ function viewGroup(m,g){
   }
 }
 
+/* ---------- the whole notice board on or off ---------- */
+function boardSwitch(m){
+  const sec=S.doc.querySelector('#notices'); if(!sec) return;
+  const on=!sec.hasAttribute('hidden');
+  const c=document.createElement('div'); c.className='card';
+  c.innerHTML='<div class="card__t"><h3>Show the notice board on the website</h3></div>'+
+    '<p class="hint" style="margin-bottom:.9rem">'+(on
+      ? 'The board is <b>on</b>. Visitors can see it, and there is a Notices link in the menu.'
+      : 'The board is <b>off</b>. The whole section is hidden from the website and so is its menu link &mdash; your notices are kept safe for next time.')+'</p>';
+  const b=document.createElement('button'); b.className='b '+(on?'b--bad':'b--go');
+  b.innerHTML='<svg><use href="#a-eye"/></svg>'+(on?'Switch the board off':'Switch the board on');
+  b.addEventListener('click',()=>{
+    const nav=S.doc.querySelector('a[href="#notices"]');
+    if(on){ sec.setAttribute('hidden',''); if(nav) nav.setAttribute('hidden',''); }
+    else  { sec.removeAttribute('hidden'); if(nav) nav.removeAttribute('hidden'); }
+    S.dirty=true; renderRail(); show(S.view);
+    toast(on?'Notice board switched off':'Notice board switched on');
+  });
+  c.appendChild(b); m.appendChild(c);
+}
+
 /* ---------- items: read one element into a plain object ---------- */
 function keyOf(el,sel){ const n=el.querySelector(sel); return n? (n.getAttribute('data-i18n')||''):''; }
 function readItem(kind,el){
@@ -874,6 +898,22 @@ function readItem(kind,el){
     o.kKey=o.kEl?.getAttribute('data-i18n')||''; o.dKey=o.dEl?.getAttribute('data-i18n')||'';
     o.i=+(el.getAttribute('data-i')||0);
     const x=S.extra[o.i]||{}; o.long=(x.desc||[]).join('\n\n'); o.facts=(x.facts||[]).map(f=>f[0]+' | '+f[1]).join('\n'); o.maps=x.maps||'';
+  } else if(kind==='notice'){
+    o.media=el.querySelector('.notice__media');
+    o.img=el.querySelector('.notice__media img');
+    o.src=o.img?o.img.getAttribute('src'):''; o.alt=o.img?o.img.getAttribute('alt'):'';
+    o.tEl=el.querySelector('h3'); o.dEl=el.querySelector('.notice__body p');
+    o.dateEl=el.querySelector('.notice__date'); o.flagEl=el.querySelector('.notice__flag');
+    o.ctaA=el.querySelector('.notice__cta'); o.ctaEl=el.querySelector('.notice__cta span');
+    o.title=o.tEl?o.tEl.textContent.trim():''; o.desc=o.dEl?o.dEl.textContent.trim():'';
+    o.date=o.dateEl?o.dateEl.textContent.trim():''; o.flag=o.flagEl?o.flagEl.textContent.trim():'';
+    o.tKey=o.tEl?.getAttribute('data-i18n')||''; o.dKey=o.dEl?.getAttribute('data-i18n')||'';
+    o.dateKey=o.dateEl?.getAttribute('data-i18n')||''; o.flagKey=o.flagEl?.getAttribute('data-i18n')||'';
+    o.ctaKey=o.ctaEl?.getAttribute('data-i18n')||'';
+    o.gold=o.flagEl?o.flagEl.classList.contains('notice__flag--new'):false;
+    o.pin=el.classList.contains('notice--pin');
+    o.cta=!!o.ctaA;
+    o.off=el.hasAttribute('hidden');
   } else if(kind==='room'){
     o.img=el.querySelector('img'); o.src=o.img?o.img.getAttribute('src'):''; o.alt=o.img?o.img.getAttribute('alt'):'';
     o.tEl=el.querySelector('h3'); o.dEl=el.querySelector('.room__body p');
@@ -937,13 +977,21 @@ function itemsBlock(m,kind){
     const row=document.createElement('div'); row.className='item';
     const pic = kind==='tile'
       ? '<div class="item__ico"><svg><use href="#'+esc(o.icon)+'"/></svg></div>'
-      : '<img class="item__pic" src="'+esc(imgURL(o.src))+'" alt="">';
+      : (o.src ? '<img class="item__pic" src="'+esc(imgURL(o.src))+'" alt="">'
+               : '<div class="item__ico"><svg><use href="#a-pen"/></svg></div>');
+    if(o.off) row.style.opacity='.55';
     row.innerHTML = pic +
-      '<div class="item__b"><h4>'+esc(o.title||'(no title)')+'</h4><p>'+esc(o.desc||o.alt||o.label||'')+'</p></div>';
+      '<div class="item__b"><h4>'+esc(o.title||'(no title)')+(o.off?' <span class="k">hidden</span>':'')+'</h4><p>'+esc(o.desc||o.alt||o.label||'')+'</p></div>';
     const acts=document.createElement('div'); acts.className='item__acts';
     const mk=(cls,icon,label,fn)=>{ const b=document.createElement('button'); b.className='b b--sm '+cls;
       b.innerHTML='<svg><use href="#'+icon+'"/></svg>'+label; b.addEventListener('click',fn); return b; };
     acts.appendChild(mk('','a-pen','Edit',()=>editItem(kind,el)));
+    if(kind==='notice'){
+      acts.appendChild(mk(o.off?'':'b--bad','a-eye',o.off?'Show':'Hide',()=>{
+        if(o.off) el.removeAttribute('hidden'); else el.setAttribute('hidden','');
+        S.dirty=true; show(S.view); toast(o.off?'Notice shown':'Notice hidden');
+      }));
+    }
     const rowm=document.createElement('div'); rowm.className='row2';
     const up=mk('','a-up','',()=>moveItem(kind,el,-1)); up.title='Move up'; up.disabled=idx===0;
     const dn=mk('','a-dn','',()=>moveItem(kind,el,1)); dn.title='Move down'; dn.disabled=idx===list.length-1;
@@ -970,7 +1018,7 @@ function reindexSpots(){
 async function delItem(kind,el){
   const o=readItem(kind,el);
   if(!await confirmBox('Delete this '+KINDS[kind].name+'?', (o.title||'This item')+' will be removed from the website. You can undo it only by opening your zip again.','Delete it')) return;
-  [o.tKey,o.dKey,o.lKey,o.kKey].filter(Boolean).forEach(dictDel);
+  [o.tKey,o.dKey,o.lKey,o.kKey,o.dateKey,o.flagKey,o.ctaKey].filter(Boolean).forEach(dictDel);
   if(kind==='spot'){ el.remove(); reindexSpots(); }
   else el.remove();
   S.dirty=true; renderRail(); show(S.view); toast('Deleted');
@@ -1072,6 +1120,102 @@ function editItem(kind,el){
         S.dirty=true; renderRail(); show(S.view); toast(isNew?'Photo added':'Saved');
       });
     hookPic('pic'); triFill('c',o.tKey);
+    return;
+  }
+
+  if(kind==='notice'){
+    const waHref = (S.doc.querySelector('.notice__cta')||{}).getAttribute
+      ? S.doc.querySelector('.notice__cta').getAttribute('href')
+      : ((S.doc.querySelector('a[href*="wa.me"]')||{getAttribute:()=>''}).getAttribute('href')||'');
+    const chk=(id,label,on)=>'<label class="f" style="display:flex;gap:.5rem;align-items:center">'+
+      '<input type="checkbox" id="'+id+'" style="width:auto"'+(on?' checked':'')+'>'+
+      '<span style="margin:0;text-transform:none;letter-spacing:0;font-size:.88rem">'+esc(label)+'</span></label>';
+    openDlg((isNew?'Add a ':'Edit this ')+name,
+      tri('t','Title', o.tKey||'', o.title||'', false) +
+      tri('d','What it says', o.dKey||'', o.desc||'', true) +
+      tri('dt','Date shown on the notice', o.dateKey||'', o.date||'', false, 'Anything you like — August 2026, Every Saturday, 5-6 August.') +
+      tri('fg','Badge (leave empty for none)', o.flagKey||'', o.flag||'', false, 'Short words work best — New, Pinned, Offer.') +
+      chk('gold','Show the badge in gold instead of purple', !!o.gold) +
+      chk('pin','Highlight this notice with a purple border', !!o.pin) +
+      chk('cta','Show a "Message us on WhatsApp" link', isNew?true:!!o.cta) +
+      chk('off','Hide this notice from the website for now', !!o.off) +
+      picField('pic', isNew?'Photo (optional)':'Replace the photo', o.src, 'Optional. Without one the notice simply runs full width.') +
+      fieldRow('alt','Description of the photo for screen readers and Google', o.alt||'', false, 'e.g. Guests at the riverside barbecue'),
+      async ()=>{
+        if(!V('t')) { toast('Give the notice a title'); return false; }
+        const up=await pickedImage('pic','notice-new', o.src);
+        let node=el, tKey=o.tKey, dKey=o.dKey, dateKey=o.dateKey, flagKey=o.flagKey, ctaKey=o.ctaKey;
+        if(isNew){
+          tKey=uniqueKey('not.x#.t');
+          const stem=tKey.replace(/\.t$/,'');
+          dKey=stem+'.d'; dateKey=stem+'.date'; flagKey=stem+'.flag'; ctaKey=stem+'.cta';
+          node=S.doc.createElement('article'); node.className='notice';
+          node.innerHTML='<div class="notice__body">'+
+            '<div class="notice__meta"><span class="notice__date" data-i18n="'+dateKey+'"></span></div>'+
+            '<h3 data-i18n="'+tKey+'"></h3><p data-i18n="'+dKey+'"></p></div>';
+          S.doc.querySelector(KINDS.notice.box).appendChild(node);
+        }
+        if(!dateKey){ dateKey=(tKey||'not.x1.t').replace(/\.t$/,'')+'.date'; }
+        if(!flagKey){ flagKey=(tKey||'not.x1.t').replace(/\.t$/,'')+'.flag'; }
+        if(!ctaKey){  ctaKey =(tKey||'not.x1.t').replace(/\.t$/,'')+'.cta'; }
+        const body=node.querySelector('.notice__body');
+
+        /* photo */
+        let media=node.querySelector('.notice__media');
+        if(up){
+          if(!media){ media=S.doc.createElement('div'); media.className='notice__media';
+            media.innerHTML='<img src="" alt="" loading="lazy">'; node.insertBefore(media, body); }
+          const img=media.querySelector('img');
+          img.setAttribute('src',up.name); img.setAttribute('width',up.w); img.setAttribute('height',up.h);
+        }
+        if(media) media.querySelector('img').setAttribute('alt',V('alt'));
+
+        /* meta row */
+        let meta=node.querySelector('.notice__meta');
+        if(!meta){ meta=S.doc.createElement('div'); meta.className='notice__meta'; body.insertBefore(meta, body.firstChild); }
+        let dateEl=meta.querySelector('.notice__date');
+        if(!dateEl){ dateEl=S.doc.createElement('span'); dateEl.className='notice__date';
+          dateEl.setAttribute('data-i18n',dateKey); meta.appendChild(dateEl); }
+        dateEl.textContent=V('dt');
+        dateEl.hidden = !V('dt');
+        let flagEl=meta.querySelector('.notice__flag');
+        if(V('fg')){
+          if(!flagEl){ flagEl=S.doc.createElement('span'); flagEl.className='notice__flag';
+            flagEl.setAttribute('data-i18n',flagKey); meta.appendChild(flagEl); }
+          flagEl.textContent=V('fg');
+          flagEl.className='notice__flag'+($('#gold').checked?' notice__flag--new':'');
+        } else if(flagEl){ flagEl.remove(); dictDel(flagKey); }
+
+        /* words */
+        node.querySelector('h3').textContent=V('t');
+        node.querySelector('.notice__body p').textContent=V('d');
+
+        /* whatsapp link */
+        let a=node.querySelector('.notice__cta');
+        if($('#cta').checked){
+          if(!a){
+            a=S.doc.createElement('a'); a.className='notice__cta';
+            a.setAttribute('href', waHref||'https://wa.me/94742698328');
+            a.setAttribute('target','_blank'); a.setAttribute('rel','noopener');
+            a.innerHTML='<span data-i18n="'+ctaKey+'">Message us on WhatsApp</span>'+
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg>';
+            body.appendChild(a);
+          }
+          if(!a.querySelector('span').textContent.trim()) a.querySelector('span').textContent='Message us on WhatsApp';
+        } else if(a){ a.remove(); dictDel(ctaKey); }
+
+        node.classList.toggle('notice--plain', !node.querySelector('.notice__media'));
+        node.classList.toggle('notice--pin', $('#pin').checked);
+        if($('#off').checked) node.setAttribute('hidden',''); else node.removeAttribute('hidden');
+
+        dictSet(tKey,V('t_si'),V('t_ta'));
+        dictSet(dKey,V('d_si'),V('d_ta'));
+        dictSet(dateKey,V('dt_si'),V('dt_ta'));
+        if(V('fg')) dictSet(flagKey,V('fg_si'),V('fg_ta'));
+        S.dirty=true; renderRail(); show(S.view); toast(isNew?'Notice added':'Saved');
+      });
+    hookPic('pic'); triFill('t',o.tKey); triFill('d',o.dKey);
+    triFill('dt',o.dateKey); triFill('fg',o.flagKey);
     return;
   }
 

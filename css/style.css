@@ -848,3 +848,49 @@ html[lang="si"] .bookbar__lead,html[lang="ta"] .bookbar__lead{font-family:var(--
 .rate-flag b{font-size:1.22rem;font-weight:700;letter-spacing:0}
 .rate-flag .rate-flag__per{opacity:.85;font-weight:500}
 .scroll-hint{margin:0 0 .6rem;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:var(--violet-hi);font-weight:600;opacity:.85}@media(hover:hover){.scroll-hint{opacity:.6}}
+
+
+/* ============ notice board ============ */
+[hidden]{display:none!important}
+
+.sec--notice{background:linear-gradient(180deg,#FFFFFF 0%,var(--paper) 100%)}
+.notices{display:grid;gap:clamp(14px,1.6vw,20px)}
+
+.notice{
+  display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);
+  gap:clamp(16px,2vw,28px);align-items:stretch;
+  background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.notice--plain,
+.notice:not(:has(.notice__media)){grid-template-columns:1fr}
+.notice__media{position:relative;background:var(--lavender);min-height:190px}
+.notice__media img{width:100%;height:100%;object-fit:cover}
+.notice__body{padding:clamp(18px,2.2vw,30px) clamp(18px,2.4vw,34px) clamp(20px,2.4vw,32px) 0}
+.notice--plain .notice__body,
+.notice:not(:has(.notice__media)) .notice__body{padding-left:clamp(18px,2.4vw,34px)}
+
+.notice__meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.notice__date{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--violet-text)}
+.notice__flag{
+  font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:#fff;background:var(--violet-fill);border-radius:999px;padding:4px 11px
+}
+.notice__flag--new{background:var(--gold)}
+.notice h3{font-size:clamp(1.15rem,1.5vw,1.45rem);margin-bottom:.45rem}
+.notice p{color:var(--muted);margin-bottom:.7rem}
+.notice p:last-child{margin-bottom:0}
+.notice__cta{
+  display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem;
+  color:var(--violet-text);text-decoration:none;border-bottom:2px solid var(--violet-hi);padding-bottom:2px
+}
+.notice__cta svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+.notice__cta:hover{border-bottom-color:var(--violet-text)}
+.notice--pin{border-color:var(--violet-hi);box-shadow:var(--shadow-lg)}
+
+@media (max-width:760px){
+  .notice{grid-template-columns:1fr}
+  .notice__media{min-height:0;aspect-ratio:16/9}
+  .notice__body{padding:20px 20px 24px}
+}
