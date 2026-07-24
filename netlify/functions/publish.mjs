@@ -1,0 +1,143 @@
+/* Salido control room — publish.
+   Takes the edited files from the editor, commits them to GitHub in one
+   commit, and lets Netlify's own git deploy put them live. No packages. */
+
+const enc = new TextEncoder();
+
+/* only these may ever be written */
+const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg))$/;
+const MAX_TOTAL = 4.6 * 1024 * 1024;   // Netlify caps a request body at ~6 MB
+
+function json(status, obj) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+  });
+}
+
+function b64urlToStr(s) {
+  const p = s.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(p + '='.repeat((4 - p.length % 4) % 4));
+}
+function b64url(bytes) {
+  let str = '';
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for (let i = 0; i < u8.length; i++) str += String.fromCharCode(u8[i]);
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+async function sign(secret, payload) {
+  const key = await crypto.subtle.importKey(
+    'raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return b64url(await crypto.subtle.sign('HMAC', key, enc.encode(payload)));
+}
+async function session(req) {
+  const SECRET = process.env.SESSION_SECRET || '';
+  if (!SECRET) return null;
+  const raw = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  const dot = raw.lastIndexOf('.');
+  if (dot < 1) return null;
+  const payload = raw.slice(0, dot), sig = raw.slice(dot + 1);
+  if (await sign(SECRET, payload) !== sig) return null;
+  let data;
+  try { data = JSON.parse(b64urlToStr(payload)); } catch (e) { return null; }
+  if (!data || !data.exp || Date.now() > data.exp) return null;
+  return data;
+}
+
+async function gh(path, init) {
+  const r = await fetch('https://api.github.com' + path, Object.assign({}, init, {
+    headers: Object.assign({
+      authorization: 'Bearer ' + (process.env.GITHUB_TOKEN || ''),
+      accept: 'application/vnd.github+json',
+      'user-agent': 'salido-control-room',
+      'content-type': 'application/json'
+    }, (init && init.headers) || {})
+  }));
+  const text = await r.text();
+  if (!r.ok) {
+    let msg = text.slice(0, 300);
+    try { msg = JSON.parse(text).message || msg; } catch (e) { /* keep raw */ }
+    if (r.status === 401 || r.status === 403) {
+      msg = 'the GitHub token was refused (' + msg + '). Check GITHUB_TOKEN in Netlify, and that it has Contents: Read and write on this repository.';
+    }
+    if (r.status === 404) {
+      msg = 'the repository or branch was not found (' + msg + '). Check GITHUB_REPO and GITHUB_BRANCH in Netlify.';
+    }
+    throw new Error('GitHub: ' + msg);
+  }
+  return text ? JSON.parse(text) : {};
+}
+
+export default async (req) => {
+  if (req.method !== 'POST') return json(405, { error: 'Use POST.' });
+
+  const s = await session(req);
+  if (!s) return json(401, { error: 'Please sign in again.' });
+
+  const repo = process.env.GITHUB_REPO || '';
+  const branch = process.env.GITHUB_BRANCH || 'main';
+  if (!repo || !process.env.GITHUB_TOKEN) {
+    return json(500, { error: 'Publishing is not set up yet. Add GITHUB_REPO and GITHUB_TOKEN in Netlify → Site configuration → Environment variables.' });
+  }
+
+  let body = {};
+  try { body = await req.json(); } catch (e) {
+    return json(400, { error: 'The editor sent something the server could not read.' });
+  }
+
+  const files = Array.isArray(body.files) ? body.files : [];
+  if (!files.length) return json(400, { error: 'There was nothing to publish.' });
+
+  let total = 0;
+  for (const f of files) {
+    if (!f || typeof f.path !== 'string' || typeof f.b64 !== 'string') {
+      return json(400, { error: 'One of the files was malformed.' });
+    }
+    if (f.path.includes('..') || !ALLOWED.test(f.path)) {
+      return json(400, { error: 'This file is not allowed to be published: ' + f.path });
+    }
+    total += f.b64.length * 0.75;
+  }
+  if (total > MAX_TOTAL) {
+    return json(413, { error: 'Too much in one go (' + Math.round(total / 1048576) + ' MB). Publish what you have, then add the next photo.' });
+  }
+
+  const message = String(body.message || 'Website update from the control room').slice(0, 200);
+
+  try {
+    const ref = await gh('/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
+    const headSha = ref.object.sha;
+    const headCommit = await gh('/repos/' + repo + '/git/commits/' + headSha);
+
+    const tree = [];
+    for (const f of files) {
+      const blob = await gh('/repos/' + repo + '/git/blobs', {
+        method: 'POST',
+        body: JSON.stringify({ content: f.b64, encoding: 'base64' })
+      });
+      tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
+    }
+
+    const newTree = await gh('/repos/' + repo + '/git/trees', {
+      method: 'POST',
+      body: JSON.stringify({ base_tree: headCommit.tree.sha, tree })
+    });
+
+    const commit = await gh('/repos/' + repo + '/git/commits', {
+      method: 'POST',
+      body: JSON.stringify({ message, tree: newTree.sha, parents: [headSha] })
+    });
+
+    await gh('/repos/' + repo + '/git/refs/heads/' + encodeURIComponent(branch), {
+      method: 'PATCH',
+      body: JSON.stringify({ sha: commit.sha })
+    });
+
+    return json(200, { ok: true, commit: commit.sha, files: files.length });
+  } catch (e) {
+    return json(502, { error: e.message });
+  }
+};
+
+export const config = { path: '/api/publish' };
