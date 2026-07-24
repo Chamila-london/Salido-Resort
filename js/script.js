@@ -69,32 +69,7 @@
   var rail = document.querySelector('.rail');
   var sm = document.getElementById('spotModal');
   if(rail && sm){
-    var EXTRA = [
-      { desc:["A 27-acre bird park in the Hanthana hills, next to the Tea Museum, opened in 2023.",
-              "Home to over a hundred endemic and migratory species — parrots, owls, eagles, kingfishers and peacocks — with walk-through areas, feeding times, and small animals the children will like."],
-        facts:[["What it is","27-acre bird park & recreation centre"],["Good for","Families and an easy half-day"],["Best time","Early morning or late afternoon"],["Entry","Ticketed — check the current rate"]],
-        maps:"Hanthana International Bird Park, Kandy" },
-      { desc:["Sri Dalada Maligawa — Sri Lanka's holiest Buddhist site and a UNESCO World Heritage Site — sits on Kandy Lake within the old royal palace complex.",
-              "It houses the sacred tooth relic of the Buddha, kept inside golden caskets. The relic itself is never shown, but during the daily puja the shrine doors open and the drums begin."],
-        facts:[["Open","Daily, roughly 5:30am – 8:00pm"],["Puja (offerings)","5:30am · 9:30am · 6:30pm — evening is the most atmospheric"],["Entry","Around LKR 2,000 for foreign visitors"],["Dress","Cover shoulders and knees; shoes off inside"]],
-        maps:"Temple of the Sacred Tooth Relic, Kandy" },
-      { desc:["Also called Kiri Muhuda, the \u201cSea of Milk\u201d, this lake was created in 1807 by the last king of Kandy.",
-              "A slow loop beside the temple and the old town — one of the nicest and easiest things to do in the city."],
-        facts:[["Cost","Free to walk"],["Best time","Early morning or evening"],["Right by","The Temple of the Tooth"]],
-        maps:"Kandy Lake, Kandy" },
-      { desc:["An 88-foot white seated Buddha on Bahirawa Kanda hill, completed in the 1990s and visible from all over the city.",
-              "The short climb (or a quick tuk-tuk) is rewarded with the best panoramic view over Kandy, the lake and the hills. It's lit up at night."],
-        facts:[["Highlight","The best viewpoint over Kandy"],["Best time","Late afternoon, for the sunset"],["Entry","Small fee, around LKR 250"],["Dress","Cover shoulders and knees; shoes off"]],
-        maps:"Bahirawakanda Vihara Buddha Statue, Kandy" },
-      { desc:["The city centre — colonial-era facades, the central market, shops, and plenty of places to eat before the drive back.",
-              "The National Museum of Kandy sits right beside the Temple of the Tooth if you want a little more history."],
-        facts:[["What's there","Market, shops and food"],["Nearby","National Museum, by the temple"],["Best time","Daytime for the market"]],
-        maps:"Kandy city centre, Sri Lanka" },
-      { desc:["A shaded loop all the way around Kandy Lake — flat, easy and quiet, with the temple and old town on one side.",
-              "Best early in the day, before the heat and the traffic build up."],
-        facts:[["Cost","Free"],["Best time","Early morning"],["Good for","An easy stroll"]],
-        maps:"Kandy Lake, Kandy" }
-    ];
+    var EXTRA = [{"desc":["A 27-acre bird park in the Hanthana hills, next to the Tea Museum, opened in 2023.","Home to over a hundred endemic and migratory species — parrots, owls, eagles, kingfishers and peacocks — with walk-through areas, feeding times, and small animals the children will like."],"facts":[["What it is","27-acre bird park & recreation centre"],["Good for","Families and an easy half-day"],["Best time","Early morning or late afternoon"],["Entry","Ticketed — check the current rate"]],"maps":"Hanthana International Bird Park, Kandy"},{"desc":["Sri Dalada Maligawa — Sri Lanka's holiest Buddhist site and a UNESCO World Heritage Site — sits on Kandy Lake within the old royal palace complex.","It houses the sacred tooth relic of the Buddha, kept inside golden caskets. The relic itself is never shown, but during the daily puja the shrine doors open and the drums begin."],"facts":[["Open","Daily, roughly 5:30am – 8:00pm"],["Puja (offerings)","5:30am · 9:30am · 6:30pm — evening is the most atmospheric"],["Entry","Around LKR 2,000 for foreign visitors"],["Dress","Cover shoulders and knees; shoes off inside"]],"maps":"Temple of the Sacred Tooth Relic, Kandy"},{"desc":["Also called Kiri Muhuda, the “Sea of Milk”, this lake was created in 1807 by the last king of Kandy.","A slow loop beside the temple and the old town — one of the nicest and easiest things to do in the city."],"facts":[["Cost","Free to walk"],["Best time","Early morning or evening"],["Right by","The Temple of the Tooth"]],"maps":"Kandy Lake, Kandy"},{"desc":["An 88-foot white seated Buddha on Bahirawa Kanda hill, completed in the 1990s and visible from all over the city.","The short climb (or a quick tuk-tuk) is rewarded with the best panoramic view over Kandy, the lake and the hills. It's lit up at night."],"facts":[["Highlight","The best viewpoint over Kandy"],["Best time","Late afternoon, for the sunset"],["Entry","Small fee, around LKR 250"],["Dress","Cover shoulders and knees; shoes off"]],"maps":"Bahirawakanda Vihara Buddha Statue, Kandy"},{"desc":["The city centre — colonial-era facades, the central market, shops, and plenty of places to eat before the drive back.","The National Museum of Kandy sits right beside the Temple of the Tooth if you want a little more history."],"facts":[["What's there","Market, shops and food"],["Nearby","National Museum, by the temple"],["Best time","Daytime for the market"]],"maps":"Kandy city centre, Sri Lanka"},{"desc":["A shaded loop all the way around Kandy Lake — flat, easy and quiet, with the temple and old town on one side.","Best early in the day, before the heat and the traffic build up."],"facts":[["Cost","Free"],["Best time","Early morning"],["Good for","An easy stroll"]],"maps":"Kandy Lake, Kandy"}];
     var smImg=document.getElementById('sm-img'), smEye=document.getElementById('sm-eyebrow'),
         smTitle=document.getElementById('sm-title'), smKm=document.getElementById('sm-km'),
         smDesc=document.getElementById('sm-desc'), smFacts=document.getElementById('sm-facts'),
