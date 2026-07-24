@@ -1,0 +1,11 @@
+# Cloudflare Pages reads this file. Netlify reads it too, so the repository
+# works on either host during the changeover.
+
+/admin/*
+  Cache-Control: no-store
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
