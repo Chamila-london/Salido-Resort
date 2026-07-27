@@ -5,7 +5,7 @@
 const enc = new TextEncoder();
 
 const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg))$/;
-const MAX_TOTAL = 4.6 * 1024 * 1024;
+const MAX_TOTAL = 4.0 * 1024 * 1024;
 
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
@@ -30,6 +30,13 @@ async function sign(secret, payload) {
   );
   return b64url(await crypto.subtle.sign('HMAC', key, enc.encode(payload)));
 }
+function equal(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function session(request, env) {
   const SECRET = env.SESSION_SECRET || '';
   if (!SECRET) return null;
@@ -37,7 +44,8 @@ async function session(request, env) {
   const dot = raw.lastIndexOf('.');
   if (dot < 1) return null;
   const payload = raw.slice(0, dot), sig = raw.slice(dot + 1);
-  if (await sign(SECRET, payload) !== sig) return null;
+  const expected = await sign(SECRET, payload);
+  if (!equal(expected, sig)) return null;
   let data;
   try { data = JSON.parse(b64urlToStr(payload)); } catch (e) { return null; }
   if (!data || !data.exp || Date.now() > data.exp) return null;
@@ -103,11 +111,15 @@ export async function onRequest(context) {
     return json(413, { error: 'Too much in one go (' + Math.round(total / 1048576) + ' MB). Publish what you have, then add the next photo.' });
   }
 
-  const message = String(body.message || 'Website update from the control room').slice(0, 200);
+  const message = String(body.message || 'Website update from the control room').replace(/[\r\n]+/g, ' ').slice(0, 200);
+  const expectedHead = typeof body.expectedHead === 'string' ? body.expectedHead : '';
 
   try {
     const ref = await gh(env, '/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
     const headSha = ref.object.sha;
+    if (expectedHead && expectedHead !== headSha) {
+      return json(409, { error: 'The website changed after you opened the editor. Reload the editor so you do not overwrite newer work.', conflict: true, headSha });
+    }
     const headCommit = await gh(env, '/repos/' + repo + '/git/commits/' + headSha);
 
     const tree = [];
@@ -134,8 +146,9 @@ export async function onRequest(context) {
       body: JSON.stringify({ sha: commit.sha })
     });
 
-    return json(200, { ok: true, commit: commit.sha, files: files.length });
+    return json(200, { ok: true, commit: commit.sha, headSha: commit.sha, files: files.length });
   } catch (e) {
-    return json(502, { error: e.message });
+    console.error(e);
+    return json(502, { error: 'Publishing failed. Check the deployment logs and GitHub repository settings.' });
   }
 }

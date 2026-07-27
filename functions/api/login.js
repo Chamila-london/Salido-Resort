@@ -3,6 +3,9 @@
    hands back a short-lived signed token. No packages, no database. */
 
 const enc = new TextEncoder();
+const attempts = globalThis.__salidoLoginAttempts || (globalThis.__salidoLoginAttempts = new Map());
+const WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 8;
 
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
@@ -47,16 +50,26 @@ export async function onRequest(context) {
 
   let body = {};
   try { body = await request.json(); } catch (e) { /* keep defaults */ }
-  const user = String(body.user || '');
-  const pass = String(body.pass || '');
+  const user = String(body.user || '').slice(0, 100);
+  const pass = String(body.pass || '').slice(0, 300);
+  const ip = (request.headers.get('cf-connecting-ip') || request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  let state = attempts.get(ip);
+  if (!state || now - state.started > WINDOW_MS) state = { started: now, count: 0 };
+  if (state.count >= MAX_ATTEMPTS) {
+    return new Response(JSON.stringify({ error: 'Too many sign-in attempts. Try again later.' }), { status: 429, headers: { 'content-type':'application/json', 'cache-control':'no-store', 'retry-after':'900' } });
+  }
 
   const ok = equal(user.toLowerCase(), USER.toLowerCase()) && equal(pass, PASS);
   if (!ok) {
-    try { await new Promise(r => setTimeout(r, 700)); } catch (e) { /* slow down guessing */ }
+    state.count += 1; attempts.set(ip, state);
+    try { await new Promise(r => setTimeout(r, 900 + Math.min(state.count, 5) * 250)); } catch (e) {}
     return json(401, { error: 'That username and password do not match.' });
   }
+  attempts.delete(ip);
 
-  const hours = Number(env.SESSION_HOURS || 12);
+  const requestedHours = Number(env.SESSION_HOURS);
+  const hours = Number.isFinite(requestedHours) ? Math.min(24, Math.max(1, requestedHours)) : 12;
   const payload = b64url(enc.encode(JSON.stringify({
     u: USER,
     exp: Date.now() + hours * 3600 * 1000

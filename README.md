@@ -94,3 +94,42 @@ After that you can move hosts whenever you like and nobody notices.
 
 **The offline copy.** `Salido-Resort-OFFLINE.html` is the whole site in one file for
 a USB stick or email. It is a snapshot and does not update itself.
+
+## V2 cinematic hero and interactive map
+
+- The home hero now uses `video/hero-4k.webm` with `video/hero-4k.mp4` as the browser fallback.
+- Both videos were generated from the original room photograph as a subtle 12-second cinematic loop. They contain no audio.
+- `images/hero-1920.webp` and `images/hero-4k.webp` are used as responsive poster/fallback images.
+- Reduced-motion and reduced-data users receive the static image instead of forced motion.
+- The location section now uses an interactive dark map with an optional satellite view and a custom Salido marker. It uses Leaflet with OpenStreetMap/CARTO and Esri tiles, so no Mapbox access token is required.
+
+## V3 premium edition
+
+- Replaced the soft generated hero video with a sharper responsive still-image motion system.
+- Added 1920px and 4K WebP hero assets with cinematic camera, light-beam and bokeh effects.
+- Added premium navigation, hero trust indicators, glass booking bar and refined typography.
+- Rebuilt the map section with an interactive dark map, resort information card and booking-benefit strip.
+- Preserved reduced-motion and mobile fallbacks.
+
+## V3 reference correction
+The navigation now remains a compact dark-glass overlay rather than becoming a large white bar. The hero composition follows the approved reference with left-aligned compact copy, darker cinematic grading, and no quick-book bar covering the image.
+
+## V3 final layout rebuild
+
+This package includes the final homepage structure correction:
+
+- Floating navigation remains independent from the page background.
+- The header no longer becomes a full-width opaque strip.
+- Hero slider controls are anchored to the bottom-right of the hero.
+- The location/map module has been moved to the bottom of the page, before the footer.
+- Hero contrast, text proportions, responsive spacing, and section jump offsets were refined.
+
+
+V3.4 update: smaller signature welcome animation and a cleaner, more precise map destination pin.
+
+## V3.5 rebuild
+- New full-screen HD cinematic welcome artwork, with no visible image-card/square boundary.
+- New layered entrance animation: soft-focus reveal, slow camera settle, purple orbital trails, flare and light sweep.
+- Option A Luxury Hotel Pin installed on the interactive map.
+- Map radius reduced to keep surrounding roads and labels readable.
+- Sticky navigation and all V3.4 site functions retained.

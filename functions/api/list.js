@@ -27,6 +27,13 @@ async function sign(secret, payload) {
   );
   return b64url(await crypto.subtle.sign('HMAC', key, enc.encode(payload)));
 }
+function equal(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function session(request, env) {
   const SECRET = env.SESSION_SECRET || '';
   if (!SECRET) return null;
@@ -34,7 +41,8 @@ async function session(request, env) {
   const dot = raw.lastIndexOf('.');
   if (dot < 1) return null;
   const payload = raw.slice(0, dot), sig = raw.slice(dot + 1);
-  if (await sign(SECRET, payload) !== sig) return null;
+  const expected = await sign(SECRET, payload);
+  if (!equal(expected, sig)) return null;
   let data;
   try { data = JSON.parse(b64urlToStr(payload)); } catch (e) { return null; }
   if (!data || !data.exp || Date.now() > data.exp) return null;
@@ -72,13 +80,16 @@ export async function onRequest(context) {
   }
 
   try {
-    const tree = await gh(env, '/repos/' + repo + '/git/trees/' + encodeURIComponent(branch) + '?recursive=1');
+    const ref = await gh(env, '/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
+    const headSha = ref.object.sha;
+    const tree = await gh(env, '/repos/' + repo + '/git/trees/' + headSha + '?recursive=1');
     const images = (tree.tree || [])
       .filter(n => n.type === 'blob' && /^images\/[^/]+\.(webp|png|jpg|jpeg|svg)$/i.test(n.path))
       .map(n => ({ path: n.path, size: n.size || 0 }))
       .sort((a, b) => a.path.localeCompare(b.path));
-    return json(200, { user: s.u, repo, branch, images });
+    return json(200, { user: s.u, repo, branch, headSha, platform: 'Cloudflare Pages', images });
   } catch (e) {
-    return json(502, { error: e.message });
+    console.error(e);
+    return json(502, { error: 'Could not read the website repository. Check the deployment logs and repository settings.' });
   }
 }
