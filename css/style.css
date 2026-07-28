@@ -2906,7 +2906,7 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
 /* === Admin-controlled header, hero and language settings (V4.4.24) === */
 :root{
   --admin-nav-h:54px;
-  --admin-nav-max-w:760px;
+  --admin-nav-max-w:900px;
   --admin-nav-radius:28px;
   --admin-nav-shell-x:8px;
   --admin-nav-gap:6px;
@@ -2922,8 +2922,11 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
 @media (min-width:861px){
   .nav{
     min-height:var(--admin-nav-h)!important;
-    width:min(100%,var(--admin-nav-max-w))!important;
-    max-width:var(--admin-nav-max-w)!important;
+    width:fit-content!important;
+    min-width:max-content!important;
+    max-width:min(var(--admin-nav-max-w),calc(100vw - 520px))!important;
+    overflow:visible!important;
+    flex-wrap:nowrap!important;
     padding-left:var(--admin-nav-shell-x)!important;
     padding-right:var(--admin-nav-shell-x)!important;
     gap:var(--admin-nav-gap)!important;
@@ -2931,6 +2934,8 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
     background:color-mix(in srgb, #1c122a var(--admin-nav-alpha), transparent)!important;
   }
   .nav a{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
     border-radius:var(--admin-nav-radius)!important;
     padding-left:var(--admin-nav-link-x)!important;
     padding-right:var(--admin-nav-link-x)!important;
@@ -2952,6 +2957,11 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   border-radius:var(--admin-lang-radius)!important;
   padding-left:var(--admin-lang-x)!important;
   padding-right:var(--admin-lang-x)!important;
+}
+
+@media (min-width:861px) and (max-width:1320px){
+  .nav{max-width:calc(100vw - 430px)!important}
+  .nav a{padding-left:min(var(--admin-nav-link-x),10px)!important;padding-right:min(var(--admin-nav-link-x),10px)!important}
 }
 @media(max-width:860px){
   .hero__in{padding-top:clamp(120px,var(--admin-hero-copy-y),210px)!important;max-width:min(100%,var(--admin-hero-copy-w))!important}

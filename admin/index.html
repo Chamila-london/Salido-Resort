@@ -145,8 +145,9 @@ a{color:var(--violet-text)}
 .liveprev__state{font-size:.74rem;font-weight:700;color:#18744b;display:inline-flex;align-items:center;gap:.35rem}
 .liveprev__state::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(24,116,75,.1)}
 .liveprev__state.is-busy{color:var(--violet-text)}
-.liveprev__stage{--preview-width:100%;height:min(690px,calc(100dvh - 205px));min-height:500px;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:0;background:#dcd8e4;border:1px solid var(--line);border-radius:16px}
-.liveprev__frame{display:block;width:var(--preview-width);max-width:100%;height:100%;min-height:500px;border:0;background:#fff;box-shadow:0 0 0 1px rgba(23,16,43,.08),0 18px 45px rgba(23,16,43,.15);transition:width .22s ease}
+.liveprev__stage{--preview-viewport:1440;--preview-scale:1;height:min(760px,calc(100dvh - 165px));min-height:560px;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding:0;background:#dcd8e4;border:1px solid var(--line);border-radius:16px}
+.liveprev__canvas{position:relative;flex:0 0 auto;height:100%;overflow:hidden}
+.liveprev__frame{display:block;border:0;background:#fff;box-shadow:0 0 0 1px rgba(23,16,43,.08),0 18px 45px rgba(23,16,43,.15);transform-origin:top left;transition:transform .18s ease,width .18s ease}
 .liveprev__actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-left:auto}
 .liveprev__actions .b{padding:.52rem .72rem;min-height:36px}
 .preview-full{width:min(96vw,1800px);height:min(94dvh,1100px);padding:0;border:0;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 30px 100px rgba(0,0,0,.45)}
@@ -254,7 +255,7 @@ html{font-size:15px} body{line-height:1.5}
 @media(max-width:760px){.ws{grid-template-columns:1fr}.rail{position:static;display:flex;overflow-x:auto;padding:.55rem;gap:.25rem}.rail__h{display:none}.rail button{width:auto;min-width:max-content;padding:.55rem .7rem}.main{padding:.75rem}.top__name small,.who{display:none}.two{grid-template-columns:1fr}.item{flex-wrap:wrap}.item__acts{width:100%;flex-direction:row;justify-content:flex-end}.gate__card{padding:1.4rem 1.1rem}.langs button{padding:.28rem .5rem}}
 @media(max-width:480px){.top{gap:.35rem}.top .b{padding:.45rem .55rem}.main__h h2{font-size:1.18rem}.card{padding:.85rem}.dlg__b{padding:.85rem}.tiles,.pgrid{grid-template-columns:1fr 1fr}}
 
-.v5studio{display:grid;gap:14px}.v5studio__bar{display:flex;align-items:center;justify-content:space-between;gap:16px}.v5studio__bar-actions,.v5tabs{display:flex;flex-wrap:wrap;gap:8px}.v5studio__grid{display:grid;grid-template-columns:minmax(420px,1fr) minmax(420px,1.05fr);gap:16px;align-items:start}.v5studio__controls{min-width:0}.v5studio__preview{position:sticky;top:16px;min-width:0}.v5control{display:grid;grid-template-columns:minmax(170px,1fr) minmax(160px,1.25fr) 68px;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line)}.v5control>span{display:grid;gap:2px}.v5control small{font:500 11px/1.2 ui-monospace,monospace;color:var(--muted)}.v5control input[type=range]{width:100%}.v5control input[type=color]{width:100%;height:42px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#fff}.v5control output,.v5control code{text-align:right;font-weight:700;color:var(--violet)}@media(max-width:1100px){.v5studio__grid{grid-template-columns:1fr}.v5studio__preview{position:relative;top:auto}}@media(max-width:620px){.v5studio__bar{align-items:flex-start;flex-direction:column}.v5control{grid-template-columns:1fr 90px}.v5control>span{grid-column:1/-1}}
+.v5studio{display:grid;gap:14px}.v5studio__bar{display:flex;align-items:center;justify-content:space-between;gap:16px}.v5studio__bar-actions,.v5tabs{display:flex;flex-wrap:wrap;gap:8px}.v5studio__grid{display:grid;grid-template-columns:minmax(390px,.78fr) minmax(560px,1.42fr);gap:16px;align-items:start}.v5studio__controls{min-width:0}.v5studio__preview{position:sticky;top:16px;min-width:0}.v5control{display:grid;grid-template-columns:minmax(170px,1fr) minmax(160px,1.25fr) 68px;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line)}.v5control>span{display:grid;gap:2px}.v5control small{font:500 11px/1.2 ui-monospace,monospace;color:var(--muted)}.v5control input[type=range]{width:100%}.v5control input[type=color]{width:100%;height:42px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#fff}.v5control output,.v5control code{text-align:right;font-weight:700;color:var(--violet)}@media(max-width:1100px){.v5studio__grid{grid-template-columns:1fr}.v5studio__preview{position:relative;top:auto}}@media(max-width:620px){.v5studio__bar{align-items:flex-start;flex-direction:column}.v5control{grid-template-columns:1fr 90px}.v5control>span{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -1268,13 +1269,13 @@ function viewLook(m){
           <div class="card__t"><h3>Original website — live preview</h3><span class="liveprev__state" id="lfPreviewState">Live</span></div>
           <div class="liveprev__toolbar">
             <div class="liveprev__devices">
-              <button type="button" class="liveprev__device is-on" data-preview-width="100%">Desktop</button>
-              <button type="button" class="liveprev__device" data-preview-width="768px">Tablet</button>
-              <button type="button" class="liveprev__device" data-preview-width="390px">Mobile</button>
+              <button type="button" class="liveprev__device is-on" data-preview-width="1440">Desktop</button>
+              <button type="button" class="liveprev__device" data-preview-width="768">Tablet</button>
+              <button type="button" class="liveprev__device" data-preview-width="390">Mobile</button>
             </div>
             <div class="liveprev__actions"><button type="button" class="b" id="lfRefreshPreview">Refresh</button><button type="button" class="b b--go" id="lfOpenFullPreview">Full screen</button></div>
           </div>
-          <div class="liveprev__stage" id="lfPreviewStage"><iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the complete Salido Resort website"></iframe></div>
+          <div class="liveprev__stage" id="lfPreviewStage"><div class="liveprev__canvas" id="lfPreviewCanvas"><iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the complete Salido Resort website"></iframe></div></div>
           <p class="hint" style="margin-top:.7rem">The preview uses your actual public page, images, wording and sections.</p>
         </div>
       </aside>
@@ -1291,7 +1292,7 @@ function viewLook(m){
         ['select','Menu font','f-nav','font'],['range','Menu text size','z-nav',70,150,1,'scale'],['select','Button font','f-btn','font'],['range','Button text size','z-btn',70,150,1,'scale'],['select','Heading font','display','font'],['range','Heading size','z-head',70,160,1,'scale'],['select','Body font','body','font'],['range','Body size','fs',80,140,1,'scale']
       ],
       Header:[
-        ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',420,1100,10,'px'],['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
+        ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',620,1400,10,'px'],['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
       ],
       Hero:[
         ['range','Hero height','admin-hero-h',480,980,10,'px'],['range','Hero text width','admin-hero-copy-w',360,980,10,'px'],['range','Hero text vertical position','admin-hero-copy-y',60,320,5,'px'],['range','Hero overlay darkness','admin-hero-shade',0,95,1,'%']
@@ -1331,11 +1332,11 @@ function viewLook(m){
     document.getElementById('v5Undo').onclick=()=>{if(historyIndex>0){historyIndex--;S.css=history[historyIndex];S.dirty=true;renderPanel();paintPreview(true);updateHistory();}};
     document.getElementById('v5Redo').onclick=()=>{if(historyIndex<history.length-1){historyIndex++;S.css=history[historyIndex];S.dirty=true;renderPanel();paintPreview(true);updateHistory();}};
     document.getElementById('v5ResetAll').onclick=async()=>{if(!await confirmBox('Reset all design settings?','All design settings return to the original website. Content and photos stay unchanged.','Reset all'))return;S.css=originalCss;S.dirty=true;pushHistory();renderPanel();paintPreview(true);toast('All design settings reset');};
-    shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));document.getElementById('lfPreviewStage').style.setProperty('--preview-width',btn.dataset.previewWidth);});
+    shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));document.getElementById('lfPreviewStage').dataset.viewport=btn.dataset.previewWidth;fitLivePreview();});
     document.getElementById('lfRefreshPreview').onclick=()=>paintPreview(true);
     let dlg=document.getElementById('lfFullPreviewDialog');if(!dlg){dlg=document.createElement('dialog');dlg.id='lfFullPreviewDialog';dlg.className='preview-full';dlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live preview</b><button class="b" type="button" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame"></iframe>';document.body.appendChild(dlg);document.getElementById('lfCloseFullPreview').onclick=()=>dlg.close();}
     document.getElementById('lfOpenFullPreview').onclick=()=>{paintPreview(true);dlg.showModal();};
-    renderTabs();renderPanel();updateHistory();paintPreview(true);
+    renderTabs();renderPanel();updateHistory();document.getElementById('lfPreviewStage').dataset.viewport='1440';if(window.ResizeObserver){new ResizeObserver(fitLivePreview).observe(document.getElementById('lfPreviewStage'));}window.addEventListener('resize',fitLivePreview,{passive:true});fitLivePreview();paintPreview(true);
   }catch(err){
     console.error('Look & Feel failed to initialise',err);
     const box=document.createElement('div');box.className='card';box.style.borderColor='#c62828';box.innerHTML='<h3>Look & Feel could not initialise</h3><p class="hint">'+esc(err&&err.message?err.message:String(err))+'</p><button type="button" class="b" id="v5Retry">Retry</button>';shell.prepend(box);document.getElementById('v5Retry').onclick=()=>view('look');
@@ -1358,6 +1359,19 @@ function livePreviewHTML(){
   if(S.js){ const script=clone.createElement('script'); script.textContent=S.js; clone.body.appendChild(script); }
   return '<!DOCTYPE html>\n'+clone.documentElement.outerHTML;
 }
+function fitLivePreview(){
+  const stage=document.getElementById('lfPreviewStage'), canvas=document.getElementById('lfPreviewCanvas'), frame=document.getElementById('lfSitePreview');
+  if(!stage||!canvas||!frame) return;
+  const viewport=Math.max(320,Number(stage.dataset.viewport||1440));
+  const available=Math.max(280,stage.clientWidth-2);
+  const scale=Math.min(1,available/viewport);
+  const visibleH=Math.max(540,stage.clientHeight);
+  canvas.style.width=(viewport*scale)+'px';
+  canvas.style.height=visibleH+'px';
+  frame.style.width=viewport+'px';
+  frame.style.height=(visibleH/scale)+'px';
+  frame.style.transform='scale('+scale+')';
+}
 function paintPreview(immediate=false){
   const frames=[$('#lfSitePreview'),$('#lfFullSitePreview')].filter(Boolean); if(!frames.length) return;
   const state=$('#lfPreviewState'), fullState=$('#lfFullState');
@@ -1368,7 +1382,7 @@ function paintPreview(immediate=false){
     let pending=0;
     frames.forEach(frame=>{
       if(!frame.isConnected) return; pending++;
-      frame.onload=()=>{ pending--; if(pending<=0) [state,fullState].filter(Boolean).forEach(x=>{x.textContent='Live';x.classList.remove('is-busy');}); };
+      frame.onload=()=>{ if(frame.id==='lfSitePreview')fitLivePreview(); pending--; if(pending<=0) [state,fullState].filter(Boolean).forEach(x=>{x.textContent='Live';x.classList.remove('is-busy');}); };
       frame.srcdoc=html;
     });
     if(!pending) [state,fullState].filter(Boolean).forEach(x=>{x.textContent='Live';x.classList.remove('is-busy');});
