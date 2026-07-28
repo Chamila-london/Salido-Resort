@@ -1172,7 +1172,7 @@ function tokGet(name,fallback){
      declaration, so the editor must read the last declaration as well. */
   const css=S.css||'';
   const safe=String(name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  const re=new RegExp('--'+safe+'\s*:\s*([^;}{]+)','g');
+  const re=new RegExp('--'+safe+'\\s*:\\s*([^;}{]+)','g');
   let m,last='';
   while((m=re.exec(css))) last=m[1].trim();
   return last || (fallback||'');
@@ -1198,6 +1198,9 @@ function tokSet(name,val){
   values[name]=val;
   writeAdminDesign(values);
   S.dirty=true;
+  /* Keep any mounted universal preview synchronized even when a control uses
+     a native change event rather than an input event. */
+  if(document.getElementById('lfPrev')) requestAnimationFrame(paintPreview);
 }
 function hexOf(v){
   v=(v||'').trim();
