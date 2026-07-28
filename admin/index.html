@@ -998,6 +998,7 @@ function readItem(kind,el){
     o.src=o.img?o.img.getAttribute('src'):''; o.alt=o.img?o.img.getAttribute('alt'):'';
     o.title=o.cap?o.cap.textContent.trim():''; o.tKey=o.cap?.getAttribute('data-i18n')||'';
     o.big=el.classList.contains('large');
+    o.category=el.getAttribute('data-category')||'gallery';
   } else if(kind==='spot'){
     o.img=el.querySelector('img'); o.src=o.img?o.img.getAttribute('src'):''; o.alt=o.img?o.img.getAttribute('alt'):'';
     o.lEl=el.querySelector('.spot__body span'); o.tEl=el.querySelector('h3'); o.kEl=el.querySelector('.spot__km');
@@ -1631,6 +1632,9 @@ function editItem(kind,el){
   if(kind==='gal'){
     openDlg((isNew?'Add a ':'Edit ')+name,
       picField('pic', isNew?'Photo':'Replace the photo', o.src) +
+      '<label class="f"><span>Gallery category</span><select id="cat">'+
+        [['gallery','Gallery'],['rooms','Rooms']].map(function(x){return '<option value="'+x[0]+'"'+((o.category||'gallery')===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+
+      '</select><small class="hint">Choose whether this photo appears under Gallery or Rooms on the public website.</small></label>'+
       tri('c','Caption shown on the photo', o.tKey||'', o.title||'', false) +
       fieldRow('alt','Description for screen readers and Google', o.alt||'', false, 'e.g. Double room with a hill view') +
       '<label class="f" style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="big" style="width:auto"'+(o.big?' checked':'')+'><span style="margin:0;text-transform:none;letter-spacing:0;font-size:.88rem">Show this one large in the grid</span></label>',
@@ -1650,6 +1654,7 @@ function editItem(kind,el){
         img.setAttribute('alt',V('alt'));
         node.querySelector('figcaption').textContent=V('c');
         node.classList.toggle('large', $('#big').checked);
+        node.setAttribute('data-category',$('#cat').value);
         dictSet(key,V('c_si'),V('c_ta'));
         S.dirty=true; renderRail(); show(S.view); toast(isNew?'Photo added':'Saved');
       });
