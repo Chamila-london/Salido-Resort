@@ -301,6 +301,17 @@
   if(gal){
     var allShots = [].slice.call(gal.querySelectorAll('figure'));
     var shots = allShots.slice();
+    function setOrientation(figure){
+      var img=figure.querySelector('img'); if(!img) return;
+      function apply(){
+        var portrait=img.naturalHeight>img.naturalWidth;
+        figure.classList.toggle('is-portrait',portrait);
+        figure.classList.toggle('is-landscape',!portrait);
+        figure.setAttribute('data-orientation',portrait?'portrait':'landscape');
+      }
+      if(img.complete && img.naturalWidth) apply(); else img.addEventListener('load',apply,{once:true});
+    }
+    allShots.forEach(setOrientation);
     var filterButtons = [].slice.call(document.querySelectorAll('[data-gallery-filter]'));
     var result = document.getElementById('gallery-result');
     var labels = {gallery:'gallery',rooms:'room'};
@@ -361,7 +372,7 @@
       if(!lb.classList.contains('open'))return;
       if(e.key==='Escape')closePhoto(); if(e.key==='ArrowLeft')showPhoto(cur-1); if(e.key==='ArrowRight')showPhoto(cur+1);
     });
-    applyGalleryFilter('all');
+    applyGalleryFilter('gallery');
   }
 
   /* scroll-spy: highlight the nav link for the section in view */

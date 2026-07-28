@@ -1502,7 +1502,7 @@ function itemsBlock(m,kind){
   if(kind==='gal'){
     const roomCount=list.filter(el=>(el.getAttribute('data-category')||'gallery')==='rooms').length;
     const galleryCount=list.length-roomCount;
-    bar.innerHTML='<div><h3>Gallery images <span class="k">'+galleryCount+'</span> &nbsp; Rooms images <span class="k">'+roomCount+'</span></h3><p class="hint" style="margin:.25rem 0 0">Use the category control on each image to decide where it appears on the public website.</p></div>';
+    bar.innerHTML='<div><h3>Gallery images <span class="k">'+galleryCount+'</span> &nbsp; Rooms images <span class="k">'+roomCount+'</span></h3><p class="hint" style="margin:.25rem 0 0">Use the category control to choose Gallery or Rooms. Drag an image card to change the public display order.</p></div>';
   } else {
     bar.innerHTML='<h3>'+esc(c.name.replace(/^./,x=>x.toUpperCase()))+'s <span class="k">'+list.length+'</span></h3>';
   }
@@ -1528,6 +1528,12 @@ function itemsBlock(m,kind){
     shown.forEach((el)=>{
       const idx=list.indexOf(el), o=readItem(kind,el);
       const row=document.createElement('div'); row.className='item';
+      if(kind==='gal'){
+        row.draggable=true;
+        row.dataset.galleryIndex=String(idx);
+        row.style.cursor='grab';
+        row.title='Drag to reorder this image';
+      }
       const pic = kind==='tile'
         ? '<div class="item__ico"><svg><use href="#'+esc(o.icon)+'"/></svg></div>'
         : (o.src ? '<img class="item__pic" src="'+esc(imgURL(o.src))+'" alt="">'
@@ -1563,6 +1569,25 @@ function itemsBlock(m,kind){
       rowm.appendChild(up); rowm.appendChild(dn); acts.appendChild(rowm);
       acts.appendChild(mk('b--bad','a-bin','Delete',()=>delItem(kind,el)));
       row.appendChild(acts); wrap.appendChild(row);
+      if(kind==='gal'){
+        row.addEventListener('dragstart',function(e){
+          row.classList.add('is-dragging'); row.style.opacity='.55';
+          e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(idx));
+        });
+        row.addEventListener('dragend',function(){ row.classList.remove('is-dragging'); row.style.opacity=''; });
+        row.addEventListener('dragover',function(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; row.style.outline='2px solid var(--violet)'; });
+        row.addEventListener('dragleave',function(){ row.style.outline=''; });
+        row.addEventListener('drop',function(e){
+          e.preventDefault(); row.style.outline='';
+          const from=Number(e.dataTransfer.getData('text/plain'));
+          const current=$$(c.sel,box); const moving=current[from];
+          if(!moving || moving===el) return;
+          const r=row.getBoundingClientRect();
+          if(e.clientY < r.top+r.height/2) box.insertBefore(moving,el);
+          else box.insertBefore(moving,el.nextElementSibling);
+          S.dirty=true; show(S.view); toast('Gallery order updated');
+        });
+      }
     });
   });
   m.appendChild(wrap);
@@ -1668,7 +1693,7 @@ function editItem(kind,el){
       '</select><small class="hint">Choose whether this photo appears under Gallery or Rooms on the public website.</small></label>'+
       tri('c','Caption shown on the photo', o.tKey||'', o.title||'', false) +
       fieldRow('alt','Description for screen readers and Google', o.alt||'', false, 'e.g. Double room with a hill view') +
-      '<label class="f" style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="big" style="width:auto"'+(o.big?' checked':'')+'><span style="margin:0;text-transform:none;letter-spacing:0;font-size:.88rem">Show this one large in the grid</span></label>',
+      '<p class="hint">Portrait and landscape orientation is detected automatically. The public masonry gallery shows the complete image without cropping.</p>',
       async ()=>{
         if(!V('c')) { toast('Give it a caption'); return false; }
         const up=await pickedImage('pic','gallery-new', o.src);
@@ -1684,7 +1709,7 @@ function editItem(kind,el){
         if(up){ img.setAttribute('src',up.name); img.setAttribute('width',up.w); img.setAttribute('height',up.h); }
         img.setAttribute('alt',V('alt'));
         node.querySelector('figcaption').textContent=V('c');
-        node.classList.toggle('large', $('#big').checked);
+        node.classList.remove('large');
         node.setAttribute('data-category',$('#cat').value);
         dictSet(key,V('c_si'),V('c_ta'));
         S.dirty=true; renderRail(); show(S.view); toast(isNew?'Photo added':'Saved');
