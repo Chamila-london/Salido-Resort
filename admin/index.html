@@ -1243,18 +1243,15 @@ function lum(hex){
 function ratio(a,b){ const l1=lum(a),l2=lum(b); return ((Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)); }
 
 function viewLook(m){
-  head(m,'Look & feel','V5 design studio — edit the real website, preview every change live, and reset safely.');
-  const defaults=(S.orig&&S.orig.css)||S.css||'';
-  const history=[]; let historyIndex=-1;
-  const snapshot=()=>({css:S.css||''});
-  const remember=()=>{ const snap=snapshot(); if(historyIndex>=0&&history[historyIndex].css===snap.css) return; history.splice(historyIndex+1); history.push(snap); if(history.length>40) history.shift(); historyIndex=history.length-1; };
-  const restore=(snap)=>{ if(!snap) return; S.css=snap.css; S.dirty=true; renderValues(); paintPreview(true); };
-  remember();
+  head(m,'Look & feel','Edit the real Salido Resort website and see every design change immediately.');
 
-  const shell=document.createElement('div'); shell.className='v5studio';
+  /* V5.0.1 deliberately mounts the editor shell before doing any token work.
+     This prevents one malformed legacy value from leaving the page blank. */
+  const shell=document.createElement('div');
+  shell.className='v5studio';
   shell.innerHTML=`
     <div class="v5studio__bar card">
-      <div><b>Salido Design Studio V5.0</b><div class="hint">One source of truth: controls → CSS tokens → original website preview → publish.</div></div>
+      <div><b>Salido Design Studio V5.0.1</b><div class="hint">Live controls for the original website. Changes remain drafts until you publish.</div></div>
       <div class="v5studio__bar-actions">
         <button class="b" type="button" id="v5Undo">Undo</button>
         <button class="b" type="button" id="v5Redo">Redo</button>
@@ -1278,80 +1275,71 @@ function viewLook(m){
             <div class="liveprev__actions"><button type="button" class="b" id="lfRefreshPreview">Refresh</button><button type="button" class="b b--go" id="lfOpenFullPreview">Full screen</button></div>
           </div>
           <div class="liveprev__stage" id="lfPreviewStage"><iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the complete Salido Resort website"></iframe></div>
-          <p class="hint" style="margin-top:.7rem">This is your complete public website, not a sample. Changes remain drafts until Preview &amp; publish.</p>
+          <p class="hint" style="margin-top:.7rem">The preview uses your actual public page, images, wording and sections.</p>
         </div>
       </aside>
     </div>`;
   m.appendChild(shell);
 
-  const groups={
-    Colours:[
-      ['color','Main purple','violet'],['color','Purple highlight','violet-hi'],['color','Dark section','dark'],['color','Page background','paper'],['color','Main text','ink'],['color','Secondary text','muted'],['color','Gold accent','gold'],['color','Nature accent','forest']
-    ],
-    Typography:[
-      ['select','Menu font','f-nav','font'],['range','Menu text size','z-nav',70,150,1,'scale'],
-      ['select','Button font','f-btn','font'],['range','Button text size','z-btn',70,150,1,'scale'],
-      ['select','Heading font','display','font'],['range','Heading size','z-head',70,160,1,'scale'],
-      ['select','Body font','body','font'],['range','Body size','fs',80,140,1,'scale']
-    ],
-    Header:[
-      ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',420,1100,10,'px'],
-      ['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],
-      ['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],
-      ['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],
-      ['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
-    ],
-    Hero:[
-      ['range','Hero height','admin-hero-h',480,980,10,'px'],['range','Hero text width','admin-hero-copy-w',360,980,10,'px'],
-      ['range','Hero text vertical position','admin-hero-copy-y',60,320,5,'px'],['range','Hero overlay darkness','admin-hero-shade',0,95,1,'%']
-    ],
-    Layout:[
-      ['range','Maximum page width','wrap',980,3200,10,'px'],['range','Section spacing','admin-section-y',24,120,2,'px'],
-      ['range','Content gaps','admin-content-gap',8,80,2,'px'],['range','Card padding','admin-card-pad',6,48,1,'px'],
-      ['range','Corner roundness','r',0,42,1,'px'],['range','Image roundness','admin-image-r',0,42,1,'px']
-    ],
-    Components:[
-      ['range','Button height','admin-button-h',36,76,1,'px'],['range','Form field height','admin-field-h',36,76,1,'px'],
-      ['range','Map height','admin-map-h',260,760,10,'px'],['range','Footer vertical padding','admin-footer-y',12,100,2,'px'],
-      ['range','Floating action size','admin-dock-size',34,76,1,'px']
-    ]
-  };
-  const tabs=$('#v5Tabs'), panel=$('#v5Panel'); let active='Colours';
-  const fontChoices=typeof FACES!=='undefined'?FACES:[['"Instrument Sans",sans-serif','Instrument Sans'],['"Outfit",sans-serif','Outfit'],['Georgia,serif','Georgia'],['system-ui,sans-serif','System']];
-  const readVal=(tok,kind,min)=>{ const raw=tokGet(tok,''); if(kind==='scale') return Math.round((parseFloat(raw)||1)*100); return parseFloat(raw)||min; };
-  const commit=(tok,val)=>{ remember(); tokSet(tok,val); remember(); paintPreview(); updateHistoryButtons(); };
-  function renderValues(){ renderPanel(); updateHistoryButtons(); }
-  function renderTabs(){ tabs.innerHTML=''; Object.keys(groups).forEach(name=>{ const b=document.createElement('button'); b.type='button'; b.className='b'+(name===active?' b--go':''); b.textContent=name; b.onclick=()=>{active=name;renderTabs();renderPanel();}; tabs.appendChild(b); }); }
-  function renderPanel(){
-    panel.innerHTML=''; const card=document.createElement('div'); card.className='card'; card.innerHTML='<div class="card__t"><h3>'+esc(active)+'</h3><button type="button" class="b" id="v5ResetSection">Reset section</button></div>';
-    groups[active].forEach(cfg=>{
-      const [type,label,tok,a,b,step,kind]=cfg; const row=document.createElement('label'); row.className='v5control'; row.innerHTML='<span><b>'+esc(label)+'</b><small>'+esc(tok)+'</small></span>';
-      if(type==='color'){
-        const inp=document.createElement('input'); inp.type='color'; inp.value=hexOf(tokGet(tok,'#888888')); const out=document.createElement('code'); out.textContent=inp.value;
-        inp.oninput=()=>{ out.textContent=inp.value; commit(tok,inp.value); }; row.append(inp,out);
-      } else if(type==='select'){
-        const sel=document.createElement('select'); const cur=tokGet(tok,'').replace(/\s/g,''); fontChoices.forEach(([v,t])=>{const o=new Option(t,v); if(v.replace(/\s/g,'')===cur)o.selected=true;sel.add(o);}); sel.onchange=()=>commit(tok,sel.value); row.append(sel);
-      } else {
-        const inp=document.createElement('input'); inp.type='range'; inp.min=a; inp.max=b; inp.step=step; inp.value=readVal(tok,kind,a); const out=document.createElement('output');
-        const fmt=()=> kind==='scale'?inp.value+'%':inp.value+(kind||''); out.textContent=fmt(); inp.oninput=()=>{out.textContent=fmt(); const value=kind==='scale'?(Number(inp.value)/100).toFixed(2):inp.value+(kind||''); commit(tok,value);}; row.append(inp,out);
-      }
-      card.appendChild(row);
-    });
-    panel.appendChild(card);
-    $('#v5ResetSection').onclick=async()=>{
-      if(!await confirmBox('Reset '+active+' settings?','Only this section returns to its original values.','Reset section')) return;
-      const originalCss=S.css; S.css=defaults; const vals={}; groups[active].forEach(cfg=>{vals[cfg[2]]=tokGet(cfg[2],'');}); S.css=originalCss; vals && Object.entries(vals).forEach(([k,v])=>tokSet(k,v)); remember(); renderPanel(); paintPreview(true); toast(active+' reset');
+  try{
+    const originalCss=(S.orig && typeof S.orig==='object' && typeof S.orig.css==='string') ? S.orig.css : (S.css||'');
+    const groups={
+      Colours:[
+        ['color','Main purple','violet'],['color','Purple highlight','violet-hi'],['color','Dark section','dark'],['color','Page background','paper'],['color','Main text','ink'],['color','Secondary text','muted'],['color','Gold accent','gold'],['color','Nature accent','forest']
+      ],
+      Typography:[
+        ['select','Menu font','f-nav','font'],['range','Menu text size','z-nav',70,150,1,'scale'],['select','Button font','f-btn','font'],['range','Button text size','z-btn',70,150,1,'scale'],['select','Heading font','display','font'],['range','Heading size','z-head',70,160,1,'scale'],['select','Body font','body','font'],['range','Body size','fs',80,140,1,'scale']
+      ],
+      Header:[
+        ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',420,1100,10,'px'],['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
+      ],
+      Hero:[
+        ['range','Hero height','admin-hero-h',480,980,10,'px'],['range','Hero text width','admin-hero-copy-w',360,980,10,'px'],['range','Hero text vertical position','admin-hero-copy-y',60,320,5,'px'],['range','Hero overlay darkness','admin-hero-shade',0,95,1,'%']
+      ],
+      Layout:[
+        ['range','Maximum page width','wrap',980,3200,10,'px'],['range','Section spacing','admin-section-y',24,120,2,'px'],['range','Content gaps','admin-content-gap',8,80,2,'px'],['range','Card padding','admin-card-pad',6,48,1,'px'],['range','Corner roundness','r',0,42,1,'px'],['range','Image roundness','admin-image-r',0,42,1,'px']
+      ],
+      Components:[
+        ['range','Button height','admin-button-h',36,76,1,'px'],['range','Form field height','admin-field-h',36,76,1,'px'],['range','Map height','admin-map-h',260,760,10,'px'],['range','Footer vertical padding','admin-footer-y',12,100,2,'px'],['range','Floating action size','admin-dock-size',34,76,1,'px']
+      ]
     };
+    let active='Colours';
+    const history=[S.css||'']; let historyIndex=0;
+    const tabs=document.getElementById('v5Tabs'), panel=document.getElementById('v5Panel');
+    const fontChoices=(typeof FACES!=='undefined' && Array.isArray(FACES))?FACES:[['"Instrument Sans",sans-serif','Instrument Sans'],['"Outfit",sans-serif','Outfit'],['Georgia,serif','Georgia'],['system-ui,sans-serif','System']];
+    const safeTok=(name,fallback='')=>{ try{return tokGet(name,fallback)||fallback;}catch(_){return fallback;} };
+    const pushHistory=()=>{ const css=S.css||''; if(history[historyIndex]===css)return; history.splice(historyIndex+1);history.push(css);if(history.length>50)history.shift();historyIndex=history.length-1;updateHistory(); };
+    const apply=(name,value)=>{ try{tokSet(name,value);}catch(err){console.error('Design token update failed',name,err);return;} pushHistory(); paintPreview(); };
+    const numeric=(name,min,scale)=>{ const n=parseFloat(safeTok(name,'')); if(!Number.isFinite(n))return min; return scale?Math.round(n*100):n; };
+    function updateHistory(){ const u=document.getElementById('v5Undo'),r=document.getElementById('v5Redo');if(u)u.disabled=historyIndex<=0;if(r)r.disabled=historyIndex>=history.length-1; }
+    function renderTabs(){ tabs.innerHTML='';Object.keys(groups).forEach(name=>{const b=document.createElement('button');b.type='button';b.className='b'+(name===active?' b--go':'');b.textContent=name;b.onclick=()=>{active=name;renderTabs();renderPanel();};tabs.appendChild(b);}); }
+    function renderPanel(){
+      panel.innerHTML='';const card=document.createElement('div');card.className='card';card.innerHTML='<div class="card__t"><h3>'+esc(active)+'</h3><button type="button" class="b" id="v5ResetSection">Reset section</button></div>';
+      groups[active].forEach(cfg=>{
+        const [type,label,name,a,b,step,kind]=cfg,row=document.createElement('label');row.className='v5control';row.innerHTML='<span><b>'+esc(label)+'</b><small>'+esc(name)+'</small></span>';
+        if(type==='color'){
+          const input=document.createElement('input'),out=document.createElement('code');input.type='color';input.value=hexOf(safeTok(name,'#888888'));out.textContent=input.value;input.oninput=()=>{out.textContent=input.value;apply(name,input.value);};row.append(input,out);
+        }else if(type==='select'){
+          const select=document.createElement('select'),cur=safeTok(name,'').replace(/\s/g,'');fontChoices.forEach(pair=>{const value=pair[0],title=pair[1],o=new Option(title,value);if(String(value).replace(/\s/g,'')===cur)o.selected=true;select.add(o);});select.onchange=()=>apply(name,select.value);row.append(select);
+        }else{
+          const input=document.createElement('input'),out=document.createElement('output');input.type='range';input.min=a;input.max=b;input.step=step;input.value=numeric(name,a,kind==='scale');const show=()=>kind==='scale'?input.value+'%':input.value+(kind||'');out.textContent=show();input.oninput=()=>{out.textContent=show();apply(name,kind==='scale'?(Number(input.value)/100).toFixed(2):input.value+(kind||''));};row.append(input,out);
+        }
+        card.appendChild(row);
+      });panel.appendChild(card);
+      document.getElementById('v5ResetSection').onclick=async()=>{if(!await confirmBox('Reset '+active+' settings?','Only this section returns to the original website values.','Reset section'))return;const current=S.css||'';S.css=originalCss;const vals={};groups[active].forEach(c=>vals[c[2]]=safeTok(c[2],''));S.css=current;Object.entries(vals).forEach(([k,v])=>{if(v)tokSet(k,v);});pushHistory();renderPanel();paintPreview(true);toast(active+' reset');};
+    }
+    document.getElementById('v5Undo').onclick=()=>{if(historyIndex>0){historyIndex--;S.css=history[historyIndex];S.dirty=true;renderPanel();paintPreview(true);updateHistory();}};
+    document.getElementById('v5Redo').onclick=()=>{if(historyIndex<history.length-1){historyIndex++;S.css=history[historyIndex];S.dirty=true;renderPanel();paintPreview(true);updateHistory();}};
+    document.getElementById('v5ResetAll').onclick=async()=>{if(!await confirmBox('Reset all design settings?','All design settings return to the original website. Content and photos stay unchanged.','Reset all'))return;S.css=originalCss;S.dirty=true;pushHistory();renderPanel();paintPreview(true);toast('All design settings reset');};
+    shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));document.getElementById('lfPreviewStage').style.setProperty('--preview-width',btn.dataset.previewWidth);});
+    document.getElementById('lfRefreshPreview').onclick=()=>paintPreview(true);
+    let dlg=document.getElementById('lfFullPreviewDialog');if(!dlg){dlg=document.createElement('dialog');dlg.id='lfFullPreviewDialog';dlg.className='preview-full';dlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live preview</b><button class="b" type="button" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame"></iframe>';document.body.appendChild(dlg);document.getElementById('lfCloseFullPreview').onclick=()=>dlg.close();}
+    document.getElementById('lfOpenFullPreview').onclick=()=>{paintPreview(true);dlg.showModal();};
+    renderTabs();renderPanel();updateHistory();paintPreview(true);
+  }catch(err){
+    console.error('Look & Feel failed to initialise',err);
+    const box=document.createElement('div');box.className='card';box.style.borderColor='#c62828';box.innerHTML='<h3>Look & Feel could not initialise</h3><p class="hint">'+esc(err&&err.message?err.message:String(err))+'</p><button type="button" class="b" id="v5Retry">Retry</button>';shell.prepend(box);document.getElementById('v5Retry').onclick=()=>view('look');
   }
-  function updateHistoryButtons(){ $('#v5Undo').disabled=historyIndex<=0; $('#v5Redo').disabled=historyIndex>=history.length-1; }
-  $('#v5Undo').onclick=()=>{if(historyIndex>0){historyIndex--;restore(history[historyIndex]);updateHistoryButtons();}};
-  $('#v5Redo').onclick=()=>{if(historyIndex<history.length-1){historyIndex++;restore(history[historyIndex]);updateHistoryButtons();}};
-  $('#v5ResetAll').onclick=async()=>{ if(!await confirmBox('Reset all design settings?','All colours, typography, header, hero, layout and component settings return to the original website values. Content and photos are unchanged.','Reset all')) return; S.css=defaults;S.dirty=true;remember();renderValues();paintPreview(true);toast('All design settings reset'); };
-  shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));$('#lfPreviewStage').style.setProperty('--preview-width',btn.dataset.previewWidth);});
-  $('#lfRefreshPreview').onclick=()=>paintPreview(true);
-  let dlg=$('#lfFullPreviewDialog'); if(!dlg){dlg=document.createElement('dialog');dlg.id='lfFullPreviewDialog';dlg.className='preview-full';dlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live preview</b><button class="b" type="button" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame"></iframe>';document.body.appendChild(dlg);$('#lfCloseFullPreview').onclick=()=>dlg.close();}
-  $('#lfOpenFullPreview').onclick=()=>{paintPreview(true);dlg.showModal();};
-  renderTabs();renderPanel();updateHistoryButtons();paintPreview(true);
 }
 
 let livePreviewTimer=0;
