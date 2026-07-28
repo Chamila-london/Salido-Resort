@@ -253,6 +253,8 @@ html{font-size:15px} body{line-height:1.5}
 .main{width:100%}.card{overflow-wrap:anywhere}.f input,.f select,.f textarea,.fi{font-size:16px}
 @media(max-width:760px){.ws{grid-template-columns:1fr}.rail{position:static;display:flex;overflow-x:auto;padding:.55rem;gap:.25rem}.rail__h{display:none}.rail button{width:auto;min-width:max-content;padding:.55rem .7rem}.main{padding:.75rem}.top__name small,.who{display:none}.two{grid-template-columns:1fr}.item{flex-wrap:wrap}.item__acts{width:100%;flex-direction:row;justify-content:flex-end}.gate__card{padding:1.4rem 1.1rem}.langs button{padding:.28rem .5rem}}
 @media(max-width:480px){.top{gap:.35rem}.top .b{padding:.45rem .55rem}.main__h h2{font-size:1.18rem}.card{padding:.85rem}.dlg__b{padding:.85rem}.tiles,.pgrid{grid-template-columns:1fr 1fr}}
+
+.v5studio{display:grid;gap:14px}.v5studio__bar{display:flex;align-items:center;justify-content:space-between;gap:16px}.v5studio__bar-actions,.v5tabs{display:flex;flex-wrap:wrap;gap:8px}.v5studio__grid{display:grid;grid-template-columns:minmax(420px,1fr) minmax(420px,1.05fr);gap:16px;align-items:start}.v5studio__controls{min-width:0}.v5studio__preview{position:sticky;top:16px;min-width:0}.v5control{display:grid;grid-template-columns:minmax(170px,1fr) minmax(160px,1.25fr) 68px;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line)}.v5control>span{display:grid;gap:2px}.v5control small{font:500 11px/1.2 ui-monospace,monospace;color:var(--muted)}.v5control input[type=range]{width:100%}.v5control input[type=color]{width:100%;height:42px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#fff}.v5control output,.v5control code{text-align:right;font-weight:700;color:var(--violet)}@media(max-width:1100px){.v5studio__grid{grid-template-columns:1fr}.v5studio__preview{position:relative;top:auto}}@media(max-width:620px){.v5studio__bar{align-items:flex-start;flex-direction:column}.v5control{grid-template-columns:1fr 90px}.v5control>span{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -1241,230 +1243,115 @@ function lum(hex){
 function ratio(a,b){ const l1=lum(a),l2=lum(b); return ((Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)); }
 
 function viewLook(m){
-  head(m,'Look & feel','Change the colours, the lettering and the size of the writing across the whole website.');
-  if(!rootBlock()){
-    const c=document.createElement('div'); c.className='card';
-    c.innerHTML='<p class="hint">The stylesheet could not be read, so there is nothing to change here.</p>';
-    m.appendChild(c); return;
-  }
-  const two=document.createElement('div'); two.className='two';
-  const left=document.createElement('div'), right=document.createElement('div');
-  right.className='look-preview-col';
+  head(m,'Look & feel','V5 design studio — edit the real website, preview every change live, and reset safely.');
+  const defaults=(S.orig&&S.orig.css)||S.css||'';
+  const history=[]; let historyIndex=-1;
+  const snapshot=()=>({css:S.css||''});
+  const remember=()=>{ const snap=snapshot(); if(historyIndex>=0&&history[historyIndex].css===snap.css) return; history.splice(historyIndex+1); history.push(snap); if(history.length>40) history.shift(); historyIndex=history.length-1; };
+  const restore=(snap)=>{ if(!snap) return; S.css=snap.css; S.dirty=true; renderValues(); paintPreview(true); };
+  remember();
 
-  /* ---- colours ---- */
-  const cc=document.createElement('div'); cc.className='card';
-  cc.innerHTML='<div class="card__t"><h3>Colours</h3><span class="hint" style="margin-left:auto">tap a colour to change it</span></div>';
-  const swrap=document.createElement('div'); swrap.className='sw';
-  PALETTE.forEach(([tok,label])=>{
-    const cur=hexOf(tokGet(tok,'#888888'));
-    const l=document.createElement('label'); l.style.position='relative';
-    l.innerHTML='<span class="dab" style="background:'+cur+'"></span><b>'+esc(label)+'</b><code>'+cur+'</code>';
-    const inp=document.createElement('input'); inp.type='color'; inp.value=cur;
-    inp.addEventListener('input',()=>{
-      tokSet(tok,inp.value);
-      l.querySelector('.dab').style.background=inp.value;
-      l.querySelector('code').textContent=inp.value;
-      paintPreview(); checkContrast();
+  const shell=document.createElement('div'); shell.className='v5studio';
+  shell.innerHTML=`
+    <div class="v5studio__bar card">
+      <div><b>Salido Design Studio V5.0</b><div class="hint">One source of truth: controls → CSS tokens → original website preview → publish.</div></div>
+      <div class="v5studio__bar-actions">
+        <button class="b" type="button" id="v5Undo">Undo</button>
+        <button class="b" type="button" id="v5Redo">Redo</button>
+        <button class="b b--bad" type="button" id="v5ResetAll">Reset all design</button>
+      </div>
+    </div>
+    <div class="v5studio__grid">
+      <section class="v5studio__controls">
+        <div class="card v5tabs" id="v5Tabs"></div>
+        <div id="v5Panel"></div>
+      </section>
+      <aside class="v5studio__preview">
+        <div class="card">
+          <div class="card__t"><h3>Original website — live preview</h3><span class="liveprev__state" id="lfPreviewState">Live</span></div>
+          <div class="liveprev__toolbar">
+            <div class="liveprev__devices">
+              <button type="button" class="liveprev__device is-on" data-preview-width="100%">Desktop</button>
+              <button type="button" class="liveprev__device" data-preview-width="768px">Tablet</button>
+              <button type="button" class="liveprev__device" data-preview-width="390px">Mobile</button>
+            </div>
+            <div class="liveprev__actions"><button type="button" class="b" id="lfRefreshPreview">Refresh</button><button type="button" class="b b--go" id="lfOpenFullPreview">Full screen</button></div>
+          </div>
+          <div class="liveprev__stage" id="lfPreviewStage"><iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the complete Salido Resort website"></iframe></div>
+          <p class="hint" style="margin-top:.7rem">This is your complete public website, not a sample. Changes remain drafts until Preview &amp; publish.</p>
+        </div>
+      </aside>
+    </div>`;
+  m.appendChild(shell);
+
+  const groups={
+    Colours:[
+      ['color','Main purple','violet'],['color','Purple highlight','violet-hi'],['color','Dark section','dark'],['color','Page background','paper'],['color','Main text','ink'],['color','Secondary text','muted'],['color','Gold accent','gold'],['color','Nature accent','forest']
+    ],
+    Typography:[
+      ['select','Menu font','f-nav','font'],['range','Menu text size','z-nav',70,150,1,'scale'],
+      ['select','Button font','f-btn','font'],['range','Button text size','z-btn',70,150,1,'scale'],
+      ['select','Heading font','display','font'],['range','Heading size','z-head',70,160,1,'scale'],
+      ['select','Body font','body','font'],['range','Body size','fs',80,140,1,'scale']
+    ],
+    Header:[
+      ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',420,1100,10,'px'],
+      ['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],
+      ['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],
+      ['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],
+      ['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
+    ],
+    Hero:[
+      ['range','Hero height','admin-hero-h',480,980,10,'px'],['range','Hero text width','admin-hero-copy-w',360,980,10,'px'],
+      ['range','Hero text vertical position','admin-hero-copy-y',60,320,5,'px'],['range','Hero overlay darkness','admin-hero-shade',0,95,1,'%']
+    ],
+    Layout:[
+      ['range','Maximum page width','wrap',980,3200,10,'px'],['range','Section spacing','admin-section-y',24,120,2,'px'],
+      ['range','Content gaps','admin-content-gap',8,80,2,'px'],['range','Card padding','admin-card-pad',6,48,1,'px'],
+      ['range','Corner roundness','r',0,42,1,'px'],['range','Image roundness','admin-image-r',0,42,1,'px']
+    ],
+    Components:[
+      ['range','Button height','admin-button-h',36,76,1,'px'],['range','Form field height','admin-field-h',36,76,1,'px'],
+      ['range','Map height','admin-map-h',260,760,10,'px'],['range','Footer vertical padding','admin-footer-y',12,100,2,'px'],
+      ['range','Floating action size','admin-dock-size',34,76,1,'px']
+    ]
+  };
+  const tabs=$('#v5Tabs'), panel=$('#v5Panel'); let active='Colours';
+  const fontChoices=typeof FACES!=='undefined'?FACES:[['"Instrument Sans",sans-serif','Instrument Sans'],['"Outfit",sans-serif','Outfit'],['Georgia,serif','Georgia'],['system-ui,sans-serif','System']];
+  const readVal=(tok,kind,min)=>{ const raw=tokGet(tok,''); if(kind==='scale') return Math.round((parseFloat(raw)||1)*100); return parseFloat(raw)||min; };
+  const commit=(tok,val)=>{ remember(); tokSet(tok,val); remember(); paintPreview(); updateHistoryButtons(); };
+  function renderValues(){ renderPanel(); updateHistoryButtons(); }
+  function renderTabs(){ tabs.innerHTML=''; Object.keys(groups).forEach(name=>{ const b=document.createElement('button'); b.type='button'; b.className='b'+(name===active?' b--go':''); b.textContent=name; b.onclick=()=>{active=name;renderTabs();renderPanel();}; tabs.appendChild(b); }); }
+  function renderPanel(){
+    panel.innerHTML=''; const card=document.createElement('div'); card.className='card'; card.innerHTML='<div class="card__t"><h3>'+esc(active)+'</h3><button type="button" class="b" id="v5ResetSection">Reset section</button></div>';
+    groups[active].forEach(cfg=>{
+      const [type,label,tok,a,b,step,kind]=cfg; const row=document.createElement('label'); row.className='v5control'; row.innerHTML='<span><b>'+esc(label)+'</b><small>'+esc(tok)+'</small></span>';
+      if(type==='color'){
+        const inp=document.createElement('input'); inp.type='color'; inp.value=hexOf(tokGet(tok,'#888888')); const out=document.createElement('code'); out.textContent=inp.value;
+        inp.oninput=()=>{ out.textContent=inp.value; commit(tok,inp.value); }; row.append(inp,out);
+      } else if(type==='select'){
+        const sel=document.createElement('select'); const cur=tokGet(tok,'').replace(/\s/g,''); fontChoices.forEach(([v,t])=>{const o=new Option(t,v); if(v.replace(/\s/g,'')===cur)o.selected=true;sel.add(o);}); sel.onchange=()=>commit(tok,sel.value); row.append(sel);
+      } else {
+        const inp=document.createElement('input'); inp.type='range'; inp.min=a; inp.max=b; inp.step=step; inp.value=readVal(tok,kind,a); const out=document.createElement('output');
+        const fmt=()=> kind==='scale'?inp.value+'%':inp.value+(kind||''); out.textContent=fmt(); inp.oninput=()=>{out.textContent=fmt(); const value=kind==='scale'?(Number(inp.value)/100).toFixed(2):inp.value+(kind||''); commit(tok,value);}; row.append(inp,out);
+      }
+      card.appendChild(row);
     });
-    l.appendChild(inp); swrap.appendChild(l);
-  });
-  cc.appendChild(swrap);
-  const warn=document.createElement('div'); warn.className='warnbox'; warn.hidden=true; warn.id='cWarn';
-  cc.appendChild(warn);
-  left.appendChild(cc);
-
-  /* ---- type (font + size for each part) ---- */
-  const tc=document.createElement('div'); tc.className='card';
-  tc.innerHTML='<div class="card__t"><h3>Lettering</h3><span class="hint" style="margin-left:auto">font &amp; size for each part</span></div>';
-  const partRow=(title,note,fontTok,sizeTok,smin,smax)=>{
-    const box=document.createElement('div'); box.style.cssText='padding:.75rem 0;border-top:1px solid var(--line)';
-    box.innerHTML='<div style="font-weight:600">'+esc(title)+'</div>'+(note?'<p class="hint" style="margin:.1rem 0 .55rem">'+esc(note)+'</p>':'<div style="height:.55rem"></div>');
-    /* font */
-    const fw=document.createElement('label'); fw.className='f'; fw.style.marginBottom='.55rem';
-    fw.innerHTML='<span>Font</span>';
-    const sel=document.createElement('select'); const cur=tokGet(fontTok,'');
-    FACES.forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t;
-      if(cur.replace(/\s/g,'')===v.replace(/\s/g,'')) o.selected=true; sel.appendChild(o); });
-    sel.addEventListener('change',()=>{ tokSet(fontTok,sel.value); paintPreview(); });
-    fw.appendChild(sel); box.appendChild(fw);
-    /* size */
-    const zw=document.createElement('label'); zw.className='f'; zw.style.marginBottom='0';
-    zw.innerHTML='<span>Size</span>';
-    const rng=document.createElement('input'); rng.type='range'; rng.className='rng';
-    rng.min=String(smin); rng.max=String(smax); rng.step='1';
-    rng.value=String(Math.round((parseFloat(tokGet(sizeTok,'1'))||1)*100));
-    const lbl=document.createElement('div'); lbl.className='rlbl';
-    const paint=()=>lbl.innerHTML='<span>Smaller</span><span><b>'+rng.value+'%</b></span><span>Larger</span>';
-    rng.addEventListener('input',()=>{ tokSet(sizeTok,(rng.value/100).toFixed(2)); paint(); paintPreview(); });
-    paint(); zw.appendChild(rng); zw.appendChild(lbl); box.appendChild(zw);
-    tc.appendChild(box);
-  };
-  partRow('Menu links','The links across the top of the page','f-nav','z-nav',80,130);
-  partRow('Buttons','“Book now”, “See the gallery”, “Send”…','f-btn','z-btn',80,130);
-  partRow('Headings','Section titles and card titles','display','z-head',80,140);
-  partRow('Body writing','The ordinary paragraphs','body','fs',90,120);
-
-  const rWrap=document.createElement('label'); rWrap.className='f'; rWrap.style.marginBottom='0';
-  rWrap.innerHTML='<span>Roundness of corners</span>';
-  const rr=document.createElement('input'); rr.type='range'; rr.className='rng';
-  rr.min='0'; rr.max='36'; rr.step='1'; rr.value=String(parseInt(tokGet('r','20'),10)||20);
-  const rl=document.createElement('div'); rl.className='rlbl';
-  const rn=()=>rl.innerHTML='<span>Square</span><span><b>'+rr.value+'px</b></span><span>Very round</span>';
-  rr.addEventListener('input',()=>{
-    tokSet('r',rr.value+'px'); tokSet('r-lg',Math.round(rr.value*1.5)+'px'); rn(); paintPreview();
-  });
-  rn(); rWrap.appendChild(rr); rWrap.appendChild(rl); tc.appendChild(rWrap);
-  left.appendChild(tc);
-
-  /* ---- header, hero and language controls ---- */
-  const hc=document.createElement('div'); hc.className='card';
-  hc.innerHTML='<div class="card__t"><h3>Header, hero &amp; language</h3><span class="hint" style="margin-left:auto">controls for the areas shown above</span></div>'+ 
-    '<p class="hint" style="margin-bottom:.65rem">Adjust the top menu pill, opening hero text block and language selector without editing CSS.</p>';
-  const controlRow=(title,note,tok,min,max,step=1,suffix='px')=>{
-    const box=document.createElement('div'); box.style.cssText='padding:.72rem 0;border-top:1px solid var(--line)';
-    box.innerHTML='<div style="font-weight:600">'+esc(title)+'</div>'+(note?'<p class="hint" style="margin:.1rem 0 .5rem">'+esc(note)+'</p>':'');
-    const rng=document.createElement('input'); rng.type='range'; rng.className='rng'; rng.min=min; rng.max=max; rng.step=step;
-    rng.value=String(parseFloat(tokGet(tok,String(min)+suffix))||min);
-    const lbl=document.createElement('div'); lbl.className='rlbl';
-    const paint=()=>lbl.innerHTML='<span>Less</span><span><b>'+rng.value+suffix+'</b></span><span>More</span>';
-    rng.addEventListener('input',()=>{ tokSet(tok,rng.value+suffix); paint(); paintPreview(); });
-    paint(); box.appendChild(rng); box.appendChild(lbl); hc.appendChild(box);
-  };
-  controlRow('Navigation height','Changes the complete desktop navigation pill height.','admin-nav-h',38,76,1);
-  controlRow('Navigation maximum width','Controls how wide the complete menu may become.','admin-nav-max-w',420,980,10);
-  controlRow('Menu pill roundness','Changes the rounded container around Home, Notices, About and the other menu links.','admin-nav-radius',0,40,1);
-  controlRow('Menu container side padding','Controls the empty space at the left and right edges of the menu pill.','admin-nav-shell-x',4,24,1);
-  controlRow('Gap between menu links','Controls the spacing between Home, Notices, About and the other links.','admin-nav-gap',0,20,1);
-  controlRow('Menu link horizontal padding','Controls the width of each menu item.','admin-nav-link-x',6,26,1);
-  controlRow('Menu link vertical padding','Controls the height of each menu item and active button.','admin-nav-link-y',4,16,1);
-  controlRow('Menu pill transparency','Controls how solid the dark menu background appears.','admin-nav-alpha',0,90,1,'%');
-  controlRow('Hero text width','Controls how wide the main accommodation text block can become.','admin-hero-copy-w',420,900,10);
-  controlRow('Hero text vertical position','Moves the opening text block up or down.','admin-hero-copy-y',100,260,5);
-  controlRow('Hero overlay darkness','Improves text readability over bright room images.','admin-hero-shade',20,90,1,'%');
-  controlRow('Language selector roundness','Controls the shape of the EN / Sinhala / Tamil selector.','admin-lang-radius',0,40,1);
-  controlRow('Language button padding','Controls the width of each language button.','admin-lang-x',6,18,1);
-  left.appendChild(hc);
-
-  /* ---- layout and component sizing ---- */
-  const lc=document.createElement('div'); lc.className='card';
-  lc.innerHTML='<div class="card__t"><h3>Layout &amp; sizes</h3><span class="hint" style="margin-left:auto">whole-site controls</span></div>'+
-    '<p class="hint" style="margin-bottom:.65rem">These controls update every public page section consistently, including desktop, tablet and mobile layouts.</p>';
-  const pxRow=(title,note,tok,min,max,step=1)=>{
-    const box=document.createElement('div'); box.style.cssText='padding:.72rem 0;border-top:1px solid var(--line)';
-    box.innerHTML='<div style="font-weight:600">'+esc(title)+'</div>'+(note?'<p class="hint" style="margin:.1rem 0 .5rem">'+esc(note)+'</p>':'');
-    const rng=document.createElement('input'); rng.type='range'; rng.className='rng'; rng.min=min; rng.max=max; rng.step=step;
-    rng.value=String(parseFloat(tokGet(tok,String(min)+'px'))||min);
-    const lbl=document.createElement('div'); lbl.className='rlbl';
-    const paint=()=>lbl.innerHTML='<span>Compact</span><span><b>'+rng.value+'px</b></span><span>Spacious</span>';
-    rng.addEventListener('input',()=>{ tokSet(tok,rng.value+'px'); paint(); paintPreview(); });
-    paint(); box.appendChild(rng); box.appendChild(lbl); lc.appendChild(box);
-  };
-  pxRow('Maximum page width','Controls how wide content can spread on large screens. Set it to Full screen to remove the large empty side areas.','wrap',980,3200,10);
-  const fullWidthBox=document.createElement('div');
-  fullWidthBox.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:-.15rem 0 .8rem;padding:.65rem .75rem;border:1px solid var(--line);border-radius:12px;background:var(--soft)';
-  fullWidthBox.innerHTML='<div><b>Full-screen website</b><p class="hint" style="margin:.08rem 0 0">Uses the full browser width while keeping a small safe edge.</p></div>';
-  const fullWidthBtn=document.createElement('button'); fullWidthBtn.className='b'; fullWidthBtn.type='button'; fullWidthBtn.textContent='Use full screen';
-  fullWidthBtn.addEventListener('click',()=>{ tokSet('wrap','3200px'); tokSet('gut','clamp(16px,2vw,36px)'); S.dirty=true; show('_look'); toast('Full-screen layout applied'); });
-  fullWidthBox.appendChild(fullWidthBtn); lc.appendChild(fullWidthBox);
-  pxRow('Section spacing','Vertical space above and below major sections.','admin-section-y',32,104,2);
-  pxRow('Content gaps','Space between columns, cards and content groups.','admin-content-gap',12,64,2);
-  pxRow('Card padding','Internal space inside cards and panels.','admin-card-pad',10,36,1);
-  pxRow('Button height','Applies to primary and secondary website buttons.','admin-button-h',40,66,1);
-  pxRow('Form field height','Inputs and dropdowns across reservation forms.','admin-field-h',40,66,1);
-  pxRow('Hero minimum height','Controls the opening banner height on desktop.','admin-hero-h',520,920,10);
-  pxRow('Map height','Controls the main location map panel.','admin-map-h',320,680,10);
-  pxRow('Footer vertical padding','Reduces or expands the footer area.','admin-footer-y',20,80,2);
-  pxRow('Floating action size','WhatsApp, phone and back-to-top controls.','admin-dock-size',40,64,1);
-  pxRow('Brand logo height','Main website and footer brand marks.','admin-logo-h',28,62,1);
-  pxRow('Image corner radius','Gallery, attraction and feature images.','admin-image-r',0,32,1);
-  left.appendChild(lc);
-
-  /* ---- reset ---- */
-  const rc=document.createElement('div'); rc.className='card';
-  rc.innerHTML='<div class="card__t"><h3>Reset changes</h3></div>'+
-    '<p class="hint">Return settings to the exact state they had when this admin page was opened. Resetting does not publish anything automatically.</p>'+
-    '<div class="reset-grid" id="lookResetActions"></div>';
-  const resetDesign=document.createElement('button'); resetDesign.className='b b--bad'; resetDesign.type='button';
-  resetDesign.innerHTML='<svg><use href="#a-up"/></svg>Reset Look &amp; Feel';
-  resetDesign.addEventListener('click',async ()=>{
-    if(!S.orig) return;
-    if(!await confirmBox('Reset all Look & Feel settings?','Colours, fonts, navigation, hero, language selector, spacing and component sizes return to the values from when you opened the admin. Words and photos stay unchanged.','Reset design')) return;
-    S.css=S.orig.css; S.dirty=true; show('_look'); toast('All Look & Feel settings reset');
-  });
-  const resetEverything=document.createElement('button'); resetEverything.className='b'; resetEverything.type='button';
-  resetEverything.innerHTML='<svg><use href="#a-up"/></svg>Reset every admin change';
-  resetEverything.addEventListener('click',async ()=>{
-    if(!S.orig) return;
-    if(!await confirmBox('Reset every admin change?','This restores design, wording, translations, gallery order and page content to the exact state from when the admin was opened. Nothing is published until you choose Publish.','Reset everything')) return;
-    const parser=new DOMParser();
-    S.doc=parser.parseFromString('<!DOCTYPE html>'+S.orig.html,'text/html');
-    S.css=S.orig.css; S.js=S.orig.js; S.dirty=true;
-    show('_look'); toast('Every admin change reset');
-  });
-  const resetActions=rc.querySelector('#lookResetActions'); resetActions.append(resetDesign,resetEverything);
-  left.appendChild(rc);
-
-  /* ---- universal live preview: render the real edited website ---- */
-  const pc=document.createElement('div'); pc.className='card';
-  pc.innerHTML='<div class="card__t"><h3>Universal live preview</h3><span class="hint" style="margin-left:auto">your original website · live</span></div>'+ 
-    '<div class="liveprev__toolbar">'+
-      '<div class="liveprev__devices" role="group" aria-label="Preview size">'+
-        '<button type="button" class="liveprev__device is-on" data-preview-width="100%">Desktop</button>'+
-        '<button type="button" class="liveprev__device" data-preview-width="768px">Tablet</button>'+
-        '<button type="button" class="liveprev__device" data-preview-width="390px">Mobile</button>'+
-      '</div>'+
-      '<span class="liveprev__state" id="lfPreviewState">Live</span>'+
-      '<div class="liveprev__actions"><button type="button" class="b" id="lfRefreshPreview">Refresh</button><button type="button" class="b b--go" id="lfOpenFullPreview">Open full website</button></div>'+
-    '</div>'+
-    '<div class="liveprev__stage" id="lfPreviewStage">'+
-      '<iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the edited Salido Resort website" loading="eager"></iframe>'+
-    '</div>'+
-    '<p class="hint" style="margin-top:.7rem">This iframe uses your complete original public website—same sections, text, photos and scripts. Every admin change refreshes here before you publish.</p>';
-  right.appendChild(pc);
-
-  pc.querySelectorAll('.liveprev__device').forEach(btn=>btn.addEventListener('click',()=>{
-    pc.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));
-    const stage=$('#lfPreviewStage');
-    stage.style.setProperty('--preview-width',btn.dataset.previewWidth||'100%');
-  }));
-
-  let fullDlg=$('#lfFullPreviewDialog');
-  if(!fullDlg){
-    fullDlg=document.createElement('dialog'); fullDlg.id='lfFullPreviewDialog'; fullDlg.className='preview-full';
-    fullDlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live website</b><span id="lfFullState">Live</span><button type="button" class="b" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame" title="Full live preview"></iframe>';
-    document.body.appendChild(fullDlg);
-    fullDlg.querySelector('#lfCloseFullPreview').addEventListener('click',()=>fullDlg.close());
+    panel.appendChild(card);
+    $('#v5ResetSection').onclick=async()=>{
+      if(!await confirmBox('Reset '+active+' settings?','Only this section returns to its original values.','Reset section')) return;
+      const originalCss=S.css; S.css=defaults; const vals={}; groups[active].forEach(cfg=>{vals[cfg[2]]=tokGet(cfg[2],'');}); S.css=originalCss; vals && Object.entries(vals).forEach(([k,v])=>tokSet(k,v)); remember(); renderPanel(); paintPreview(true); toast(active+' reset');
+    };
   }
-  $('#lfRefreshPreview').addEventListener('click',()=>{ paintPreview(true); toast('Preview refreshed'); });
-  $('#lfOpenFullPreview').addEventListener('click',()=>{ paintPreview(true); fullDlg.showModal(); });
-
-  two.appendChild(left); two.appendChild(right); m.appendChild(two);
-
-  /* Keep the preview inside the visible viewport while the long controls scroll.
-     Its horizontal position is calculated from the real second grid column, so it
-     never overlaps the controls or the navigation rail. */
-  const placePreview=()=>{
-    if(!right.isConnected) return;
-    if(window.matchMedia('(max-width:860px)').matches){
-      right.classList.remove('is-fixed');
-      right.style.left=''; right.style.width='';
-      return;
-    }
-    const grid=two.getBoundingClientRect();
-    const first=left.getBoundingClientRect();
-    const gap=parseFloat(getComputedStyle(two).columnGap)||0;
-    const x=first.right+gap;
-    const w=Math.max(280,grid.right-x);
-    right.classList.add('is-fixed');
-    right.style.left=Math.round(x)+'px';
-    right.style.width=Math.round(w)+'px';
-  };
-  if(S.lookPreviewResize) window.removeEventListener('resize',S.lookPreviewResize);
-  S.lookPreviewResize=placePreview;
-  window.addEventListener('resize',placePreview,{passive:true});
-  requestAnimationFrame(placePreview);
-
-  paintPreview(); checkContrast();
+  function updateHistoryButtons(){ $('#v5Undo').disabled=historyIndex<=0; $('#v5Redo').disabled=historyIndex>=history.length-1; }
+  $('#v5Undo').onclick=()=>{if(historyIndex>0){historyIndex--;restore(history[historyIndex]);updateHistoryButtons();}};
+  $('#v5Redo').onclick=()=>{if(historyIndex<history.length-1){historyIndex++;restore(history[historyIndex]);updateHistoryButtons();}};
+  $('#v5ResetAll').onclick=async()=>{ if(!await confirmBox('Reset all design settings?','All colours, typography, header, hero, layout and component settings return to the original website values. Content and photos are unchanged.','Reset all')) return; S.css=defaults;S.dirty=true;remember();renderValues();paintPreview(true);toast('All design settings reset'); };
+  shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));$('#lfPreviewStage').style.setProperty('--preview-width',btn.dataset.previewWidth);});
+  $('#lfRefreshPreview').onclick=()=>paintPreview(true);
+  let dlg=$('#lfFullPreviewDialog'); if(!dlg){dlg=document.createElement('dialog');dlg.id='lfFullPreviewDialog';dlg.className='preview-full';dlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live preview</b><button class="b" type="button" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame"></iframe>';document.body.appendChild(dlg);$('#lfCloseFullPreview').onclick=()=>dlg.close();}
+  $('#lfOpenFullPreview').onclick=()=>{paintPreview(true);dlg.showModal();};
+  renderTabs();renderPanel();updateHistoryButtons();paintPreview(true);
 }
 
 let livePreviewTimer=0;
