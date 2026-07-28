@@ -1,4 +1,4 @@
-# Salido Resort V6.0
+# Salido Resort V7.0
 
 Cleaned production package based on the existing Salido Resort website.
 
