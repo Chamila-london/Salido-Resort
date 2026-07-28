@@ -2966,3 +2966,220 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
 @media(max-width:860px){
   .hero__in{padding-top:clamp(120px,var(--admin-hero-copy-y),210px)!important;max-width:min(100%,var(--admin-hero-copy-w))!important}
 }
+/* SALIDO ADMIN DESIGN OVERRIDES — START */
+:root{
+  --admin-button-h:48px;
+  --admin-dock-size:48px;
+  --admin-field-h:48px;
+  --admin-footer-y:36px;
+  --admin-hero-copy-w:970px;
+  --admin-hero-h:970px;
+  --admin-hero-shade:93%;
+  --admin-lang-radius:28px;
+  --admin-lang-x:10px;
+  --admin-logo-h:40px;
+  --admin-map-h:500px;
+  --admin-nav-alpha:24%;
+  --admin-nav-gap:6px;
+  --admin-nav-h:54px;
+  --admin-nav-link-x:14px;
+  --admin-nav-link-y:8px;
+  --admin-nav-max-w:760px;
+  --admin-nav-radius:28px;
+  --admin-nav-shell-x:8px;
+}
+/* SALIDO ADMIN DESIGN OVERRIDES — END */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
