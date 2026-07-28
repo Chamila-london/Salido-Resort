@@ -147,6 +147,15 @@ a{color:var(--violet-text)}
 .liveprev__state.is-busy{color:var(--violet-text)}
 .liveprev__stage{--preview-width:100%;height:min(690px,calc(100dvh - 205px));min-height:500px;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:0;background:#dcd8e4;border:1px solid var(--line);border-radius:16px}
 .liveprev__frame{display:block;width:var(--preview-width);max-width:100%;height:100%;min-height:500px;border:0;background:#fff;box-shadow:0 0 0 1px rgba(23,16,43,.08),0 18px 45px rgba(23,16,43,.15);transition:width .22s ease}
+.liveprev__actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-left:auto}
+.liveprev__actions .b{padding:.52rem .72rem;min-height:36px}
+.preview-full{width:min(96vw,1800px);height:min(94dvh,1100px);padding:0;border:0;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 30px 100px rgba(0,0,0,.45)}
+.preview-full::backdrop{background:rgba(18,10,30,.82);backdrop-filter:blur(5px)}
+.preview-full__bar{height:54px;display:flex;align-items:center;gap:.7rem;padding:0 .85rem;background:#241735;color:#fff}
+.preview-full__bar b{margin-right:auto}
+.preview-full__frame{display:block;width:100%;height:calc(100% - 54px);border:0;background:#fff}
+.reset-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.75rem}
+@media(max-width:620px){.reset-grid{grid-template-columns:1fr}}
 .jump{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-top:1px solid var(--line);width:100%;
   background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer}
 .jump:first-of-type{border-top:0}
@@ -1372,20 +1381,32 @@ function viewLook(m){
 
   /* ---- reset ---- */
   const rc=document.createElement('div'); rc.className='card';
-  rc.innerHTML='<div class="card__t"><h3>Start again</h3></div>'+
-    '<p class="hint" style="margin-bottom:.7rem">Puts every colour, letter and size back to how the website looked when you opened it.</p>';
-  const rb=document.createElement('button'); rb.className='b b--bad';
-  rb.innerHTML='<svg><use href="#a-up"/></svg>Put the design back';
-  rb.addEventListener('click',async ()=>{
+  rc.innerHTML='<div class="card__t"><h3>Reset changes</h3></div>'+
+    '<p class="hint">Return settings to the exact state they had when this admin page was opened. Resetting does not publish anything automatically.</p>'+
+    '<div class="reset-grid" id="lookResetActions"></div>';
+  const resetDesign=document.createElement('button'); resetDesign.className='b b--bad'; resetDesign.type='button';
+  resetDesign.innerHTML='<svg><use href="#a-up"/></svg>Reset Look &amp; Feel';
+  resetDesign.addEventListener('click',async ()=>{
     if(!S.orig) return;
-    if(!await confirmBox('Put the design back?','Every colour, font and size returns to how it was when you opened the admin page. Your words and photos are not touched.','Put it back')) return;
-    S.css=S.orig.css; S.dirty=true; show('_look'); toast('Design put back');
+    if(!await confirmBox('Reset all Look & Feel settings?','Colours, fonts, navigation, hero, language selector, spacing and component sizes return to the values from when you opened the admin. Words and photos stay unchanged.','Reset design')) return;
+    S.css=S.orig.css; S.dirty=true; show('_look'); toast('All Look & Feel settings reset');
   });
-  rc.appendChild(rb); left.appendChild(rc);
+  const resetEverything=document.createElement('button'); resetEverything.className='b'; resetEverything.type='button';
+  resetEverything.innerHTML='<svg><use href="#a-up"/></svg>Reset every admin change';
+  resetEverything.addEventListener('click',async ()=>{
+    if(!S.orig) return;
+    if(!await confirmBox('Reset every admin change?','This restores design, wording, translations, gallery order and page content to the exact state from when the admin was opened. Nothing is published until you choose Publish.','Reset everything')) return;
+    const parser=new DOMParser();
+    S.doc=parser.parseFromString('<!DOCTYPE html>'+S.orig.html,'text/html');
+    S.css=S.orig.css; S.js=S.orig.js; S.dirty=true;
+    show('_look'); toast('Every admin change reset');
+  });
+  const resetActions=rc.querySelector('#lookResetActions'); resetActions.append(resetDesign,resetEverything);
+  left.appendChild(rc);
 
   /* ---- universal live preview: render the real edited website ---- */
   const pc=document.createElement('div'); pc.className='card';
-  pc.innerHTML='<div class="card__t"><h3>Universal live preview</h3><span class="hint" style="margin-left:auto">real website · live</span></div>'+ 
+  pc.innerHTML='<div class="card__t"><h3>Universal live preview</h3><span class="hint" style="margin-left:auto">your original website · live</span></div>'+ 
     '<div class="liveprev__toolbar">'+
       '<div class="liveprev__devices" role="group" aria-label="Preview size">'+
         '<button type="button" class="liveprev__device is-on" data-preview-width="100%">Desktop</button>'+
@@ -1393,11 +1414,12 @@ function viewLook(m){
         '<button type="button" class="liveprev__device" data-preview-width="390px">Mobile</button>'+
       '</div>'+
       '<span class="liveprev__state" id="lfPreviewState">Live</span>'+
+      '<div class="liveprev__actions"><button type="button" class="b" id="lfRefreshPreview">Refresh</button><button type="button" class="b b--go" id="lfOpenFullPreview">Open full website</button></div>'+
     '</div>'+
     '<div class="liveprev__stage" id="lfPreviewStage">'+
       '<iframe id="lfSitePreview" class="liveprev__frame" title="Live preview of the edited Salido Resort website" loading="eager"></iframe>'+
     '</div>'+
-    '<p class="hint" style="margin-top:.7rem">This is the real website, not a sample. Colours, fonts, navigation, hero, language selector, spacing, wording and current photos refresh as you edit.</p>';
+    '<p class="hint" style="margin-top:.7rem">This iframe uses your complete original public website—same sections, text, photos and scripts. Every admin change refreshes here before you publish.</p>';
   right.appendChild(pc);
 
   pc.querySelectorAll('.liveprev__device').forEach(btn=>btn.addEventListener('click',()=>{
@@ -1405,6 +1427,16 @@ function viewLook(m){
     const stage=$('#lfPreviewStage');
     stage.style.setProperty('--preview-width',btn.dataset.previewWidth||'100%');
   }));
+
+  let fullDlg=$('#lfFullPreviewDialog');
+  if(!fullDlg){
+    fullDlg=document.createElement('dialog'); fullDlg.id='lfFullPreviewDialog'; fullDlg.className='preview-full';
+    fullDlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live website</b><span id="lfFullState">Live</span><button type="button" class="b" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame" title="Full live preview"></iframe>';
+    document.body.appendChild(fullDlg);
+    fullDlg.querySelector('#lfCloseFullPreview').addEventListener('click',()=>fullDlg.close());
+  }
+  $('#lfRefreshPreview').addEventListener('click',()=>{ paintPreview(true); toast('Preview refreshed'); });
+  $('#lfOpenFullPreview').addEventListener('click',()=>{ paintPreview(true); fullDlg.showModal(); });
 
   two.appendChild(left); two.appendChild(right); m.appendChild(two);
 
@@ -1451,16 +1483,21 @@ function livePreviewHTML(){
   if(S.js){ const script=clone.createElement('script'); script.textContent=S.js; clone.body.appendChild(script); }
   return '<!DOCTYPE html>\n'+clone.documentElement.outerHTML;
 }
-function paintPreview(){
-  const frame=$('#lfSitePreview'); if(!frame) return;
-  const state=$('#lfPreviewState');
-  if(state){ state.textContent='Updating…'; state.classList.add('is-busy'); }
+function paintPreview(immediate=false){
+  const frames=[$('#lfSitePreview'),$('#lfFullSitePreview')].filter(Boolean); if(!frames.length) return;
+  const state=$('#lfPreviewState'), fullState=$('#lfFullState');
+  [state,fullState].filter(Boolean).forEach(x=>{ x.textContent='Updating…'; x.classList.add('is-busy'); });
   clearTimeout(livePreviewTimer);
   livePreviewTimer=setTimeout(()=>{
-    if(!frame.isConnected) return;
-    frame.srcdoc=livePreviewHTML();
-    frame.onload=()=>{ if(state){ state.textContent='Live'; state.classList.remove('is-busy'); } };
-  },70);
+    const html=livePreviewHTML();
+    let pending=0;
+    frames.forEach(frame=>{
+      if(!frame.isConnected) return; pending++;
+      frame.onload=()=>{ pending--; if(pending<=0) [state,fullState].filter(Boolean).forEach(x=>{x.textContent='Live';x.classList.remove('is-busy');}); };
+      frame.srcdoc=html;
+    });
+    if(!pending) [state,fullState].filter(Boolean).forEach(x=>{x.textContent='Live';x.classList.remove('is-busy');});
+  },immediate?0:70);
 }
 
 function checkContrast(){
