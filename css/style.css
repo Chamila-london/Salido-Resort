@@ -2901,3 +2901,58 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   .hero{min-height:clamp(520px,var(--admin-hero-h),920px)!important}
   .map-v3 .map--luxury,.map-v3 .map__canvas{min-height:clamp(320px,var(--admin-map-h),680px)!important}
 }
+
+
+/* === Admin-controlled header, hero and language settings (V4.4.24) === */
+:root{
+  --admin-nav-h:54px;
+  --admin-nav-max-w:760px;
+  --admin-nav-radius:28px;
+  --admin-nav-shell-x:8px;
+  --admin-nav-gap:6px;
+  --admin-nav-link-x:14px;
+  --admin-nav-link-y:8px;
+  --admin-nav-alpha:24%;
+  --admin-hero-copy-w:760px;
+  --admin-hero-copy-y:170px;
+  --admin-hero-shade:62%;
+  --admin-lang-radius:28px;
+  --admin-lang-x:10px;
+}
+@media (min-width:861px){
+  .nav{
+    min-height:var(--admin-nav-h)!important;
+    width:min(100%,var(--admin-nav-max-w))!important;
+    max-width:var(--admin-nav-max-w)!important;
+    padding-left:var(--admin-nav-shell-x)!important;
+    padding-right:var(--admin-nav-shell-x)!important;
+    gap:var(--admin-nav-gap)!important;
+    border-radius:var(--admin-nav-radius)!important;
+    background:color-mix(in srgb, #1c122a var(--admin-nav-alpha), transparent)!important;
+  }
+  .nav a{
+    border-radius:var(--admin-nav-radius)!important;
+    padding-left:var(--admin-nav-link-x)!important;
+    padding-right:var(--admin-nav-link-x)!important;
+    padding-top:var(--admin-nav-link-y)!important;
+    padding-bottom:var(--admin-nav-link-y)!important;
+    line-height:1.15!important;
+  }
+}
+.hero__in{
+  max-width:var(--admin-hero-copy-w)!important;
+  padding-top:var(--admin-hero-copy-y)!important;
+}
+.hero__veil{
+  background:
+    linear-gradient(90deg,color-mix(in srgb, #0d0816 var(--admin-hero-shade), transparent) 0%,rgba(25,14,38,.48) 36%,rgba(25,14,38,.10) 72%,rgba(13,8,22,.22) 100%)!important;
+}
+.lang{border-radius:var(--admin-lang-radius)!important}
+.lang button{
+  border-radius:var(--admin-lang-radius)!important;
+  padding-left:var(--admin-lang-x)!important;
+  padding-right:var(--admin-lang-x)!important;
+}
+@media(max-width:860px){
+  .hero__in{padding-top:clamp(120px,var(--admin-hero-copy-y),210px)!important;max-width:min(100%,var(--admin-hero-copy-w))!important}
+}

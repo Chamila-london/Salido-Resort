@@ -1294,6 +1294,35 @@ function viewLook(m){
   rn(); rWrap.appendChild(rr); rWrap.appendChild(rl); tc.appendChild(rWrap);
   left.appendChild(tc);
 
+  /* ---- header, hero and language controls ---- */
+  const hc=document.createElement('div'); hc.className='card';
+  hc.innerHTML='<div class="card__t"><h3>Header, hero &amp; language</h3><span class="hint" style="margin-left:auto">controls for the areas shown above</span></div>'+ 
+    '<p class="hint" style="margin-bottom:.65rem">Adjust the top menu pill, opening hero text block and language selector without editing CSS.</p>';
+  const controlRow=(title,note,tok,min,max,step=1,suffix='px')=>{
+    const box=document.createElement('div'); box.style.cssText='padding:.72rem 0;border-top:1px solid var(--line)';
+    box.innerHTML='<div style="font-weight:600">'+esc(title)+'</div>'+(note?'<p class="hint" style="margin:.1rem 0 .5rem">'+esc(note)+'</p>':'');
+    const rng=document.createElement('input'); rng.type='range'; rng.className='rng'; rng.min=min; rng.max=max; rng.step=step;
+    rng.value=String(parseFloat(tokGet(tok,String(min)+suffix))||min);
+    const lbl=document.createElement('div'); lbl.className='rlbl';
+    const paint=()=>lbl.innerHTML='<span>Less</span><span><b>'+rng.value+suffix+'</b></span><span>More</span>';
+    rng.addEventListener('input',()=>{ tokSet(tok,rng.value+suffix); paint(); paintPreview(); });
+    paint(); box.appendChild(rng); box.appendChild(lbl); hc.appendChild(box);
+  };
+  controlRow('Navigation height','Changes the complete desktop navigation pill height.','admin-nav-h',38,76,1);
+  controlRow('Navigation maximum width','Controls how wide the complete menu may become.','admin-nav-max-w',420,980,10);
+  controlRow('Menu pill roundness','Changes the rounded container around Home, Notices, About and the other menu links.','admin-nav-radius',0,40,1);
+  controlRow('Menu container side padding','Controls the empty space at the left and right edges of the menu pill.','admin-nav-shell-x',4,24,1);
+  controlRow('Gap between menu links','Controls the spacing between Home, Notices, About and the other links.','admin-nav-gap',0,20,1);
+  controlRow('Menu link horizontal padding','Controls the width of each menu item.','admin-nav-link-x',6,26,1);
+  controlRow('Menu link vertical padding','Controls the height of each menu item and active button.','admin-nav-link-y',4,16,1);
+  controlRow('Menu pill transparency','Controls how solid the dark menu background appears.','admin-nav-alpha',0,90,1,'%');
+  controlRow('Hero text width','Controls how wide the main accommodation text block can become.','admin-hero-copy-w',420,900,10);
+  controlRow('Hero text vertical position','Moves the opening text block up or down.','admin-hero-copy-y',100,260,5);
+  controlRow('Hero overlay darkness','Improves text readability over bright room images.','admin-hero-shade',20,90,1,'%');
+  controlRow('Language selector roundness','Controls the shape of the EN / Sinhala / Tamil selector.','admin-lang-radius',0,40,1);
+  controlRow('Language button padding','Controls the width of each language button.','admin-lang-x',6,18,1);
+  left.appendChild(hc);
+
   /* ---- layout and component sizing ---- */
   const lc=document.createElement('div'); lc.className='card';
   lc.innerHTML='<div class="card__t"><h3>Layout &amp; sizes</h3><span class="hint" style="margin-left:auto">whole-site controls</span></div>'+
@@ -1417,9 +1446,26 @@ function paintPreview(){
   p.style.fontFamily=g('body','sans-serif');
   p.style.fontSize=(12*fs)+'px';
 
-  const bar=$('#lfBar'); bar.style.background=g('plum','#241735'); bar.style.fontFamily=g('f-nav','sans-serif'); bar.style.fontSize=zNav+'em';
+  const bar=$('#lfBar');
+  bar.style.background=g('plum','#241735');
+  bar.style.fontFamily=g('f-nav','sans-serif');
+  bar.style.fontSize=zNav+'em';
+  bar.style.borderRadius=Math.min(px('admin-nav-radius',28),32)+'px';
+  bar.style.minHeight=scale(px('admin-nav-h',54),38,76,30,48).toFixed(0)+'px';
+  bar.style.maxWidth=scale(px('admin-nav-max-w',760),420,980,250,560).toFixed(0)+'px';
+  bar.style.marginInline='auto';
+  bar.style.paddingLeft=scale(px('admin-nav-shell-x',8),4,24,4,16).toFixed(0)+'px';
+  bar.style.paddingRight=scale(px('admin-nav-shell-x',8),4,24,4,16).toFixed(0)+'px';
+  const pvNav=bar.querySelector('.upv__nav');
+  if(pvNav){
+    pvNav.style.gap=scale(px('admin-nav-gap',6),0,20,0,13).toFixed(0)+'px';
+    pvNav.querySelectorAll('span').forEach(a=>{
+      a.style.padding=scale(px('admin-nav-link-y',8),4,16,3,10).toFixed(0)+'px '+scale(px('admin-nav-link-x',14),6,26,5,16).toFixed(0)+'px';
+      a.style.borderRadius=Math.min(px('admin-nav-radius',28),32)+'px';
+    });
+  }
   const pill=$('#lfPill'); pill.style.background=g('violet-fill','#8f57d2'); pill.style.fontFamily=g('f-btn','sans-serif'); pill.style.fontSize=zBtn+'em';
-  const hero=$('#lfHero'); hero.style.minHeight=scale(heroH,520,920,145,285).toFixed(0)+'px';
+  const hero=$('#lfHero'); hero.style.minHeight=scale(heroH,520,920,145,285).toFixed(0)+'px'; const copy=hero.querySelector('.upv__hero-copy'); if(copy){copy.style.maxWidth=scale(px('admin-hero-copy-w',760),420,900,60,94).toFixed(0)+'%'; copy.style.transform='translateY('+scale(px('admin-hero-copy-y',170),100,260,-18,18).toFixed(0)+'px)';}
   $('#lfEb').style.color=g('gold','#c6a15b');
   $('#lfH').style.fontFamily=g('display','serif'); $('#lfH').style.fontSize=(2*zHead)+'em';
   $('#lfP').style.fontFamily=g('body','sans-serif'); $('#lfP').style.fontSize=(.78*fs)+'em';
