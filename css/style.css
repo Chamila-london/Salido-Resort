@@ -2983,6 +2983,7 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
 }
 /* SALIDO ADMIN DESIGN OVERRIDES — START */
 :root{
+  --admin-dock-size:48px;
   --admin-lang-radius:28px;
   --admin-lang-x:10px;
   --admin-logo-h:40px;
@@ -3004,6 +3005,47 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   --z-nav:1;
 }
 /* SALIDO ADMIN DESIGN OVERRIDES — END */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
