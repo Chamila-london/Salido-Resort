@@ -24,7 +24,7 @@
 <meta name="twitter:description" content="A quiet stay on Riverview Road, Tennekumbura — minutes from the Temple of the Tooth and Kandy Lake.">
 <meta name="twitter:image" content="https://salido-resort.pages.dev/images/hero.webp">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=4.4.14">
 <style>
 #zip-warning{display:none;position:fixed;inset:0;z-index:9999;background:#2E1A4A;color:#fff;
   padding:24px;text-align:center;flex-direction:column;align-items:center;justify-content:center;
@@ -245,7 +245,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
       <p><a class="btn btn--ink" href="#gallery"><span data-i18n="cta.seerooms">See the rooms</span> <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"></use></svg></a></p>
     </div>
     <div class="split__media reveal">
-      <img src="images/about.webp" alt="Bright room at Salido Resort opening onto a balcony" width="1195" height="896" decoding="async">
+      <img loading="lazy" decoding="async" src="images/about.webp" alt="Bright room at Salido Resort opening onto a balcony" width="1195" height="896" decoding="async">
       <div class="stat">
         <svg class="mark" viewBox="0 0 115 157" aria-hidden="true"><use href="#i-mark"></use></svg>
         <div><b data-i18n-html="about.statb">Your comfort<br>is our priority</b><i data-i18n="about.stati">Since day one</i></div>
@@ -353,7 +353,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
   <button class="lb__btn lb__x" id="lb-x" aria-label="Close">×</button>
   <button class="lb__btn lb__p" id="lb-p" aria-label="Previous photo">‹</button>
   <button class="lb__btn lb__n" id="lb-n" aria-label="Next photo">›</button>
-  <img id="lb-img" alt="">
+  <img loading="lazy" decoding="async" id="lb-img" alt="">
   <p id="lb-cap" class="lb__cap"></p>
 </div>
 
@@ -361,7 +361,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <div class="smodal" id="spotModal" role="dialog" aria-modal="true" aria-labelledby="sm-title">
   <div class="smodal__panel" role="document">
     <button class="smodal__x" id="sm-x" aria-label="Close">×</button>
-    <div class="smodal__media"><img id="sm-img" alt=""></div>
+    <div class="smodal__media"><img loading="lazy" decoding="async" id="sm-img" alt=""></div>
     <div class="smodal__body">
       <span class="eyebrow" id="sm-eyebrow"></span>
       <h3 id="sm-title"></h3>
@@ -529,9 +529,9 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
         <div class="payment-methods" aria-label="Accepted payment methods">
           <span class="payment-methods__title">Cards welcome</span>
           <div class="payment-methods__logos">
-            <span class="payment-logo payment-logo--visa" aria-label="Visa">VISA</span>
-            <span class="payment-logo payment-logo--mastercard" aria-label="Mastercard"><i></i><i></i><b>mastercard</b></span>
-            <span class="payment-logo payment-logo--amex" aria-label="American Express">AMERICAN<br>EXPRESS</span>
+            <span class="payment-logo payment-logo--visa"><img src="images/payment/visa-card.svg?v=4.4.10" alt="Visa" width="320" height="180" loading="lazy" decoding="async"></span>
+            <span class="payment-logo payment-logo--mastercard"><img src="images/payment/mastercard-card.svg?v=4.4.10" alt="Mastercard" width="320" height="180" loading="lazy" decoding="async"></span>
+            <span class="payment-logo payment-logo--amex"><img src="images/payment/amex-card.svg?v=4.4.10" alt="American Express" width="320" height="180" loading="lazy" decoding="async"></span>
           </div>
         </div>
       </aside>
@@ -590,7 +590,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-<script src="js/script.js" defer=""></script>
+<script src="js/script.js?v=4.4.14" defer=""></script>
 
 <script>
 (function(){
