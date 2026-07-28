@@ -32,7 +32,7 @@
   /* per-part lettering, driven by the admin page (Look & feel) */
   --f-nav:"Instrument Sans","Segoe UI",system-ui,sans-serif;
   --f-btn:"Instrument Sans","Segoe UI",system-ui,sans-serif;
-  --z-head:1.40;--z-nav:1;--z-btn:1;
+  --z-head:1;--z-nav:1;--z-btn:1;
 
   --wrap:2560px;
   --gut:clamp(16px,2vw,36px);
@@ -49,7 +49,7 @@
   --admin-button-h:48px;
   --admin-field-h:48px;
   --admin-hero-h:720px;
-  --admin-map-h:500px;
+  --admin-map-h:320px;
   --admin-footer-y:36px;
   --admin-dock-size:48px;
   --admin-logo-h:40px;
