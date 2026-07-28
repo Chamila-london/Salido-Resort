@@ -2987,8 +2987,8 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   --admin-lang-x:10px;
   --admin-logo-h:40px;
   --admin-nav-alpha:24%;
-  --admin-nav-gap:0px;
-  --admin-nav-h:54px;
+  --admin-nav-gap:6px;
+  --admin-nav-h:38px;
   --admin-nav-link-x:14px;
   --admin-nav-link-y:8px;
   --admin-nav-max-w:1120px;
@@ -2996,66 +2996,6 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   --admin-nav-shell-x:8px;
 }
 /* SALIDO ADMIN DESIGN OVERRIDES — END */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
