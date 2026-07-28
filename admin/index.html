@@ -1691,11 +1691,10 @@ function editItem(kind,el){
       '<label class="f"><span>Gallery category</span><select id="cat">'+
         [['gallery','Gallery'],['rooms','Rooms']].map(function(x){return '<option value="'+x[0]+'"'+((o.category||'gallery')===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+
       '</select><small class="hint">Choose whether this photo appears under Gallery or Rooms on the public website.</small></label>'+
-      tri('c','Caption shown on the photo', o.tKey||'', o.title||'', false) +
+      tri('c','Caption shown on the photo (optional)', o.tKey||'', o.title||'', false, 'Leave blank to show the photo without a text overlay.') +
       fieldRow('alt','Description for screen readers and Google', o.alt||'', false, 'e.g. Double room with a hill view') +
       '<p class="hint">Portrait and landscape orientation is detected automatically. The public masonry gallery shows the complete image without cropping.</p>',
       async ()=>{
-        if(!V('c')) { toast('Give it a caption'); return false; }
         const up=await pickedImage('pic','gallery-new', o.src);
         if(isNew && !up){ toast('Choose a photo first'); return false; }
         let node=el, key=o.tKey;
@@ -1708,7 +1707,11 @@ function editItem(kind,el){
         const img=node.querySelector('img');
         if(up){ img.setAttribute('src',up.name); img.setAttribute('width',up.w); img.setAttribute('height',up.h); }
         img.setAttribute('alt',V('alt'));
-        node.querySelector('figcaption').textContent=V('c');
+        const caption=V('c');
+        const cap=node.querySelector('figcaption');
+        cap.textContent=caption;
+        cap.hidden=!caption;
+        node.classList.toggle('has-caption',!!caption);
         node.classList.remove('large');
         node.setAttribute('data-category',$('#cat').value);
         dictSet(key,V('c_si'),V('c_ta'));
