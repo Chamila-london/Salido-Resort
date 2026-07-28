@@ -1164,18 +1164,40 @@ const FACES=[
   ['Georgia,"Times New Roman",serif','Georgia — traditional serif'],
   ['system-ui,"Segoe UI",sans-serif','System — fast and neutral']
 ];
+const ADMIN_DESIGN_START='/* SALIDO ADMIN DESIGN OVERRIDES — START */';
+const ADMIN_DESIGN_END='/* SALIDO ADMIN DESIGN OVERRIDES — END */';
 function rootBlock(){ const m=(S.css||'').match(/:root\s*\{[\s\S]*?\}/); return m?m[0]:null; }
 function tokGet(name,fallback){
-  const r=rootBlock(); if(!r) return fallback||'';
-  const m=r.match(new RegExp('--'+name+'\\s*:\\s*([^;]+);'));
-  return m? m[1].trim() : (fallback||'');
+  /* The stylesheet contains historical :root blocks. CSS uses the last
+     declaration, so the editor must read the last declaration as well. */
+  const css=S.css||'';
+  const safe=String(name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp('--'+safe+'\s*:\s*([^;}{]+)','g');
+  let m,last='';
+  while((m=re.exec(css))) last=m[1].trim();
+  return last || (fallback||'');
+}
+function adminDesignValues(){
+  const css=S.css||'';
+  const a=css.indexOf(ADMIN_DESIGN_START), b=css.indexOf(ADMIN_DESIGN_END);
+  const block=(a>=0&&b>a)?css.slice(a,b):'';
+  const out={};
+  block.replace(/--([\w-]+)\s*:\s*([^;]+);/g,(_m,k,v)=>{out[k]=v.trim();return _m;});
+  return out;
+}
+function writeAdminDesign(values){
+  const declarations=Object.keys(values).sort().map(k=>'  --'+k+':'+values[k]+';').join('\n');
+  const block='\n'+ADMIN_DESIGN_START+'\n:root{\n'+declarations+'\n}\n'+ADMIN_DESIGN_END+'\n';
+  const css=S.css||'';
+  const a=css.indexOf(ADMIN_DESIGN_START), b=css.indexOf(ADMIN_DESIGN_END);
+  S.css=(a>=0&&b>a) ? css.slice(0,a)+block.trimStart()+css.slice(b+ADMIN_DESIGN_END.length) : css.replace(/\s*$/,'')+block;
 }
 function tokSet(name,val){
-  const r=rootBlock(); if(!r) return;
-  let nr, re=new RegExp('(--'+name+'\\s*:\\s*)([^;]*)(;)');
-  if(re.test(r)) nr=r.replace(re,(mm,a,b,c)=>a+val+c);
-  else nr=r.replace(/\}\s*$/, '\n  --'+name+':'+val+';\n}');
-  S.css=S.css.replace(r,nr); S.dirty=true;
+  if(!S.css) return;
+  const values=adminDesignValues();
+  values[name]=val;
+  writeAdminDesign(values);
+  S.dirty=true;
 }
 function hexOf(v){
   v=(v||'').trim();

@@ -32,7 +32,7 @@
   /* per-part lettering, driven by the admin page (Look & feel) */
   --f-nav:"Instrument Sans","Segoe UI",system-ui,sans-serif;
   --f-btn:"Instrument Sans","Segoe UI",system-ui,sans-serif;
-  --z-head:1.40;--z-nav:1;--z-btn:1;
+  --z-head:1;--z-nav:1;--z-btn:1;
 
   --wrap:2560px;
   --gut:clamp(16px,2vw,36px);
@@ -2864,4 +2864,40 @@ html[lang="ta"] .eyebrow{
     width:min(100% - 24px,1180px);
   }
   #contact>.wrap{padding-inline:12px}
+}
+
+/* ===== V4.4.22 — authoritative admin design controls =====
+   These rules intentionally come last. Earlier legacy refinements remain in the
+   file for compatibility, but they must not override values chosen in Admin. */
+body{font-family:var(--body);font-size:calc(clamp(15.5px,.42vw + 15px,18px) * var(--fs))}
+.nav a{font-family:var(--f-nav);font-size:calc(.92rem * var(--z-nav))}
+.btn,.bookbar button,.form button{font-family:var(--f-btn);font-size:calc(.98rem * var(--z-btn));min-height:var(--admin-button-h)}
+h1{font-family:var(--display);font-size:calc(clamp(2.75rem,6.1vw,5.8rem) * var(--z-head))}
+h2{font-family:var(--display);font-size:calc(clamp(2rem,4vw,3.6rem) * var(--z-head))}
+h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--z-head))}
+.wrap{width:min(calc(100% - (var(--gut) * 2)),var(--wrap))}
+.sec{padding-block:var(--admin-section-y)}
+.split,.contact,.travel-grid,.rooms,.lux-gallery{gap:var(--admin-content-gap)}
+.tile,.room__body,.travel,.form,.notice__body,.map-card{padding:var(--admin-card-pad)}
+.field input,.field select,.bookbar input,.bookbar select{min-height:var(--admin-field-h)}
+.hero{min-height:var(--admin-hero-h)}
+.map-v3 .map--luxury,.map-v3 .map__canvas{min-height:var(--admin-map-h)}
+.foot{padding-block:var(--admin-footer-y) 16px}
+.dock a,.dock button{width:var(--admin-dock-size);height:var(--admin-dock-size)}
+.brand .mark,.foot .brand .mark{height:var(--admin-logo-h)}
+.split__media img,.lux-gallery figure,.lux-gallery img,.spot,.room,.map-v3,.map-card,.tile,.travel{border-radius:var(--admin-image-r)}
+
+/* Adaptive section widths now respect Maximum page width instead of fixed,
+   later declarations that previously made the admin slider appear broken. */
+.head__in,.hero__in,.bookbar-wrap>.wrap,
+#notices>.wrap,#about>.wrap,#facilities>.wrap,
+#gallery>.wrap,#attractions>.wrap,#getting>.wrap,
+.v3-location>.wrap,.foot>.wrap{
+  width:min(calc(100% - (var(--gut) * 2)),var(--wrap));
+}
+
+@media(max-width:760px){
+  .sec{padding-block:clamp(34px,var(--admin-section-y),104px)}
+  .hero{min-height:clamp(520px,var(--admin-hero-h),920px)!important}
+  .map-v3 .map--luxury,.map-v3 .map__canvas{min-height:clamp(320px,var(--admin-map-h),680px)!important}
 }
