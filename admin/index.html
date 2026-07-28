@@ -1282,7 +1282,13 @@ function viewLook(m){
     rng.addEventListener('input',()=>{ tokSet(tok,rng.value+'px'); paint(); paintPreview(); });
     paint(); box.appendChild(rng); box.appendChild(lbl); lc.appendChild(box);
   };
-  pxRow('Maximum page width','Controls how wide content can spread on large screens.','wrap',980,1680,10);
+  pxRow('Maximum page width','Controls how wide content can spread on large screens. Set it to Full screen to remove the large empty side areas.','wrap',980,3200,10);
+  const fullWidthBox=document.createElement('div');
+  fullWidthBox.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:-.15rem 0 .8rem;padding:.65rem .75rem;border:1px solid var(--line);border-radius:12px;background:var(--soft)';
+  fullWidthBox.innerHTML='<div><b>Full-screen website</b><p class="hint" style="margin:.08rem 0 0">Uses the full browser width while keeping a small safe edge.</p></div>';
+  const fullWidthBtn=document.createElement('button'); fullWidthBtn.className='b'; fullWidthBtn.type='button'; fullWidthBtn.textContent='Use full screen';
+  fullWidthBtn.addEventListener('click',()=>{ tokSet('wrap','3200px'); tokSet('gut','clamp(16px,2vw,36px)'); S.dirty=true; show('_look'); toast('Full-screen layout applied'); });
+  fullWidthBox.appendChild(fullWidthBtn); lc.appendChild(fullWidthBox);
   pxRow('Section spacing','Vertical space above and below major sections.','admin-section-y',32,104,2);
   pxRow('Content gaps','Space between columns, cards and content groups.','admin-content-gap',12,64,2);
   pxRow('Card padding','Internal space inside cards and panels.','admin-card-pad',10,36,1);
@@ -1365,7 +1371,7 @@ function paintPreview(){
   const sectionY=px('admin-section-y',64), gap=px('admin-content-gap',32), cardPad=px('admin-card-pad',18);
   const buttonH=px('admin-button-h',48), fieldH=px('admin-field-h',48), logoH=px('admin-logo-h',40);
   const footerY=px('admin-footer-y',40), dock=px('admin-dock-size',48), mapH=px('admin-map-h',460), heroH=px('admin-hero-h',720);
-  const wrap=px('wrap',1340);
+  const wrap=px('wrap',2560);
   const scale=(v,a,b,oa,ob)=>oa+Math.max(0,Math.min(1,(v-a)/(b-a)))*(ob-oa);
 
   p.style.setProperty('--pv-gap',scale(gap,12,64,7,22).toFixed(1)+'px');
@@ -1378,7 +1384,7 @@ function paintPreview(){
   p.style.setProperty('--pv-section-y',scale(sectionY,32,104,12,34).toFixed(1)+'px');
   p.style.setProperty('--pv-footer-y',scale(footerY,20,80,10,30).toFixed(1)+'px');
   p.style.setProperty('--pv-dock',scale(dock,40,64,25,38).toFixed(1)+'px');
-  p.style.maxWidth=scale(wrap,980,1680,310,610).toFixed(0)+'px';
+  p.style.maxWidth=scale(wrap,980,3200,310,690).toFixed(0)+'px';
   p.style.margin='0 auto';
   p.style.background=g('paper','#fff');
   p.style.borderRadius=Math.min(rad,20)+'px';

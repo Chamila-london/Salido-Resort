@@ -34,8 +34,8 @@
   --f-btn:"Instrument Sans","Segoe UI",system-ui,sans-serif;
   --z-head:1;--z-nav:1;--z-btn:1;
 
-  --wrap:1440px;
-  --gut:clamp(20px,4vw,64px);
+  --wrap:2560px;
+  --gut:clamp(16px,2vw,36px);
   --r:20px;
   --r-lg:30px;
   --shadow:0 1px 2px rgba(23,16,43,.04),0 8px 22px -12px rgba(46,26,74,.20),0 22px 48px -26px rgba(46,26,74,.20);
@@ -2905,4 +2905,91 @@ html[lang="ta"] .eyebrow{
   .map-v3 .map--luxury,.map-v3 .map__canvas{min-height:clamp(340px,var(--admin-map-h),450px)!important}
   .foot{padding-block:clamp(24px,var(--admin-footer-y),52px) 16px}
   .dock a,.dock button{width:clamp(42px,var(--admin-dock-size),54px);height:clamp(42px,var(--admin-dock-size),54px)}
+}
+
+/* ===== V4.4.16 — Salido adaptive wide-screen layout =====
+   Uses the browser width intelligently instead of stretching every section
+   to one fixed measure. Full-bleed sections keep safe edge gutters. */
+:root{
+  --salido-text-width:1440px;
+  --salido-grid-width:1800px;
+  --salido-wide-width:1920px;
+  --salido-edge:clamp(18px,3vw,64px);
+}
+
+/* Header, hero and booking bar use the available screen while preserving alignment. */
+.head__in,
+.hero__in,
+.bookbar-wrap>.wrap{
+  width:min(calc(100% - (var(--salido-edge) * 2)),var(--salido-wide-width));
+}
+
+/* Reading-heavy areas stay comfortably readable. */
+#notices>.wrap,
+#about>.wrap,
+#facilities>.wrap{
+  width:min(calc(100% - (var(--salido-edge) * 2)),var(--salido-text-width));
+}
+
+/* Visual/card areas get substantially more room on large displays. */
+#gallery>.wrap,
+#attractions>.wrap,
+#getting>.wrap,
+.v3-location>.wrap,
+.foot>.wrap{
+  width:min(calc(100% - (var(--salido-edge) * 2)),var(--salido-grid-width));
+}
+
+/* Reservation is a true full-width feature section. */
+#contact>.wrap{
+  width:100%;
+  max-width:none;
+  padding-inline:var(--salido-edge);
+}
+#contact .contact{
+  width:100%;
+  max-width:1800px;
+  margin-inline:auto;
+  grid-template-columns:minmax(320px,.72fr) minmax(560px,1.28fr);
+  align-items:start;
+}
+#contact .form{
+  width:100%;
+  max-width:none;
+}
+
+/* Let wide travel cards and map content consume their allocated canvas. */
+#getting .getting__grid,
+.v3-location__wrap,
+.map-v3{
+  width:100%;
+}
+
+/* Large desktops: fill the formerly empty side bands without crowding text. */
+@media(min-width:1600px){
+  #contact>.wrap{padding-inline:clamp(48px,5vw,96px)}
+  #contact .contact{grid-template-columns:minmax(390px,.7fr) minmax(680px,1.3fr)}
+  #contact .form{padding:clamp(1.25rem,1.5vw,1.75rem)}
+}
+
+/* Keep tablet and mobile behaviour compact and predictable. */
+@media(max-width:980px){
+  :root{--salido-edge:clamp(16px,3.5vw,32px)}
+  #contact .contact{grid-template-columns:1fr;max-width:800px}
+}
+@media(max-width:760px){
+  .head__in,.hero__in,.bookbar-wrap>.wrap,
+  #notices>.wrap,#about>.wrap,#facilities>.wrap,#gallery>.wrap,
+  #attractions>.wrap,#getting>.wrap,.v3-location>.wrap,.foot>.wrap{
+    width:min(100% - 32px,1180px);
+  }
+  #contact>.wrap{padding-inline:16px}
+}
+@media(max-width:480px){
+  .head__in,.hero__in,.bookbar-wrap>.wrap,
+  #notices>.wrap,#about>.wrap,#facilities>.wrap,#gallery>.wrap,
+  #attractions>.wrap,#getting>.wrap,.v3-location>.wrap,.foot>.wrap{
+    width:min(100% - 24px,1180px);
+  }
+  #contact>.wrap{padding-inline:12px}
 }
