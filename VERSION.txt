@@ -1,0 +1,2 @@
+Salido Resort V6.0
+Build: clean preview and navigation architecture

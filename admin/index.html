@@ -1252,7 +1252,7 @@ function viewLook(m){
   shell.className='v5studio';
   shell.innerHTML=`
     <div class="v5studio__bar card">
-      <div><b>Salido Design Studio V5.0.1</b><div class="hint">Live controls for the original website. Changes remain drafts until you publish.</div></div>
+      <div><b>Salido Design Studio V6.0</b><div class="hint">Live controls for the original website. Changes remain drafts until you publish.</div></div>
       <div class="v5studio__bar-actions">
         <button class="b" type="button" id="v5Undo">Undo</button>
         <button class="b" type="button" id="v5Redo">Redo</button>
@@ -1292,7 +1292,7 @@ function viewLook(m){
         ['select','Menu font','f-nav','font'],['range','Menu text size','z-nav',70,150,1,'scale'],['select','Button font','f-btn','font'],['range','Button text size','z-btn',70,150,1,'scale'],['select','Heading font','display','font'],['range','Heading size','z-head',70,160,1,'scale'],['select','Body font','body','font'],['range','Body size','fs',80,140,1,'scale']
       ],
       Header:[
-        ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',620,1400,10,'px'],['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
+        ['range','Navigation height','admin-nav-h',38,82,1,'px'],['range','Navigation maximum width','admin-nav-max-w',720,1280,10,'px'],['range','Navigation roundness','admin-nav-radius',0,44,1,'px'],['range','Navigation side padding','admin-nav-shell-x',2,30,1,'px'],['range','Gap between links','admin-nav-gap',0,28,1,'px'],['range','Link horizontal padding','admin-nav-link-x',4,30,1,'px'],['range','Link vertical padding','admin-nav-link-y',2,18,1,'px'],['range','Navigation opacity','admin-nav-alpha',0,100,1,'%'],['range','Logo height','admin-logo-h',24,76,1,'px'],['range','Language roundness','admin-lang-radius',0,44,1,'px'],['range','Language button padding','admin-lang-x',4,24,1,'px']
       ],
       Hero:[
         ['range','Hero height','admin-hero-h',480,980,10,'px'],['range','Hero text width','admin-hero-copy-w',360,980,10,'px'],['range','Hero text vertical position','admin-hero-copy-y',60,320,5,'px'],['range','Hero overlay darkness','admin-hero-shade',0,95,1,'%']
@@ -1335,7 +1335,7 @@ function viewLook(m){
     shell.querySelectorAll('.liveprev__device').forEach(btn=>btn.onclick=()=>{shell.querySelectorAll('.liveprev__device').forEach(x=>x.classList.toggle('is-on',x===btn));document.getElementById('lfPreviewStage').dataset.viewport=btn.dataset.previewWidth;fitLivePreview();});
     document.getElementById('lfRefreshPreview').onclick=()=>paintPreview(true);
     let dlg=document.getElementById('lfFullPreviewDialog');if(!dlg){dlg=document.createElement('dialog');dlg.id='lfFullPreviewDialog';dlg.className='preview-full';dlg.innerHTML='<div class="preview-full__bar"><b>Salido Resort — full live preview</b><button class="b" type="button" id="lfCloseFullPreview">Close</button></div><iframe id="lfFullSitePreview" class="preview-full__frame"></iframe>';document.body.appendChild(dlg);document.getElementById('lfCloseFullPreview').onclick=()=>dlg.close();}
-    document.getElementById('lfOpenFullPreview').onclick=()=>{paintPreview(true);dlg.showModal();};
+    document.getElementById('lfOpenFullPreview').onclick=()=>{const ff=document.getElementById('lfFullSitePreview');if(ff)ff.srcdoc=livePreviewHTML('desktop');dlg.showModal();};
     renderTabs();renderPanel();updateHistory();document.getElementById('lfPreviewStage').dataset.viewport='1440';if(window.ResizeObserver){new ResizeObserver(fitLivePreview).observe(document.getElementById('lfPreviewStage'));}window.addEventListener('resize',fitLivePreview,{passive:true});fitLivePreview();paintPreview(true);
   }catch(err){
     console.error('Look & Feel failed to initialise',err);
@@ -1344,20 +1344,35 @@ function viewLook(m){
 }
 
 let livePreviewTimer=0;
-function livePreviewHTML(){
+function livePreviewHTML(mode='desktop'){
   if(!S.doc) return '<!doctype html><html><body></body></html>';
   const clone=S.doc.cloneNode(true);
   clone.querySelectorAll('link[rel="stylesheet"]').forEach(x=>x.remove());
   clone.querySelectorAll('script').forEach(x=>x.remove());
+  clone.documentElement.classList.add('salido-admin-preview','salido-preview-'+mode);
   let css=S.css||'';
-  /* style.css normally lives in /css, but it is inlined in srcdoc here. */
   css=css.replace(/url\((['"]?)\.\.\/fonts\//g,'url($1fonts/')
          .replace(/url\((['"]?)\.\.\/images\//g,'url($1images/');
+  /* Preview-mode rules are deliberately appended after the public CSS. This
+     makes Desktop reliable even when the editor panel itself is narrow. */
+  css += `\n/* SALIDO V6 PREVIEW VIEWPORT */
+  html.salido-admin-preview{scroll-behavior:auto!important}
+  html.salido-preview-desktop .burger{display:none!important}
+  html.salido-preview-desktop .nav{display:flex!important;position:static!important;visibility:visible!important;opacity:1!important;transform:none!important;flex:0 0 auto!important;width:fit-content!important;min-width:max-content!important}
+  html.salido-preview-desktop .head__in{display:flex!important;flex-wrap:nowrap!important}
+  html.salido-preview-tablet .nav,html.salido-preview-mobile .nav{display:none!important}
+  html.salido-preview-tablet .burger,html.salido-preview-mobile .burger{display:flex!important}
+  `;
   const base=clone.createElement('base'); base.href='../';
   const style=clone.createElement('style'); style.textContent=css;
   clone.head.prepend(base); clone.head.appendChild(style);
   if(S.js){ const script=clone.createElement('script'); script.textContent=S.js; clone.body.appendChild(script); }
   return '<!DOCTYPE html>\n'+clone.documentElement.outerHTML;
+}
+function selectedPreviewMode(){
+  const on=document.querySelector('.liveprev__device.is-on');
+  const width=Number(on?.dataset.previewWidth||1440);
+  return width>=1200?'desktop':(width>=700?'tablet':'mobile');
 }
 function fitLivePreview(){
   const stage=document.getElementById('lfPreviewStage'), canvas=document.getElementById('lfPreviewCanvas'), frame=document.getElementById('lfSitePreview');
@@ -1378,7 +1393,7 @@ function paintPreview(immediate=false){
   [state,fullState].filter(Boolean).forEach(x=>{ x.textContent='Updating…'; x.classList.add('is-busy'); });
   clearTimeout(livePreviewTimer);
   livePreviewTimer=setTimeout(()=>{
-    const html=livePreviewHTML();
+    const html=livePreviewHTML(selectedPreviewMode());
     let pending=0;
     frames.forEach(frame=>{
       if(!frame.isConnected) return; pending++;
