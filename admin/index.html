@@ -1499,7 +1499,13 @@ function itemsBlock(m,kind){
   const wrap=document.createElement('div');
   const list=$$(c.sel,box);
   const bar=document.createElement('div'); bar.className='card__t'; bar.style.marginBottom='.6rem';
-  bar.innerHTML='<h3>'+esc(c.name.replace(/^./,x=>x.toUpperCase()))+'s <span class="k">'+list.length+'</span></h3>';
+  if(kind==='gal'){
+    const roomCount=list.filter(el=>(el.getAttribute('data-category')||'gallery')==='rooms').length;
+    const galleryCount=list.length-roomCount;
+    bar.innerHTML='<div><h3>Gallery images <span class="k">'+galleryCount+'</span> &nbsp; Rooms images <span class="k">'+roomCount+'</span></h3><p class="hint" style="margin:.25rem 0 0">Use the category control on each image to decide where it appears on the public website.</p></div>';
+  } else {
+    bar.innerHTML='<h3>'+esc(c.name.replace(/^./,x=>x.toUpperCase()))+'s <span class="k">'+list.length+'</span></h3>';
+  }
   const add=document.createElement('button'); add.className='b b--go'; add.style.marginLeft='auto';
   add.innerHTML='<svg><use href="#a-plus"/></svg>'+c.add;
   add.addEventListener('click',()=>editItem(kind,null));
@@ -1507,32 +1513,57 @@ function itemsBlock(m,kind){
 
   if(!list.length){ const e=document.createElement('p'); e.className='empty'; e.textContent='Nothing here yet.'; wrap.appendChild(e); }
 
-  list.forEach((el,idx)=>{
-    const o=readItem(kind,el);
-    const row=document.createElement('div'); row.className='item';
-    const pic = kind==='tile'
-      ? '<div class="item__ico"><svg><use href="#'+esc(o.icon)+'"/></svg></div>'
-      : (o.src ? '<img class="item__pic" src="'+esc(imgURL(o.src))+'" alt="">'
-               : '<div class="item__ico"><svg><use href="#a-pen"/></svg></div>');
-    if(o.off) row.style.opacity='.55';
-    row.innerHTML = pic +
-      '<div class="item__b"><h4>'+esc(o.title||'(no title)')+(o.off?' <span class="k">hidden</span>':'')+'</h4><p>'+esc(o.desc||o.alt||o.label||'')+'</p></div>';
-    const acts=document.createElement('div'); acts.className='item__acts';
-    const mk=(cls,icon,label,fn)=>{ const b=document.createElement('button'); b.className='b b--sm '+cls;
-      b.innerHTML='<svg><use href="#'+icon+'"/></svg>'+label; b.addEventListener('click',fn); return b; };
-    acts.appendChild(mk('','a-pen','Edit',()=>editItem(kind,el)));
-    if(kind==='notice'){
-      acts.appendChild(mk(o.off?'':'b--bad','a-eye',o.off?'Show':'Hide',()=>{
-        if(o.off) el.removeAttribute('hidden'); else el.setAttribute('hidden','');
-        S.dirty=true; show(S.view); toast(o.off?'Notice shown':'Notice hidden');
-      }));
+  const groups = kind==='gal'
+    ? [['rooms','Rooms images'],['gallery','Gallery images']]
+    : [[null,null]];
+
+  groups.forEach(([category,label])=>{
+    const shown = category ? list.filter(el=>(el.getAttribute('data-category')||'gallery')===category) : list;
+    if(kind==='gal'){
+      const h=document.createElement('div'); h.className='card__t'; h.style.margin='1rem 0 .55rem';
+      h.innerHTML='<h3>'+label+' <span class="k">'+shown.length+'</span></h3>';
+      wrap.appendChild(h);
+      if(!shown.length){ const e=document.createElement('p'); e.className='empty'; e.textContent='No '+label.toLowerCase()+' yet. Add a photo or change an image category below.'; wrap.appendChild(e); }
     }
-    const rowm=document.createElement('div'); rowm.className='row2';
-    const up=mk('','a-up','',()=>moveItem(kind,el,-1)); up.title='Move up'; up.disabled=idx===0;
-    const dn=mk('','a-dn','',()=>moveItem(kind,el,1)); dn.title='Move down'; dn.disabled=idx===list.length-1;
-    rowm.appendChild(up); rowm.appendChild(dn); acts.appendChild(rowm);
-    acts.appendChild(mk('b--bad','a-bin','Delete',()=>delItem(kind,el)));
-    row.appendChild(acts); wrap.appendChild(row);
+    shown.forEach((el)=>{
+      const idx=list.indexOf(el), o=readItem(kind,el);
+      const row=document.createElement('div'); row.className='item';
+      const pic = kind==='tile'
+        ? '<div class="item__ico"><svg><use href="#'+esc(o.icon)+'"/></svg></div>'
+        : (o.src ? '<img class="item__pic" src="'+esc(imgURL(o.src))+'" alt="">'
+                 : '<div class="item__ico"><svg><use href="#a-pen"/></svg></div>');
+      if(o.off) row.style.opacity='.55';
+      row.innerHTML = pic +
+        '<div class="item__b"><h4>'+esc(o.title||'(no title)')+(o.off?' <span class="k">hidden</span>':'')+'</h4><p>'+esc(o.desc||o.alt||o.label||'')+'</p></div>';
+      const acts=document.createElement('div'); acts.className='item__acts';
+      const mk=(cls,icon,label,fn)=>{ const b=document.createElement('button'); b.className='b b--sm '+cls;
+        b.innerHTML='<svg><use href="#'+icon+'"/></svg>'+label; b.addEventListener('click',fn); return b; };
+      if(kind==='gal'){
+        const select=document.createElement('select');
+        select.setAttribute('aria-label','Image category');
+        select.style.cssText='min-width:130px;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 .65rem;background:#fff;font:700 .82rem/1 var(--sans);color:var(--ink)';
+        select.innerHTML='<option value="gallery">Gallery</option><option value="rooms">Rooms</option>';
+        select.value=o.category||'gallery';
+        select.addEventListener('change',()=>{
+          el.setAttribute('data-category',select.value);
+          S.dirty=true; show(S.view); toast('Moved to '+(select.value==='rooms'?'Rooms':'Gallery'));
+        });
+        acts.appendChild(select);
+      }
+      acts.appendChild(mk('','a-pen','Edit',()=>editItem(kind,el)));
+      if(kind==='notice'){
+        acts.appendChild(mk(o.off?'':'b--bad','a-eye',o.off?'Show':'Hide',()=>{
+          if(o.off) el.removeAttribute('hidden'); else el.setAttribute('hidden','');
+          S.dirty=true; show(S.view); toast(o.off?'Notice shown':'Notice hidden');
+        }));
+      }
+      const rowm=document.createElement('div'); rowm.className='row2';
+      const up=mk('','a-up','',()=>moveItem(kind,el,-1)); up.title='Move up'; up.disabled=idx===0;
+      const dn=mk('','a-dn','',()=>moveItem(kind,el,1)); dn.title='Move down'; dn.disabled=idx===list.length-1;
+      rowm.appendChild(up); rowm.appendChild(dn); acts.appendChild(rowm);
+      acts.appendChild(mk('b--bad','a-bin','Delete',()=>delItem(kind,el)));
+      row.appendChild(acts); wrap.appendChild(row);
+    });
   });
   m.appendChild(wrap);
 }
