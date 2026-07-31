@@ -3160,3 +3160,25 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   .concept-v3 .head .btn{padding-inline:.78rem!important;font-size:.78rem!important}
   .concept-v3 .lang button{padding-inline:.42rem!important}
 }
+
+
+/* Sticky navbar fix v7.0.2 */
+.site-header.is-sticky,
+.header.scrolled,
+header.scrolled,
+header.is-sticky{
+  position:fixed;
+  top:16px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:min(1760px,calc(100% - 64px))!important;
+  max-width:1760px;
+  border-radius:28px!important;
+  background:rgba(30,20,45,.82)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 14px 40px rgba(0,0,0,.28);
+  z-index:9999;
+}
+body{scroll-padding-top:110px;}
+.hero,.hero-section,main>section:first-child{padding-top:32px;}
