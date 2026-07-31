@@ -318,55 +318,15 @@
       figure.classList.toggle('has-caption',hasCaption);
       if(cap) cap.hidden=!hasCaption;
     });
-
-    /* Modern Rooms presentation. The source figures remain the single source of
-       truth, so images added or reordered in Admin automatically inherit it. */
-    var roomShots = allShots.filter(function(figure){
-      return figure.getAttribute('data-category') === 'rooms';
-    });
-    roomShots.forEach(function(figure,index){
-      figure.classList.add('room-gallery-card','room-gallery-card--'+((index%5)+1));
-      figure.style.setProperty('--room-order',index);
-      var cap=figure.querySelector('figcaption');
-      if(cap && !figure.querySelector('.room-gallery-card__arrow')){
-        var arrow=document.createElement('span');
-        arrow.className='room-gallery-card__arrow';
-        arrow.setAttribute('aria-hidden','true');
-        arrow.innerHTML='&rarr;';
-        figure.appendChild(arrow);
-      }
-      if(!figure.querySelector('.room-gallery-card__icon')){
-        var icon=document.createElement('span');
-        icon.className='room-gallery-card__icon';
-        icon.setAttribute('aria-hidden','true');
-        icon.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 11V7.8A2.8 2.8 0 0 1 6.8 5h10.4A2.8 2.8 0 0 1 20 7.8V11M3 11h18v7H3zM6 18v2m12-2v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        figure.appendChild(icon);
-      }
-    });
     var filterButtons = [].slice.call(document.querySelectorAll('[data-gallery-filter]'));
     var result = document.getElementById('gallery-result');
     var labels = {gallery:'gallery',rooms:'room'};
-    var gallerySection=document.getElementById('gallery');
-    var galleryHeading=gallerySection ? gallerySection.querySelector('.sec__head h2') : null;
-    var galleryLede=gallerySection ? gallerySection.querySelector('.sec__head .lede') : null;
-    var originalHeading=galleryHeading ? galleryHeading.innerHTML : '';
-    var originalLede=galleryLede ? galleryLede.innerHTML : '';
     function applyGalleryFilter(category){
       allShots.forEach(function(figure){
         var match = category === 'all' || figure.getAttribute('data-category') === category;
         figure.hidden = !match;
       });
       shots = allShots.filter(function(figure){ return !figure.hidden; });
-      gal.classList.toggle('is-rooms-layout',category==='rooms');
-      if(gallerySection) gallerySection.classList.toggle('gallery--rooms-active',category==='rooms');
-      if(galleryHeading){
-        galleryHeading.innerHTML = category==='rooms' ? 'Our Rooms' : originalHeading;
-      }
-      if(galleryLede){
-        galleryLede.innerHTML = category==='rooms'
-          ? 'Relax in comfort and style. Explore our bright, peaceful rooms through a modern visual gallery.'
-          : originalLede;
-      }
       filterButtons.forEach(function(button){
         var active = button.getAttribute('data-gallery-filter') === category;
         button.classList.toggle('is-active',active);
@@ -640,8 +600,8 @@
 
     function escapeHtml(value){return String(value||'').replace(/[&<>'"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch];});}
     function fallback(){
-      summary.innerHTML='<strong>★ 3.2</strong><span>19 Google reviews</span>';
-      grid.innerHTML='<article class="google-review google-review--fallback"><div class="google-review__stars" aria-label="3.2 out of 5 stars">★★★☆☆</div><p>Current Google rating: 3.2 from 19 reviews. Open Google to read the latest verified feedback.</p><a class="review-card-link" href="'+escapeHtml(googleUrl)+'" target="_blank" rel="noopener">View Google reviews <span>↗</span></a></article>';
+      summary.innerHTML='<strong>Google Reviews</strong><span>Latest verified feedback</span>';
+      grid.innerHTML='<article class="google-review google-review--fallback"><p>Open Google to read the latest verified guest rating and feedback.</p><a class="review-card-link" href="'+escapeHtml(googleUrl)+'" target="_blank" rel="noopener">View Google reviews <span>↗</span></a></article>';
       note.textContent='Verified reviews on Google';
     }
     function stars(rating){var n=Math.max(0,Math.min(5,Math.round(Number(rating)||0)));return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n);}

@@ -10,7 +10,7 @@ const MAX_ATTEMPTS = 8;
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' }
   });
 }
 

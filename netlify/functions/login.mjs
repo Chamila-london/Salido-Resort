@@ -10,7 +10,7 @@ const MAX_ATTEMPTS = 8;
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' }
   });
 }
 
@@ -51,7 +51,7 @@ export default async (req) => {
   try { body = await req.json(); } catch (e) { /* keep defaults */ }
   const user = String(body.user || '').slice(0, 100);
   const pass = String(body.pass || '').slice(0, 300);
-  const ip = (request.headers.get('cf-connecting-ip') || request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
+  const ip = (req.headers.get('cf-connecting-ip') || req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
   const now = Date.now();
   let state = attempts.get(ip);
   if (!state || now - state.started > WINDOW_MS) state = { started: now, count: 0 };
@@ -61,11 +61,15 @@ export default async (req) => {
 
   const ok = equal(user.toLowerCase(), USER.toLowerCase()) && equal(pass, PASS);
   if (!ok) {
-    await new Promise(r => setTimeout(r, 700));   // slow down guessing
+    state.count += 1; attempts.set(ip, state);
+    try { await new Promise(r => setTimeout(r, 900 + Math.min(state.count, 5) * 250)); } catch (e) {}
     return json(401, { error: 'That username and password do not match.' });
   }
 
-  const hours = Number(process.env.SESSION_HOURS || 12);
+  attempts.delete(ip);
+
+  const requestedHours = Number(process.env.SESSION_HOURS);
+  const hours = Number.isFinite(requestedHours) ? Math.min(24, Math.max(1, requestedHours)) : 12;
   const payload = b64url(enc.encode(JSON.stringify({
     u: USER,
     exp: Date.now() + hours * 3600 * 1000

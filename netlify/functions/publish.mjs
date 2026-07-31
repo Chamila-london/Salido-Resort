@@ -11,7 +11,7 @@ const MAX_TOTAL = 4.0 * 1024 * 1024;   // Netlify caps a request body at ~6 MB
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' }
   });
 }
 

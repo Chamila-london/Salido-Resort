@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex, nofollow, noarchive">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
@@ -287,7 +288,7 @@ html{font-size:15px} body{line-height:1.5}
       <label class="f"><span>Username</span><input id="suUser" autocomplete="username" spellcheck="false"></label>
       <label class="f"><span>Password</span><input id="suPw" type="password" autocomplete="new-password"></label>
       <label class="f"><span>Repeat password</span><input id="suPw2" type="password" autocomplete="new-password"></label>
-      <button class="b b--go" id="suGo">Create sign-in</button>
+      <button type="button" class="b b--go" id="suGo">Create sign-in</button>
     </div>
 
     <div id="gateLogin" hidden>
@@ -296,8 +297,8 @@ html{font-size:15px} body{line-height:1.5}
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
       <label class="f"><span>Password</span><input id="liPw" type="password" autocomplete="current-password"></label>
-      <button class="b b--go" id="liGo">Sign in</button>
-      <button class="linky" id="liReset">Forgotten it? Reset the sign-in</button>
+      <button type="button" class="b b--go" id="liGo">Sign in</button>
+      <button type="button" class="linky" id="liReset">Forgotten it? Reset the sign-in</button>
     </div>
 
     <p class="gate__note"><b>Worth knowing.</b> This lock is on this file, not on your website. It keeps someone who picks up your laptop from opening the editor — it is not internet security. Keep this file on your own computer and never upload it to Netlify.</p>
@@ -311,13 +312,13 @@ html{font-size:15px} body{line-height:1.5}
     <div class="top__name">Admin Page<small>Salido Resort website</small></div>
     <div class="top__sp"></div>
     <div class="langs" id="langs" hidden>
-      <button data-l="en" aria-pressed="true">EN</button>
-      <button data-l="si" lang="si" aria-pressed="false">සිං</button>
-      <button data-l="ta" lang="ta" aria-pressed="false">தமிழ்</button>
+      <button type="button" data-l="en" aria-pressed="true">EN</button>
+      <button type="button" data-l="si" lang="si" aria-pressed="false">සිං</button>
+      <button type="button" data-l="ta" lang="ta" aria-pressed="false">தமிழ்</button>
     </div>
     <span class="who" id="who"></span>
-    <button class="b b--sm" id="btnPw" title="Change password"><svg><use href="#a-lock"/></svg><span>Change password</span></button>
-    <button class="b b--sm" id="btnOut">Sign out</button>
+    <button type="button" class="b b--sm" id="btnPw" title="Change password"><svg><use href="#a-lock"/></svg><span>Change password</span></button>
+    <button type="button" class="b b--sm" id="btnOut">Sign out</button>
   </header>
 
   <!-- load screen -->
@@ -325,7 +326,7 @@ html{font-size:15px} body{line-height:1.5}
     <div class="drop" id="drop">
       <h2>Open your website</h2>
       <p>Drop <b>SALIDO-NETLIFY.zip</b> here — or the FILES zip, or a lone index.html.</p>
-      <button class="b b--go" id="pick">Choose a file</button>
+      <button type="button" class="b b--go" id="pick">Choose a file</button>
       <input type="file" id="file" accept=".zip,.html,.htm" hidden>
       <p class="hint" id="loadMsg" style="margin-top:1rem"></p>
     </div>
@@ -434,7 +435,7 @@ function cloudBoot(){
   const note = $('.gate__note');
   if(note) note.innerHTML = '<b>Worth knowing.</b> Your username and password are kept on the server, not in this browser. Anything you publish here changes the real website about a minute later.';
   const drop = $('#drop');
-  if(drop) drop.innerHTML = '<h2>Your website</h2><p>Reading the live pages…</p><button class="b" id="reOpen">Try again</button><p class="hint" id="loadMsg" style="margin-top:1rem"></p>';
+  if(drop) drop.innerHTML = '<h2>Your website</h2><p>Reading the live pages…</p><button type="button" class="b" id="reOpen">Try again</button><p class="hint" id="loadMsg" style="margin-top:1rem"></p>';
   const rb = $('#reOpen'); if(rb) rb.addEventListener('click', ()=> loadFromLive());
   const wb = $('.load .warnbar'); if(wb) wb.textContent = 'Changes only go live when you press Publish on the last screen.';
   if(tok()) resumeCloud(); else $('#liUser').focus();
@@ -445,7 +446,11 @@ async function resumeCloud(){
     const d = await api('/api/list', {});
     enterApp(d.user || 'admin');
     await loadFromLive(d);
-  }catch(e){ setTok(''); $('#liUser').focus(); }
+  }catch(e){
+    setTok('');
+    showGateErr('#liErr', e.message || 'Could not restore your session. Please sign in again.');
+    $('#liUser').focus();
+  }
 }
 
 async function cloudSignIn(){
