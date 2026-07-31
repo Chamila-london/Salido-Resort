@@ -1,7 +1,7 @@
 {
   "name": "salido-resort-v7",
   "private": true,
-  "version": "7.0.3",
+  "version": "7.0.4",
   "type": "module",
   "scripts": {
     "test": "node tests/smoke.mjs",
