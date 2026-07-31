@@ -511,7 +511,9 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
   <div class="wrap v3-location__wrap">
     <div class="map-v3 reveal is-visible" aria-label="Interactive map showing Salido Resort in Tennekumbura, Kandy">
       <div class="map map--luxury">
-        <div id="resortMap" class="map__canvas"></div>
+        <div id="resortMap" class="map__canvas">
+          <iframe class="map__embed-fallback" title="Map showing Salido Resort, Tennekumbura, Kandy" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=7.2844504,80.6651848&amp;z=15&amp;output=embed"></iframe>
+        </div>
         <button class="map__style" id="mapStyleToggle" type="button" aria-label="Switch map style">Satellite</button>
         <noscript><a class="map__fallback" href="https://www.google.com/maps/search/?api=1&amp;query=7.2844504%2C80.6651848" target="_blank" rel="noopener">Open Salido Resort in Google Maps</a></noscript>
       </div>

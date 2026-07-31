@@ -543,6 +543,7 @@
   /* branded interactive map: dark resort style with satellite toggle */
   var mapNode = document.getElementById('resortMap');
   if(mapNode && window.L){
+    mapNode.innerHTML='';
     var resortCoords = [7.2844504, 80.6651848];
     var resortMap = L.map(mapNode, {scrollWheelZoom:false, zoomControl:true, attributionControl:true}).setView(resortCoords, 15);
     var darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -585,6 +586,10 @@
       else { resortMap.removeLayer(satelliteTiles); darkTiles.addTo(resortMap); styleButton.textContent='Satellite'; }
     }); }
     setTimeout(function(){resortMap.invalidateSize();},350);
+  }else if(mapNode){
+    mapNode.classList.add('map__canvas--fallback');
+    var fallbackToggle=document.getElementById('mapStyleToggle');
+    if(fallbackToggle) fallbackToggle.hidden=true;
   }
 
   /* Official Google Places review loader. Google returns up to five reviews. */

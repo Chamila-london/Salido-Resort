@@ -2981,3 +2981,71 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   .nav a{padding-inline:min(var(--admin-nav-link-x),8px)!important;font-size:calc(.84rem * var(--z-nav))!important}
   .head .btn{padding-inline:.9rem!important}
 }
+
+/* ===== V7.0.2 — requested UI corrections ===== */
+/* A real map remains visible even when the Leaflet CDN is unavailable. */
+.map__embed-fallback{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#151020}
+.map__canvas--fallback{background:#151020}
+
+/* Attraction modal must sit above the persistent header. */
+.smodal{z-index:5000!important;padding:clamp(14px,2.5vw,34px)!important}
+.smodal__panel{position:relative!important;overflow:hidden!important}
+.smodal__x{
+  top:16px!important;right:16px!important;z-index:20!important;
+  width:48px!important;height:48px!important;display:grid!important;place-items:center!important;
+  padding:0!important;border:1px solid rgba(255,255,255,.45)!important;
+  background:rgba(22,13,34,.86)!important;color:#fff!important;
+  font:400 2rem/1 system-ui,sans-serif!important;box-shadow:0 12px 30px rgba(0,0,0,.3)!important;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)
+}
+.smodal__x:hover,.smodal__x:focus-visible{background:#8f45db!important;transform:scale(1.06);outline:3px solid rgba(191,132,247,.35);outline-offset:3px}
+
+/* Modern segmented gallery selector. */
+.gallery-filters{
+  width:max-content;max-width:100%;padding:6px;gap:4px;border:1px solid rgba(126,70,181,.15);
+  border-radius:22px;background:rgba(255,255,255,.72);box-shadow:0 16px 42px rgba(55,25,87,.1),inset 0 1px 0 #fff;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.gallery-filter{
+  min-width:116px;border:0!important;border-radius:16px!important;padding:.88rem 1.35rem!important;
+  background:transparent!important;box-shadow:none!important;font-size:.94rem!important;font-weight:700!important;
+  transition:transform .25s ease,background .25s ease,color .25s ease,box-shadow .25s ease!important
+}
+.gallery-filter:hover{transform:none!important;background:rgba(143,69,219,.09)!important}
+.gallery-filter.is-active{background:linear-gradient(135deg,#a65bea,#7b35c5)!important;color:#fff!important;box-shadow:0 10px 24px rgba(126,52,196,.3)!important}
+.gallery-filter.is-active::before{content:"";display:inline-block;width:7px;height:7px;margin-right:.5rem;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.16);vertical-align:1px}
+.gallery-result{margin-left:.45rem}
+
+/* Continuously animated notice-board title. */
+#notices .sec__head h2{
+  width:max-content;max-width:100%;background:linear-gradient(100deg,#170d28 0%,#170d28 32%,#9a4fe2 48%,#4c1d76 58%,#170d28 76%);
+  background-size:240% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:salidoNoticeTitle 5.5s linear infinite;filter:drop-shadow(0 8px 24px rgba(127,61,191,.08))
+}
+@keyframes salidoNoticeTitle{0%{background-position:140% 0}100%{background-position:-100% 0}}
+
+/* New floating glass navigation with a clear active state. */
+.concept-v3 .nav{
+  position:relative!important;gap:4px!important;padding:6px!important;border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:22px!important;background:linear-gradient(135deg,rgba(20,12,31,.76),rgba(59,33,77,.62))!important;
+  box-shadow:0 14px 40px rgba(6,3,12,.25),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(22px) saturate(1.25)!important;-webkit-backdrop-filter:blur(22px) saturate(1.25)!important
+}
+.concept-v3 .nav a{
+  position:relative!important;padding:.68rem .9rem!important;border-radius:16px!important;color:rgba(255,255,255,.82)!important;
+  font-weight:600!important;letter-spacing:-.01em!important;transition:color .22s ease,background .22s ease,transform .22s ease!important
+}
+.concept-v3 .nav a:hover,.concept-v3 .nav a:focus-visible{background:rgba(255,255,255,.1)!important;color:#fff!important;transform:translateY(-1px)}
+.concept-v3 .nav a[aria-current="page"]{
+  background:linear-gradient(135deg,#a45be7,#7d35ca)!important;color:#fff!important;border-radius:16px!important;
+  box-shadow:0 8px 20px rgba(126,50,202,.32),inset 0 1px 0 rgba(255,255,255,.2)!important
+}
+.concept-v3 .nav a[aria-current="page"]::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;border-radius:50%;background:#fff;transform:translateX(-50%);opacity:.9}
+
+@media(max-width:760px){
+  .gallery-filters{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .gallery-filter{min-width:0}
+  .smodal{padding:10px!important;align-items:center!important}
+  .smodal__x{top:10px!important;right:10px!important;width:44px!important;height:44px!important}
+}
+@media(prefers-reduced-motion:reduce){#notices .sec__head h2{animation:none;background:#170d28;-webkit-background-clip:text;background-clip:text}}
