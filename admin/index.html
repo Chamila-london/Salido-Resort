@@ -264,7 +264,7 @@ html{font-size:15px} body{line-height:1.5}
 .v5control output,.v5control code{position:relative;z-index:3;background:var(--card,#fff);padding-left:8px}
 @media (min-width:1481px){main,.main,.workspace{min-width:0}.v5studio__grid{overflow:visible}}
 
-/* ================= V12 COMPLETE ADMIN REDESIGN ================= */
+/* ================= V12.0.1 FULL ADMIN ADMIN REDESIGN ================= */
 :root{
   --plum:#0b0720!important;--ink:#f7f2ff!important;--mute:#afa4c4!important;
   --line:rgba(196,139,255,.18)!important;--wash:rgba(120,73,180,.13)!important;
@@ -279,11 +279,11 @@ linear-gradient(145deg,#070412 0%,#0d0820 48%,#080516 100%)!important}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:38px 38px}
 #gate{background:radial-gradient(circle at 50% 0%,rgba(161,75,255,.25),transparent 36%),linear-gradient(145deg,#080417,#130a29)!important}
 .gate__card{position:relative;overflow:hidden;background:linear-gradient(155deg,rgba(29,17,58,.94),rgba(12,8,29,.96))!important;border:1px solid rgba(205,150,255,.24)!important;box-shadow:0 34px 100px rgba(0,0,0,.55),0 0 50px rgba(151,67,255,.10)!important}
-.gate__card:before{content:"SALIDO  •  V12 COMPLETE";display:block;margin-bottom:18px;color:#d5adff;font-size:.68rem;font-weight:800;letter-spacing:.22em}
+.gate__card:before{content:"SALIDO  •  V12.0.1 FULL ADMIN";display:block;margin-bottom:18px;color:#d5adff;font-size:.68rem;font-weight:800;letter-spacing:.22em}
 .gate__card:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-120px;top:-130px;background:radial-gradient(circle,rgba(186,103,255,.24),transparent 70%);pointer-events:none}
 .gate__card h1{font-family:Georgia,serif!important;font-size:clamp(1.7rem,4vw,2.35rem)!important;font-weight:500!important;color:#fff!important}.gate__sub,.gate__note,.hint{color:var(--mute)!important}
 .top{height:72px!important;padding:0 24px!important;background:rgba(8,5,22,.78)!important;border-bottom:1px solid rgba(193,133,255,.18)!important;backdrop-filter:blur(22px);box-shadow:0 12px 40px rgba(0,0,0,.25)!important;position:sticky;top:0;z-index:50}
-.top__mark{color:#d3a3ff!important;filter:drop-shadow(0 0 14px rgba(180,92,255,.45));height:46px!important}.top__name{font-family:Georgia,serif!important;font-size:1.15rem!important;letter-spacing:.04em;color:#fff!important}.top__name:after{content:"V12 COMPLETE";display:inline-flex;margin-left:10px;padding:4px 8px;border:1px solid rgba(199,142,255,.25);border-radius:999px;font:800 .58rem/1 system-ui;letter-spacing:.12em;color:#d9b5ff;background:rgba(168,88,255,.10)}.top__name small{font-family:system-ui!important;color:#a99abb!important;letter-spacing:.02em!important}
+.top__mark{color:#d3a3ff!important;filter:drop-shadow(0 0 14px rgba(180,92,255,.45));height:46px!important}.top__name{font-family:Georgia,serif!important;font-size:1.15rem!important;letter-spacing:.04em;color:#fff!important}.top__name:after{content:"V12.0.1 FULL ADMIN";display:inline-flex;margin-left:10px;padding:4px 8px;border:1px solid rgba(199,142,255,.25);border-radius:999px;font:800 .58rem/1 system-ui;letter-spacing:.12em;color:#d9b5ff;background:rgba(168,88,255,.10)}.top__name small{font-family:system-ui!important;color:#a99abb!important;letter-spacing:.02em!important}
 .ws{grid-template-columns:252px minmax(0,1fr)!important;gap:0!important;min-height:calc(100vh - 72px)}
 .rail{top:72px!important;max-height:calc(100vh - 72px)!important;padding:20px 14px!important;background:rgba(10,6,25,.72)!important;border-right:1px solid rgba(193,133,255,.16)!important;backdrop-filter:blur(18px)}
 .rail__h{color:#856b9d!important;font-size:.65rem!important;letter-spacing:.18em!important;margin:16px 12px 8px!important}.rail button{min-height:44px!important;border-radius:12px!important;color:#bfb3d0!important;padding:10px 12px!important;border:1px solid transparent!important;transition:.2s ease!important}.rail button:hover{color:#fff!important;background:rgba(171,91,255,.10)!important;border-color:rgba(190,129,255,.14)!important;transform:translateX(2px)}.rail button.on,.rail button[aria-current="page"]{color:#fff!important;background:linear-gradient(135deg,rgba(183,93,255,.28),rgba(112,67,210,.14))!important;border-color:rgba(208,155,255,.28)!important;box-shadow:inset 3px 0 #c371ff,0 10px 24px rgba(67,31,117,.18)!important}
@@ -327,7 +327,7 @@ dialog{background:linear-gradient(155deg,#1b1037,#0c081d)!important;color:#fff!i
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido V12 Admin</h1>
+      <h1>Salido V12.0.1 Admin</h1>
       <p class="gate__sub">Manage the complete Salido Resort website from one premium workspace.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -685,7 +685,7 @@ $('#liReset').addEventListener('click', async e=>{
 function enterApp(user){
   $('#gate').style.display='none'; $('#app').style.display='block';
   $('#who').textContent=user;
-  document.title='Salido V12 Admin — '+user;
+  document.title='Salido V12.0.1 Admin — '+user;
 }
 $('#btnOut').addEventListener('click', ()=>{ if(CLOUD) setTok(''); sessionStorage.removeItem(SESS); location.reload(); });
 $('#btnPw').addEventListener('click', async ()=>{
@@ -870,9 +870,9 @@ function nearestGroup(el){
   if(el.closest('#spotModal')) return '_modal';
   return '_other';
 }
-const GROUP_TITLES={_header:'Header & menu',top:'Hero (top of page)',notices:'Notice board',about:'About',facilities:'Facilities',
-  rooms:'Rooms',gallery:'Gallery',attractions:'Kandy attractions',getting:'Getting to Kandy',
-  contact:'Contact',_footer:'Footer',_modal:'Attraction pop-up',_other:'Other text'};
+const GROUP_TITLES={_header:'Header & menu',header:'Header & menu',home:'Hero & booking',top:'Hero (top of page)',notices:'Notice board',about:'About',facilities:'Facilities',
+  rooms:'Rooms',showcase:'Gallery & events',events:'Events',gallery:'Gallery',location:'Location & nearby attractions',newsletter:'Newsletter',attractions:'Kandy attractions',getting:'Getting to Kandy',
+  contact:'Contact & footer',_footer:'Footer',_modal:'Attraction pop-up',_other:'Other text'};
 const ORDER=['_header','top','notices','about','facilities','rooms','gallery','attractions','getting','contact','_footer','_modal','_other'];
 
 function snapshot(){ try{ writeBack(); S.orig={html:S.doc.documentElement.outerHTML, js:S.js||'', css:S.css||''}; }catch(e){} }
