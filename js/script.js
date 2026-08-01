@@ -663,11 +663,8 @@
   var head=document.getElementById('head');
   var burger=document.getElementById('burger');
   var nav=document.getElementById('nav');
-  if(head){
-    var syncHeader=function(){ head.classList.toggle('is-stuck',window.scrollY>24); };
-    syncHeader();
-    window.addEventListener('scroll',syncHeader,{passive:true});
-  }
+  /* Header state is managed by the single requestAnimationFrame-throttled
+     listener at the top of this file. Avoid a second synchronous scroll handler. */
   if(burger&&nav){
     document.addEventListener('keydown',function(e){
       if(e.key==='Escape'&&document.body.classList.contains('is-open')){
