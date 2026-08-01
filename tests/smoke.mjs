@@ -35,4 +35,10 @@ for (const file of ['functions/api/publish.js','netlify/functions/publish.mjs'])
 
 assert.ok(!read('index.html').includes('★ 3.2'), 'stale hard-coded Google score remains');
 assert.ok(!read('js/script.js').includes('Current Google rating: 3.2'), 'stale JS Google score remains');
+
+// V10.0.6 regression: standalone room showcase must remain removed.
+const indexHtml = read('index.html');
+assert(!indexHtml.includes('class="sec rooms-showcase"'), 'Standalone rooms showcase should be removed');
+assert(!indexHtml.includes('Deluxe Double Room'), 'Removed room card content should not remain');
+assert(!indexHtml.includes('Multi-room Booking'), 'Removed multi-room card content should not remain');
 console.log('QA smoke checks passed.');
