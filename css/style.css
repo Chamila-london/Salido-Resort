@@ -4674,3 +4674,45 @@ body.concept-v3 .head__in{transform:translateZ(0)}
   .reveal{opacity:1!important;transform:none!important}
   .nav-perimeter-sweep__light{display:none!important}
 }
+
+/* ================================================================
+   V14.2.0 — desktop + mobile performance and responsive QA
+   ================================================================ */
+html{scroll-padding-top:82px}
+body{overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+img{max-width:100%;height:auto}
+iframe,video,canvas,svg{max-width:100%}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+section:not(.hero),footer{content-visibility:auto;contain-intrinsic-size:1px 720px}
+.is-scrolling .hero__glow,.is-scrolling .luxury-marker::before,.is-scrolling .luxury-marker::after{opacity:0!important}
+.is-scrolling .hero__media,.is-scrolling .hero__picture img{transition:none!important}
+
+@media (max-width:860px){
+  html{scroll-padding-top:70px}
+  .container{width:min(100% - 32px,var(--container,1200px))}
+  .hero{min-height:100svh;min-height:100dvh}
+  .hero__content{padding-inline:16px}
+  .hero__media,.hero__picture img{transform:none!important;animation:none!important}
+  .hero__glow{display:none!important}
+  .head,.header,.site-header{transform:translateZ(0);backface-visibility:hidden}
+  .nav a,.nav button,.burger,.dock a,.dock button{touch-action:manipulation}
+  .dock{padding-bottom:max(10px,env(safe-area-inset-bottom))}
+  .leaflet-container{touch-action:pan-x pan-y}
+  input,select,textarea{font-size:16px!important}
+  .lux-gallery,.room-grid,.facilities-grid,.contact-grid{min-width:0}
+  .lux-gallery>*,.room-grid>*,.facilities-grid>*,.contact-grid>*{min-width:0}
+}
+@media (max-width:560px){
+  .container{width:min(100% - 24px,var(--container,1200px))}
+  h1{overflow-wrap:anywhere}
+  .btn,.button,[class*="btn"]{min-height:44px}
+  .dock{max-width:calc(100vw - 16px)}
+}
+@media (hover:none),(pointer:coarse){
+  .hero__media,.hero__picture img,.room-card,.room-card__media img,.lux-gallery figure,.lux-gallery figure img{animation:none!important}
+  .room-card:hover,.lux-gallery figure:hover{transform:none!important}
+}
+@media (prefers-reduced-data:reduce){
+  *,*::before,*::after{background-attachment:scroll!important}
+  .hero__glow{display:none!important}
+}
