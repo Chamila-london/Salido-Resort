@@ -354,7 +354,7 @@ button,input,select,textarea{touch-action:manipulation}img,svg,canvas,iframe{max
       <button type="button" class="linky" id="liReset">Forgotten it? Reset the sign-in</button>
     </div>
 
-    <p class="gate__note"><b>Worth knowing.</b> This lock is on this file, not on your website. It keeps someone who picks up your laptop from opening the editor — it is not internet security. Keep this file on your own computer and never upload it to Netlify.</p>
+    <p class="gate__note"><b>Worth knowing.</b> This lock is on this file, not on your website. It keeps someone who picks up your laptop from opening the editor — it is not internet security. Keep this file on your own computer and never upload it to your website host.</p>
   </div>
 </section>
 
@@ -363,7 +363,7 @@ button,input,select,textarea{touch-action:manipulation}img,svg,canvas,iframe{max
   <header class="top">
     <svg class="top__mark" viewBox="0 0 115 157" aria-hidden="true"><use href="#i-mark"/></svg>
     <div class="top__name">Admin Studio<small>Salido Resort website management</small></div>
-    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #5a367c;border-radius:999px;background:#1c0f31;color:#d9b3ff">V12.0.5 COMPLETE</span><div class="top__sp"></div>
+    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #5a367c;border-radius:999px;background:#1c0f31;color:#d9b3ff">V14.3.3</span><div class="top__sp"></div>
     <div class="langs" id="langs" hidden>
       <button type="button" data-l="en" aria-pressed="true">EN</button>
       <button type="button" data-l="si" lang="si" aria-pressed="false">සිං</button>
@@ -383,7 +383,7 @@ button,input,select,textarea{touch-action:manipulation}img,svg,canvas,iframe{max
       <input type="file" id="file" accept=".zip,.html,.htm" hidden>
       <p class="hint" id="loadMsg" style="margin-top:1rem"></p>
     </div>
-    <div class="warnbar" style="margin-top:1.2rem">Nothing you do here touches the live site until you download the new zip and drop it on Netlify yourself.</div>
+    <div class="warnbar" style="margin-top:1.2rem">Nothing you do here touches the live site until you download the new zip and publish it through GitHub Desktop yourself.</div>
   </div>
 
   <!-- workspace -->
@@ -714,7 +714,7 @@ function enterApp(user){
 }
 $('#btnOut').addEventListener('click', ()=>{ if(CLOUD) setTok(''); sessionStorage.removeItem(SESS); location.reload(); });
 $('#btnPw').addEventListener('click', async ()=>{
-  if(CLOUD){ return openDlg('Where your password lives','<p style="margin:0 0 .7rem">Your username and password are stored on the server, not in this browser — that is why you can sign in from any phone or computer.</p><p style="margin:0">To change them: go to <b>app.netlify.com</b> &rarr; your site &rarr; <b>Site configuration</b> &rarr; <b>Environment variables</b>, edit <b>ADMIN_USER</b> or <b>ADMIN_PASSWORD</b>, then <b>Deploys</b> &rarr; <b>Trigger deploy</b>.</p>', null); }
+  if(CLOUD){ return openDlg('Where your password lives','<p style="margin:0 0 .7rem">Your username and password are stored on the server, not in this browser — that is why you can sign in from any phone or computer.</p><p style="margin:0">To change them: go to <b>dash.cloudflare.com</b> &rarr; Workers &amp; Pages &rarr; your Salido project &rarr; <b>Settings</b> &rarr; <b>Environment variables</b>, edit <b>ADMIN_USER</b> or <b>ADMIN_PASSWORD</b>, and save &mdash; then redeploy from <b>Deployments</b>.</p>', null); }
   const a=readAuth(); if(!a) return;
   const html='<label class="f"><span>Current password</span><input id="cp0" type="password"></label>'+
              '<label class="f"><span>New password</span><input id="cp1" type="password"></label>'+
@@ -2121,7 +2121,7 @@ async function preview(){
 }
 function viewPublish(m){
   if(CLOUD) return viewPublishCloud(m);
-  head(m,'Preview & publish','Look at it first. Then download the zip and drop it on Netlify — that is the moment it goes live.');
+  head(m,'Preview & publish','Look at it first. Then download the zip and publish it with GitHub Desktop — that is the moment it goes live.');
   const c=document.createElement('div'); c.className='card';
   c.innerHTML='<div class="card__t"><h3>1 · Check your changes</h3></div><p class="hint" style="margin-bottom:.8rem">Opens the edited website in a new tab, exactly as visitors will see it.</p>';
   const p=document.createElement('button'); p.className='b'; p.innerHTML='<svg><use href="#a-eye"/></svg>Open the preview';
@@ -2149,7 +2149,7 @@ function viewPublish(m){
 
   const c3=document.createElement('div'); c3.className='card';
   c3.innerHTML='<div class="card__t"><h3>3 · Put it live</h3></div>'+
-    '<p class="hint">Go to <b>app.netlify.com</b>, open your Salido site, choose <b>Deploys</b>, and drag the zip you just downloaded onto the drop area. It is live about a minute later.</p>';
+    '<p class="hint">Open <b>GitHub Desktop</b> → <b>Pull origin</b> first. Empty the website folder but keep the <b>.git</b> folder, paste the contents of the zip in, then <b>Commit</b> → <b>Push</b>. The site updates about a minute later.</p>';
   m.appendChild(c3);
 
   const w=document.createElement('div'); w.className='warnbar';

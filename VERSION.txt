@@ -1,7 +1,9 @@
-SALIDO V14.3.2
-- Attraction videos are now managed from the admin panel:
-  Kandy attractions -> Edit -> "Video in the pop-up" (add, replace or remove)
-- The video is saved with its card, so reordering attractions can no longer
-  detach it (was hard-wired to card position 3)
-- Publishing accepts videos/ files up to ~25 MB (Cloudflare)
-- kandy-lake.mp4 re-encoded 9.6 MB -> 3.4 MB (720p) for faster mobile loading
+SALIDO V14.3.3
+- Mobile menu fixed: opens as a full-width panel from the top, every link reachable
+  (was pushed 157px above the screen by a later CSS layer)
+- "From LKR 2,000 / per night" restored on the map card, in all three languages
+- 44 missing Sinhala + Tamil translations restored (hero, gallery tabs & counter,
+  reservation, map card, Google reviews, trust badges, footer, map style button)
+- CSS paste error removed (.btn block trapped inside .chip and .tag rules)
+- Admin: publish instructions now describe GitHub Desktop (Netlify wording was stale),
+  version badge corrected
