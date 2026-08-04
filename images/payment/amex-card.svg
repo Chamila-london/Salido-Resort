@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+<title id="title">American Express</title>
+<defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1387dd"/><stop offset="1" stop-color="#006fcf"/></linearGradient><filter id="s" x="-20%" y="-30%" width="140%" height="170%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".2"/></filter></defs>
+<rect x="12" y="12" width="296" height="148" rx="18" fill="url(#b)" filter="url(#s)"/>
+<g fill="#fff" stroke="#fff" stroke-width="1" font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" text-anchor="middle">
+<text x="160" y="78" font-size="28" letter-spacing="-1.5">AMERICAN</text><text x="160" y="111" font-size="30" letter-spacing="-1.2">EXPRESS</text>
+</g>
+</svg>

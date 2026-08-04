@@ -1,0 +1,11 @@
+{
+  "name": "salido-resort-v14-2-0",
+  "private": true,
+  "version": "14.2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/smoke.mjs",
+    "check:syntax": "node --check js/script.js && node --check netlify/functions/login.mjs && node --check netlify/functions/list.mjs && node --check netlify/functions/publish.mjs && node --check functions/api/login.js && node --check functions/api/list.js && node --check functions/api/publish.js",
+    "qa": "npm run check:syntax && npm test"
+  }
+}
