@@ -88,7 +88,7 @@ export default async (req) => {
     const headSha = ref.object.sha;
     const tree = await gh('/repos/' + repo + '/git/trees/' + headSha + '?recursive=1');
     const images = (tree.tree || [])
-      .filter(n => n.type === 'blob' && /^images\/[^/]+\.(webp|png|jpg|jpeg|svg)$/i.test(n.path))
+      .filter(n => n.type === 'blob' && /^(images\/[^/]+\.(webp|png|jpg|jpeg|svg)|videos\/[^/]+\.(mp4|webm))$/i.test(n.path))
       .map(n => ({ path: n.path, size: n.size || 0 }))
       .sort((a, b) => a.path.localeCompare(b.path));
     return json(200, { user: s.u, repo, branch, headSha, platform: 'Netlify', images });

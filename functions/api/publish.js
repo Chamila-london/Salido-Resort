@@ -4,8 +4,8 @@
 
 const enc = new TextEncoder();
 
-const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg))$/;
-const MAX_TOTAL = 4.0 * 1024 * 1024;
+const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg)|videos\/[A-Za-z0-9._-]+\.(mp4|webm))$/;
+const MAX_TOTAL = 26 * 1024 * 1024; /* raised for attraction videos — Cloudflare Pages allows up to 25 MB per static file */
 
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {

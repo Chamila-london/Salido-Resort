@@ -609,11 +609,13 @@ function viewPublishCloud(m){
   const files = pendingFiles();
   const total = files.reduce((a, f)=> a + f.bytes.length, 0);
   const photos = files.filter(f=> /^images\//.test(f.path));
+  const vids = files.filter(f=> /^videos\//.test(f.path));
 
   const c2 = document.createElement('div'); c2.className = 'card';
   c2.innerHTML = '<div class="card__t"><h3>2 · Publish</h3></div>' +
     '<p class="hint" style="margin-bottom:.8rem">Sending the page' +
       (photos.length ? ' and ' + photos.length + ' new photo' + (photos.length > 1 ? 's' : '') : '') +
+      (vids.length ? ' and ' + vids.length + ' video' + (vids.length > 1 ? 's' : '') : '') +
       ' — ' + bytes(total) + ' in total. The website updates about a minute later.</p>' +
     '<label class="f"><span>Note for your own records (optional)</span>' +
       '<input id="pubMsg" placeholder="e.g. new BBQ photo and updated phone number"></label>';
@@ -621,7 +623,7 @@ function viewPublishCloud(m){
   gb.innerHTML = '<svg><use href="#a-dl"/></svg>Publish to the live website';
   const st = document.createElement('p'); st.className = 'hint'; st.style.marginTop = '.8rem';
   gb.addEventListener('click', async ()=>{
-    if(total > 4000000){ st.textContent = 'That is too much to send at once. Publish now, then add the next photo and publish again.'; return; }
+    if(total > 25000000){ st.textContent = 'That is too much to send at once (over 25 MB). Publish now, then add the next file and publish again.'; return; }
     const okgo = await confirmBox('Publish to the live website?',
       'Visitors will see these changes in about a minute. You can always edit again afterwards.', 'Publish');
     if(!okgo) return;
@@ -1102,7 +1104,7 @@ function readItem(kind,el){
     o.lKey=o.lEl?.getAttribute('data-i18n')||''; o.tKey=o.tEl?.getAttribute('data-i18n')||'';
     o.kKey=o.kEl?.getAttribute('data-i18n')||''; o.dKey=o.dEl?.getAttribute('data-i18n')||'';
     o.i=+(el.getAttribute('data-i')||0);
-    const x=S.extra[o.i]||{}; o.long=(x.desc||[]).join('\n\n'); o.facts=(x.facts||[]).map(f=>f[0]+' | '+f[1]).join('\n'); o.maps=x.maps||'';
+    const x=S.extra[o.i]||{}; o.long=(x.desc||[]).join('\n\n'); o.facts=(x.facts||[]).map(f=>f[0]+' | '+f[1]).join('\n'); o.maps=x.maps||''; o.video=x.video||'';
   } else if(kind==='notice'){
     o.media=el.querySelector('.notice__media');
     o.img=el.querySelector('.notice__media img');
@@ -1709,6 +1711,26 @@ async function pickedImage(id,base,oldSrc){
   S.files.set(name,data); CHANGED.add(name);
   return {name,w,h};
 }
+function vidField(id,cur){
+  return '<label class="f"><span>Video in the pop-up (optional)</span></label>'+
+    '<div style="margin:-.4rem 0 .9rem">'+
+      (cur?'<p class="hint" style="margin:0 0 .5rem">This card has a video: <b>'+esc(cur.replace('videos/',''))+'</b></p>':'')+
+      '<input type="file" id="'+id+'" accept="video/mp4,video/webm">'+
+      '<p class="hint">'+(cur?'Choose a file to replace it. ':'')+'MP4 video, 20 MB at most. Visitors get a play button on the photo when they open this card.</p>'+
+      (cur?'<label style="display:flex;gap:.5rem;align-items:center;margin-top:.6rem"><input type="checkbox" id="'+id+'_rm" style="width:auto"><span style="margin:0;text-transform:none;letter-spacing:0;font-size:.88rem">Remove the video from this card</span></label>':'')+
+    '</div>';
+}
+async function pickedVideo(id){
+  const inp=$('#'+id); const f=inp&&inp.files[0];
+  if(!f) return null;
+  const okType=/^video\//.test(f.type)||/\.(mp4|webm)$/i.test(f.name);
+  if(!okType){ toast('Please choose an MP4 video file'); return {bad:true}; }
+  if(f.size>20*1024*1024){ toast('That video is '+bytes(f.size)+' — please use one under 20 MB'); return {bad:true}; }
+  const ext=(f.type==='video/webm'||/\.webm$/i.test(f.name))?'webm':'mp4';
+  let i=1,n; do{ n='videos/attraction-video'+(i++)+'.'+ext; }while(S.files.has(n));
+  S.files.set(n,new Uint8Array(await f.arrayBuffer())); CHANGED.add(n);
+  return {name:n};
+}
 function fieldRow(id,label,val,long,ph){
   return long
     ? '<label class="f"><span>'+esc(label)+'</span><textarea id="'+id+'" placeholder="'+esc(ph||'')+'">'+esc(val||'')+'</textarea></label>'
@@ -1887,6 +1909,7 @@ function editItem(kind,el){
       tri('k','Distance', o.kKey||'', o.km||'', false, 'e.g. 3.7 km away') +
       tri('d','Short line on the card', o.dKey||'', o.desc||'', true) +
       '<hr style="border:0;border-top:1px solid var(--line);margin:1.2rem 0"><p class="hint" style="margin:0 0 .8rem">These show in the pop-up when a visitor taps the card. English only.</p>' +
+      vidField('vid', o.video||'') +
       fieldRow('long','Full description — one blank line between paragraphs', o.long||'', true) +
       fieldRow('facts','Quick facts, one per line as  Label | Value', o.facts||'', true, 'Entry | Around LKR 250') +
       fieldRow('maps','What to search on Google Maps', o.maps||'', false, 'Kandy Lake, Kandy'),
@@ -1894,6 +1917,8 @@ function editItem(kind,el){
         if(!V('t')) { toast('Give it a name'); return false; }
         const up=await pickedImage('pic','att-new', o.src);
         if(isNew && !up){ toast('Choose a photo first'); return false; }
+        const vv=await pickedVideo('vid');
+        if(vv&&vv.bad) return false;
         let node=el, lKey=o.lKey,tKey=o.tKey,kKey=o.kKey,dKey=o.dKey;
         if(isNew){
           const base=uniqueKey('att.sx#.t').replace(/\.t$/,'');
@@ -1922,6 +1947,9 @@ function editItem(kind,el){
           facts: V('facts')? V('facts').split('\n').map(l=>l.split('|')).filter(p=>p.length>1).map(p=>[p[0].trim(),p.slice(1).join('|').trim()]):[],
           maps: V('maps')||V('t')
         };
+        const vrm=$('#vid_rm')&&$('#vid_rm').checked;
+        const vpath=(vv&&vv.name)?vv.name:(vrm?'':(o.video||''));
+        if(vpath) S.extra[i].video=vpath;
         S.dirty=true; renderRail(); show(S.view); toast(isNew?'Attraction added':'Saved');
       });
     hookPic('pic'); ['l','t','k','d'].forEach((p,i)=>triFill(p,[o.lKey,o.tKey,o.kKey,o.dKey][i]));
@@ -2080,7 +2108,8 @@ async function preview(){
   const files=buildFiles(false), urls=new Map();
   const mime=k=> k.endsWith('.css')?'text/css': k.endsWith('.js')?'text/javascript':
                k.endsWith('.woff')?'font/woff': k.endsWith('.png')?'image/png':
-               k.endsWith('.xml')?'text/xml': k.endsWith('.webp')?'image/webp':'text/plain';
+               k.endsWith('.xml')?'text/xml': k.endsWith('.webp')?'image/webp':
+               k.endsWith('.mp4')?'video/mp4': k.endsWith('.webm')?'video/webm':'text/plain';
   for(const [k,v] of files){ if(k!=='index.html'&&k!=='css/style.css') urls.set(k, URL.createObjectURL(new Blob([v],{type:mime(k)}))); }
   let css=dec.decode(files.get('css/style.css')||new Uint8Array());
   css=css.replace(/\.\.\/(images|fonts)\/([A-Za-z0-9._-]+)/g,(m,a,b)=> urls.get(a+'/'+b)||m);

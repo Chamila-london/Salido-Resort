@@ -210,7 +210,8 @@
         "The Temple of the Tooth"
       ]
     ],
-    "maps": "Kandy Lake, Kandy"
+    "maps": "Kandy Lake, Kandy",
+    "video": "videos/kandy-lake.mp4"
   },
   {
     "desc": [
@@ -280,14 +281,31 @@
     "maps": "Kandy Lake, Kandy"
   }
 ];
-    var smImg=document.getElementById('sm-img'), smEye=document.getElementById('sm-eyebrow'),
-        smTitle=document.getElementById('sm-title'), smKm=document.getElementById('sm-km'),
-        smDesc=document.getElementById('sm-desc'), smFacts=document.getElementById('sm-facts'),
-        smDir=document.getElementById('sm-dir'), smX=document.getElementById('sm-x'), smLast=null;
+    var smImg=document.getElementById('sm-img'), smMedia=document.getElementById('sm-media'),
+        smVideo=document.getElementById('sm-video'), smPlay=document.getElementById('sm-play'),
+        smEye=document.getElementById('sm-eyebrow'), smTitle=document.getElementById('sm-title'),
+        smKm=document.getElementById('sm-km'), smDesc=document.getElementById('sm-desc'),
+        smFacts=document.getElementById('sm-facts'), smDir=document.getElementById('sm-dir'),
+        smX=document.getElementById('sm-x'), smLast=null;
     function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
     function openSpot(card){
       var i=+card.getAttribute('data-i'); var x=EXTRA[i]||{desc:[],facts:[],maps:''};
       var img=card.querySelector('img'); smImg.src=img?img.src:''; smImg.alt=img?img.alt:'';
+      var vsrc=x.video||'';
+      var hasVideo=!!vsrc;
+      if(smVideo && smPlay && smMedia){
+        smVideo.pause(); smVideo.controls=false;
+        if(hasVideo){
+          if(smVideo.getAttribute('src')!==vsrc) smVideo.setAttribute('src',vsrc);
+        } else if(smVideo.getAttribute('src')){
+          smVideo.removeAttribute('src'); smVideo.load();
+        }
+        try{ smVideo.currentTime=0; }catch(err){}
+        smVideo.poster=img?img.src:'';
+        smVideo.hidden=!hasVideo; smPlay.hidden=!hasVideo; smImg.hidden=hasVideo;
+        smMedia.classList.toggle('is-video-ready',hasVideo);
+        smMedia.classList.remove('is-playing');
+      }
       var eye=card.querySelector('.spot__body span'); smEye.textContent=eye?eye.textContent:'';
       var t=card.querySelector('h3'); smTitle.textContent=t?t.textContent:'';
       var km=card.querySelector('.spot__km'); smKm.textContent=km?km.textContent:'';
@@ -296,7 +314,26 @@
       smDir.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.maps||smTitle.textContent);
       smLast=document.activeElement; sm.classList.add('open'); document.body.style.overflow='hidden'; smX.focus();
     }
-    function closeSpot(){ sm.classList.remove('open'); document.body.style.overflow=''; if(smLast) smLast.focus(); }
+    function resetSpotVideo(){
+      if(!smVideo || !smMedia) return;
+      smVideo.pause(); smVideo.currentTime=0; smVideo.controls=false;
+      smMedia.classList.remove('is-playing');
+    }
+    function playSpotVideo(){
+      if(!smVideo || smVideo.hidden) return;
+      var promise=smVideo.play();
+      if(promise && promise.then){
+        promise.then(function(){ smVideo.controls=true; smMedia.classList.add('is-playing'); })
+          .catch(function(err){ console.warn('Attraction video could not play:',err); });
+      }else{ smVideo.controls=true; smMedia.classList.add('is-playing'); }
+    }
+    function closeSpot(){ resetSpotVideo(); sm.classList.remove('open'); document.body.style.overflow=''; if(smLast) smLast.focus(); }
+    if(smPlay) smPlay.addEventListener('click',function(e){e.stopPropagation();playSpotVideo();});
+    if(smVideo){
+      smVideo.addEventListener('play',function(){smVideo.controls=true;smMedia.classList.add('is-playing');});
+      smVideo.addEventListener('pause',function(){if(!smVideo.ended) smMedia.classList.remove('is-playing');});
+      smVideo.addEventListener('ended',function(){resetSpotVideo();});
+    }
     rail.addEventListener('click', function(e){ var c=e.target.closest('.spot'); if(c) openSpot(c); });
     rail.addEventListener('keydown', function(e){
       var c=e.target.closest('.spot'); if(!c) return;

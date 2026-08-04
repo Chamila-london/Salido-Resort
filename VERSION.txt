@@ -1,1 +1,7 @@
-14.3.0
+SALIDO V14.3.2
+- Attraction videos are now managed from the admin panel:
+  Kandy attractions -> Edit -> "Video in the pop-up" (add, replace or remove)
+- The video is saved with its card, so reordering attractions can no longer
+  detach it (was hard-wired to card position 3)
+- Publishing accepts videos/ files up to ~25 MB (Cloudflare)
+- kandy-lake.mp4 re-encoded 9.6 MB -> 3.4 MB (720p) for faster mobile loading

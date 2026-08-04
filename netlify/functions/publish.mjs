@@ -5,7 +5,8 @@
 const enc = new TextEncoder();
 
 /* only these may ever be written */
-const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg))$/;
+const ALLOWED = /^(index\.html|robots\.txt|sitemap\.xml|css\/[A-Za-z0-9._-]+\.css|js\/[A-Za-z0-9._-]+\.js|images\/[A-Za-z0-9._-]+\.(webp|png|jpg|jpeg|svg)|videos\/[A-Za-z0-9._-]+\.(mp4|webm))$/;
+/* NOTE: Netlify sync functions cap the request body around 6 MB — larger videos must be added through GitHub Desktop. */
 const MAX_TOTAL = 4.0 * 1024 * 1024;   // Netlify caps a request body at ~6 MB
 
 function json(status, obj) {

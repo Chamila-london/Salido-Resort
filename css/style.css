@@ -599,14 +599,65 @@ a.info__row:hover{padding-left:.5rem}
 .sm-facts li{display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;color:var(--ink)}
 .sm-facts li::before{content:"";flex:none;width:7px;height:7px;margin-top:.5rem;border-radius:50%;background:var(--violet)}
 .sm-facts b{font-weight:700}
-.smodal .btn{width:100%;justify-content:center}
-.sm-note{font-size:.76rem;color:var(--muted);text-align:center;margin-top:.8rem;line-height:1.5}
 .smodal__x{
-  position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border:0;border-radius:50%;
-  background:rgba(23,16,43,.55);color:#fff;font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center;
-  transition:background .2s;
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:3;
+
+  width:36px;              /* 75% of 48px */
+  height:36px;             /* 75% of 48px */
+
+  padding:0;
+  border:2px solid rgba(255,255,255,.9);
+  border-radius:50%;
+  background:#ef4444;
+
+  color:transparent;
+  font-size:0;
+  line-height:0;
+
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  box-shadow:0 6px 16px rgba(239,68,68,.35),
+             0 0 0 3px rgba(239,68,68,.12);
+
+  transition:background .2s ease,
+             transform .2s ease,
+             box-shadow .2s ease;
 }
-.smodal__x:hover{background:rgba(23,16,43,.8)}
+
+.smodal__x::before,
+.smodal__x::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+
+  width:16px;             /* Was 22px */
+  height:2.5px;           /* Was 3px */
+
+  border-radius:999px;
+  background:#fff;
+  transform-origin:center;
+}
+
+.smodal__x::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+
+.smodal__x::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+
+.smodal__x:hover{
+  background:#dc2626;
+  transform:scale(1.05);
+}
+.smodal__x:focus-visible{outline:3px solid rgba(239,68,68,.35);outline-offset:3px}
 .spot{cursor:pointer}
 .spot__more{
   display:inline-flex;align-items:center;gap:.4rem;margin-top:.7rem;
@@ -619,11 +670,25 @@ a.info__row:hover{padding-left:.5rem}
   .smodal__media{min-height:200px;max-height:34vh}
 }
 .lb__btn{
-  position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
-  background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:grid;place-items:center;
-  font-size:26px;line-height:1;transition:background .2s;
+  position:absolute;
+  width:52++px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  border-radius:50%;
+  background:#ef4444;
+  color:#fff;
+  cursor:pointer;
+  font-size:30px;
+  font-weight:700;
+  line-height:1;
+  padding:0;
+  box-shadow:0 8px 20px rgba(239,68,68,.35);
+  transition:all .25s ease;
 }
-.lb__btn:hover{background:rgba(255,255,255,.22)}
+.lb__btn:hover{background:#dc2626;transform:scale(1.08)}
 .lb__x{top:clamp(12px,3vw,28px);right:clamp(12px,3vw,28px)}
 .lb__p{left:clamp(8px,2vw,28px);top:50%;transform:translateY(-50%)}
 .lb__n{right:clamp(8px,2vw,28px);top:50%;transform:translateY(-50%)}
@@ -2982,6 +3047,9 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   .head .btn{padding-inline:.9rem!important}
 }
 
+/* Final proportional X size for the reduced attraction-modal close button. */
+.smodal__x::before,.smodal__x::after{width:16px!important;height:2px!important}
+
 /* ===== V7.0.2 — requested UI corrections ===== */
 /* A real map remains visible even when the Leaflet CDN is unavailable. */
 .map__embed-fallback{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#151020}
@@ -2991,14 +3059,15 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
 .smodal{z-index:5000!important;padding:clamp(14px,2.5vw,34px)!important}
 .smodal__panel{position:relative!important;overflow:hidden!important}
 .smodal__x{
-  top:16px!important;right:16px!important;z-index:20!important;
-  width:48px!important;height:48px!important;display:grid!important;place-items:center!important;
-  padding:0!important;border:1px solid rgba(255,255,255,.45)!important;
-  background:rgba(22,13,34,.86)!important;color:#fff!important;
-  font:400 2rem/1 system-ui,sans-serif!important;box-shadow:0 12px 30px rgba(0,0,0,.3)!important;
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)
+  top:12px!important;right:12px!important;z-index:20!important;
+  width:36px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:0!important;border:2px solid rgba(255,255,255,.9)!important;
+  background:#ef4444!important;color:transparent!important;
+  font-size:0!important;line-height:0!important;box-shadow:0 10px 26px rgba(239,68,68,.4)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
 }
-.smodal__x:hover,.smodal__x:focus-visible{background:#8f45db!important;transform:scale(1.06);outline:3px solid rgba(191,132,247,.35);outline-offset:3px}
+.smodal__x:hover{background:#dc2626!important;transform:scale(1.06);outline:0!important}
+.smodal__x:focus-visible{background:#dc2626!important;outline:3px solid rgba(239,68,68,.35)!important;outline-offset:3px}
 
 /* Modern segmented gallery selector. */
 .gallery-filters{
@@ -3046,7 +3115,7 @@ h3{font-family:var(--display);font-size:calc(clamp(1rem,1.45vw,1.25rem) * var(--
   .gallery-filters{width:100%;display:grid;grid-template-columns:1fr 1fr}
   .gallery-filter{min-width:0}
   .smodal{padding:10px!important;align-items:center!important}
-  .smodal__x{top:10px!important;right:10px!important;width:44px!important;height:44px!important}
+  .smodal__x{top:10px!important;right:10px!important;width:34px!important;height:34px!important}
 }
 @media(prefers-reduced-motion:reduce){#notices .sec__head h2{animation:none;background:#170d28;-webkit-background-clip:text;background-clip:text}}
 
@@ -4786,4 +4855,64 @@ body.concept-v3 #notices.sec--notice {
 @media(prefers-reduced-motion:reduce){
   .nav-guided-light{display:none!important}
   body.concept-v3 .head>.head__in>.btn{animation:none!important}
+}
+
+/* ===== V14.3.1 attraction image-to-video player ===== */
+.smodal__media{isolation:isolate}
+.smodal__media #sm-img,
+.smodal__media #sm-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.smodal__media #sm-video[hidden],
+.smodal__play[hidden]{display:none!important}
+.smodal__media.is-video-ready{cursor:pointer}
+.smodal__media.is-video-ready::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(23,16,43,.03),rgba(23,16,43,.22));
+  transition:opacity .3s ease;
+}
+.smodal__media.is-playing::after{opacity:0}
+.smodal__play{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:4;
+  width:66px;
+  height:66px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  border:2px solid rgba(255,255,255,.92);
+  border-radius:50%;
+  background:rgba(36,23,53,.72);
+  box-shadow:0 15px 36px rgba(0,0,0,.34),0 0 0 8px rgba(255,255,255,.1);
+  backdrop-filter:blur(8px);
+  cursor:pointer;
+  transform:translate(-50%,-50%);
+  transition:transform .24s ease,background .24s ease,opacity .24s ease,visibility .24s ease;
+}
+.smodal__play span{
+  width:0;
+  height:0;
+  margin-left:5px;
+  border-top:10px solid transparent;
+  border-bottom:10px solid transparent;
+  border-left:16px solid #fff;
+}
+.smodal__play:hover{background:var(--violet-fill);transform:translate(-50%,-50%) scale(1.07)}
+.smodal__play:focus-visible{outline:3px solid rgba(181,145,230,.65);outline-offset:4px}
+.smodal__media.is-playing .smodal__play{opacity:0;visibility:hidden;pointer-events:none}
+.smodal__media #sm-video{z-index:2;background:#17102b}
+.smodal__media #sm-img{z-index:0}
+@media(max-width:680px){
+  .smodal__play{width:54px;height:54px;box-shadow:0 12px 28px rgba(0,0,0,.3),0 0 0 6px rgba(255,255,255,.1)}
+  .smodal__play span{border-top-width:8px;border-bottom-width:8px;border-left-width:13px}
 }

@@ -336,7 +336,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 </div>
 </section>
 <div aria-label="Photo viewer" aria-modal="true" class="lb" id="lb" role="dialog">
-<button aria-label="Close" class="lb__btn lb__x" id="lb-x" type="button">×</button>
+<button aria-label="Close" title="Close" class="lb__btn lb__x" id="lb-x" type="button">×</button>
 <button aria-label="Previous photo" class="lb__btn lb__p" id="lb-p" type="button">‹</button>
 <button aria-label="Next photo" class="lb__btn lb__n" id="lb-n" type="button">›</button>
 <img alt="" decoding="async" fetchpriority="low" id="lb-img" loading="lazy"/>
@@ -345,8 +345,12 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <!-- ============ ATTRACTION DETAIL MODAL ============ -->
 <div aria-labelledby="sm-title" aria-modal="true" class="smodal" id="spotModal" role="dialog">
 <div class="smodal__panel" role="document">
-<button aria-label="Close" class="smodal__x" id="sm-x" type="button">×</button>
-<div class="smodal__media"><img alt="" decoding="async" fetchpriority="low" id="sm-img" loading="lazy"/></div>
+<button aria-label="Close" title="Close" class="smodal__x" id="sm-x" type="button">×</button>
+<div class="smodal__media" id="sm-media">
+<img alt="" decoding="async" fetchpriority="low" id="sm-img" loading="lazy"/>
+<video aria-label="Attraction video" id="sm-video" playsinline preload="metadata" hidden></video>
+<button aria-label="Play video" class="smodal__play" id="sm-play" type="button" hidden><span aria-hidden="true"></span></button>
+</div>
 <div class="smodal__body">
 <span class="eyebrow" id="sm-eyebrow"></span>
 <h3 id="sm-title"></h3>
