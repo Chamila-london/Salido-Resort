@@ -1,4 +1,4 @@
-SALIDO V14.3.3
+SALIDO V14.3.4
 - Mobile menu fixed: opens as a full-width panel from the top, every link reachable
   (was pushed 157px above the screen by a later CSS layer)
 - "From LKR 2,000 / per night" restored on the map card, in all three languages
@@ -7,3 +7,5 @@ SALIDO V14.3.3
 - CSS paste error removed (.btn block trapped inside .chip and .tag rules)
 - Admin: publish instructions now describe GitHub Desktop (Netlify wording was stale),
   version badge corrected
+- V14.3.4: admin publish/confirm dialogs were white-on-white in the dark theme
+  (the dark reskin never restyled the base dialog rule) — now dark with readable text
