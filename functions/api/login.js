@@ -1,5 +1,5 @@
-/* Salido control room — sign in.
-   Checks the username/password against the Netlify environment variables and
+/* Salido control room — sign in.  Cloudflare Pages Function.
+   Checks the username/password against the project's environment variables and
    hands back a short-lived signed token. No packages, no database. */
 
 const enc = new TextEncoder();
@@ -35,23 +35,24 @@ function equal(a, b) {
   return diff === 0;
 }
 
-export default async (req) => {
-  if (req.method !== 'POST') return json(405, { error: 'Use POST.' });
+export async function onRequest(context) {
+  const { request, env } = context;
+  if (request.method !== 'POST') return json(405, { error: 'Use POST.' });
 
-  const USER = process.env.ADMIN_USER || '';
-  const PASS = process.env.ADMIN_PASSWORD || '';
-  const SECRET = process.env.SESSION_SECRET || '';
+  const USER = env.ADMIN_USER || '';
+  const PASS = env.ADMIN_PASSWORD || '';
+  const SECRET = env.SESSION_SECRET || '';
   if (!USER || !PASS || !SECRET) {
     return json(500, {
-      error: 'The admin login is not set up yet. In Netlify open Site configuration → Environment variables and add ADMIN_USER, ADMIN_PASSWORD and SESSION_SECRET.'
+      error: 'The admin login is not set up yet. In Cloudflare open your Pages project → Settings → Variables and secrets and add ADMIN_USER, ADMIN_PASSWORD and SESSION_SECRET.'
     });
   }
 
   let body = {};
-  try { body = await req.json(); } catch (e) { /* keep defaults */ }
+  try { body = await request.json(); } catch (e) { /* keep defaults */ }
   const user = String(body.user || '').slice(0, 100);
   const pass = String(body.pass || '').slice(0, 300);
-  const ip = (req.headers.get('cf-connecting-ip') || req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
+  const ip = (request.headers.get('cf-connecting-ip') || request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
   const now = Date.now();
   let state = attempts.get(ip);
   if (!state || now - state.started > WINDOW_MS) state = { started: now, count: 0 };
@@ -65,10 +66,9 @@ export default async (req) => {
     try { await new Promise(r => setTimeout(r, 900 + Math.min(state.count, 5) * 250)); } catch (e) {}
     return json(401, { error: 'That username and password do not match.' });
   }
-
   attempts.delete(ip);
 
-  const requestedHours = Number(process.env.SESSION_HOURS);
+  const requestedHours = Number(env.SESSION_HOURS);
   const hours = Number.isFinite(requestedHours) ? Math.min(24, Math.max(1, requestedHours)) : 12;
   const payload = b64url(enc.encode(JSON.stringify({
     u: USER,
@@ -77,6 +77,4 @@ export default async (req) => {
   const token = payload + '.' + await sign(SECRET, payload);
 
   return json(200, { token, user: USER });
-};
-
-export const config = { path: '/api/login' };
+}

@@ -1,6 +1,6 @@
-/* Salido control room — what is on the server.
+/* Salido control room — what is on the server.  Cloudflare Pages Function.
    Confirms the caller's session and returns the photo files in the repository
-   so the editor can show them without downloading 30 MB of pictures. */
+   so the editor can show them without downloading megabytes of pictures. */
 
 const enc = new TextEncoder();
 
@@ -34,11 +34,10 @@ function equal(a, b) {
   return diff === 0;
 }
 
-
-export async function session(req) {
-  const SECRET = process.env.SESSION_SECRET || '';
+async function session(request, env) {
+  const SECRET = env.SESSION_SECRET || '';
   if (!SECRET) return null;
-  const raw = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  const raw = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   const dot = raw.lastIndexOf('.');
   if (dot < 1) return null;
   const payload = raw.slice(0, dot), sig = raw.slice(dot + 1);
@@ -50,52 +49,47 @@ export async function session(req) {
   return data;
 }
 
-export async function gh(path, init) {
-  const token = process.env.GITHUB_TOKEN || '';
-  const r = await fetch('https://api.github.com' + path, Object.assign({}, init, {
-    headers: Object.assign({
-      authorization: 'Bearer ' + token,
+async function gh(env, path) {
+  const r = await fetch('https://api.github.com' + path, {
+    headers: {
+      authorization: 'Bearer ' + (env.GITHUB_TOKEN || ''),
       accept: 'application/vnd.github+json',
-      'user-agent': 'salido-control-room',
-      'content-type': 'application/json'
-    }, (init && init.headers) || {})
-  }));
+      'user-agent': 'salido-control-room'
+    }
+  });
   const text = await r.text();
   if (!r.ok) {
     let msg = text.slice(0, 300);
     try { msg = JSON.parse(text).message || msg; } catch (e) { /* keep raw */ }
-    const err = new Error('GitHub said: ' + msg + ' (' + r.status + ')');
-    err.status = r.status;
-    throw err;
+    throw new Error('GitHub said: ' + msg + ' (' + r.status + ')');
   }
   return text ? JSON.parse(text) : {};
 }
 
-export default async (req) => {
-  if (req.method !== 'POST') return json(405, { error: 'Use POST.' });
+export async function onRequest(context) {
+  const { request, env } = context;
+  if (request.method !== 'POST') return json(405, { error: 'Use POST.' });
 
-  const s = await session(req);
+  const s = await session(request, env);
   if (!s) return json(401, { error: 'Please sign in again.' });
 
-  const repo = process.env.GITHUB_REPO || '';
-  const branch = process.env.GITHUB_BRANCH || 'main';
-  if (!repo || !process.env.GITHUB_TOKEN) {
-    return json(500, { error: 'Publishing is not set up yet. Add GITHUB_REPO and GITHUB_TOKEN in Netlify → Site configuration → Environment variables.' });
+  const repo = env.GITHUB_REPO || '';
+  const branch = env.GITHUB_BRANCH || 'main';
+  if (!repo || !env.GITHUB_TOKEN) {
+    return json(500, { error: 'Publishing is not set up yet. Add GITHUB_REPO and GITHUB_TOKEN in your Cloudflare Pages project settings.' });
   }
 
   try {
-    const ref = await gh('/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
+    const ref = await gh(env, '/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
     const headSha = ref.object.sha;
-    const tree = await gh('/repos/' + repo + '/git/trees/' + headSha + '?recursive=1');
+    const tree = await gh(env, '/repos/' + repo + '/git/trees/' + headSha + '?recursive=1');
     const images = (tree.tree || [])
       .filter(n => n.type === 'blob' && /^(images\/[^/]+\.(webp|png|jpg|jpeg|svg)|videos\/[^/]+\.(mp4|webm))$/i.test(n.path))
       .map(n => ({ path: n.path, size: n.size || 0 }))
       .sort((a, b) => a.path.localeCompare(b.path));
-    return json(200, { user: s.u, repo, branch, headSha, platform: 'Netlify', images });
+    return json(200, { user: s.u, repo, branch, headSha, platform: 'Cloudflare Pages', images });
   } catch (e) {
     console.error(e);
     return json(502, { error: 'Could not read the website repository. Check the deployment logs and repository settings.' });
   }
-};
-
-export const config = { path: '/api/list' };
+}
