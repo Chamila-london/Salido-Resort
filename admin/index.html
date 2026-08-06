@@ -401,7 +401,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido Admin Studio</h1>
+      <h1>Salido Admin Studio V17.0.1</h1>
       <p class="gate__sub">Sign in to edit the website.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -520,14 +520,25 @@ function tok(){ try{ return sessionStorage.getItem(TOKK)||''; }catch(e){ return 
 function setTok(t){ try{ t? sessionStorage.setItem(TOKK,t) : sessionStorage.removeItem(TOKK); }catch(e){} }
 
 async function api(path, body){
-  let r;
-  try{
-    r = await fetch(path, { method:'POST', cache:'no-store',
-      headers: Object.assign({'content-type':'application/json'}, tok()? {authorization:'Bearer '+tok()} : {}),
-      body: JSON.stringify(body||{}) });
-  }catch(e){ throw new Error('Could not reach the server. Check your internet connection.'); }
-  let d={}; try{ d = await r.json(); }catch(e){}
-  if(r.status===404) throw new Error('This website has no admin server yet. Deploy the included server functions for your hosting platform.');
+  const opts = { method:'POST', cache:'no-store',
+    headers: Object.assign({'content-type':'application/json'}, tok()? {authorization:'Bearer '+tok()} : {}),
+    body: JSON.stringify(body||{}) };
+  const candidates = [path];
+  if(path.startsWith('/api/')) candidates.push('/.netlify/functions/' + path.slice(5));
+  let r=null, d={};
+  for(let i=0;i<candidates.length;i++){
+    try{ r = await fetch(candidates[i], opts); }
+    catch(e){
+      if(i===candidates.length-1) throw new Error('Could not reach the admin server. Check the deployment and internet connection.');
+      continue;
+    }
+    try{ d = await r.clone().json(); }catch(e){ d={}; }
+    if((r.status===404 || r.status===405) && i<candidates.length-1) continue;
+    break;
+  }
+  if(!r || r.status===404 || r.status===405){
+    throw new Error('Admin API is not running. A normal local/static server cannot process sign-in. Deploy this project through Netlify Git or Netlify CLI so the included functions are installed.');
+  }
   if(r.status===401){ const err=new Error(d.error||'Your session has ended. Please sign in again.'); err.auth=true; throw err; }
   if(!r.ok) throw new Error(d.error || ('Server error '+r.status+'.'));
   return d;
