@@ -29,7 +29,7 @@ async function sign(secret, payload) {
 }
 
 function equal(a, b) {
-  if (a.length !== b.length) return false;
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
@@ -59,7 +59,11 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: 'Too many sign-in attempts. Try again later.' }), { status: 429, headers: { 'content-type':'application/json', 'cache-control':'no-store', 'retry-after':'900' } });
   }
 
-  const ok = equal(user.toLowerCase(), USER.toLowerCase()) && equal(pass, PASS);
+  /* Evaluate both comparisons unconditionally so response timing does not reveal
+     whether the username or the password was the part that did not match. */
+  const userOk = equal(user.toLowerCase(), USER.toLowerCase());
+  const passOk = equal(pass, PASS);
+  const ok = userOk & passOk ? true : false;
   if (!ok) {
     state.count += 1; attempts.set(ip, state);
     try { await new Promise(r => setTimeout(r, 900 + Math.min(state.count, 5) * 250)); } catch (e) {}
