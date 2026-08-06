@@ -7,14 +7,14 @@
 <title>Salido Resort Kandy | Rooms in Tennekumbura, Sri Lanka</title>
 <meta content="Stay at Salido Resort in Tennekumbura, Kandy. Comfortable AC and non-AC rooms, attached bathrooms, hot water, free Wi-Fi, safe parking and direct WhatsApp reservations." name="description"/>
 <meta content="#24103F" name="theme-color"/>
-<meta content="light dark" name="color-scheme"/>
+<meta content="light" name="color-scheme"/>
 <meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
 <meta content="telephone=yes" name="format-detection"/>
 <link href="site.webmanifest" rel="manifest"/>
 <link href="images/favicon.png" rel="icon"/>
 <link href="images/favicon.png" rel="icon" sizes="32x32"/>
 <link href="images/favicon.png" rel="apple-touch-icon"/>
-<link as="image" fetchpriority="high" href="images/hero-v3-1920.webp" rel="preload"/>
+<link as="image" fetchpriority="high" rel="preload" imagesrcset="images/hero-v3-4k.webp 3840w, images/hero-v3-1920.webp 1920w, images/hero.webp 1536w" imagesizes="100vw" href="images/hero.webp"/>
 <meta content="Salido Resort Kandy | A peaceful stay in Tennekumbura" property="og:title"/>
 <meta content="A quiet stay on Riverview Road, Tennekumbura — minutes from the Temple of the Tooth and Kandy Lake." property="og:description"/>
 <meta content="website" property="og:type"/>
@@ -34,8 +34,8 @@
 <link crossorigin="" href="https://unpkg.com" rel="preconnect"/>
 <link crossorigin="" href="https://tile.openstreetmap.org" rel="preconnect"/>
 <link href="https://www.google.com" rel="dns-prefetch"/>
-<link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="css/style.css?v=16.0.0" rel="stylesheet"/>
+<link crossorigin="anonymous" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet"/><noscript><link crossorigin="anonymous" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/></noscript>
+<link href="css/style.css?v=17.0.0" rel="stylesheet"/>
 <style>
 #zip-warning{display:none;position:fixed;inset:0;z-index:9999;background:#2E1A4A;color:#fff;
   padding:24px;text-align:center;flex-direction:column;align-items:center;justify-content:center;
@@ -152,7 +152,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <picture class="hero__picture">
 <source media="(min-width:1800px)" srcset="images/hero-v3-4k.webp"/>
 <source media="(min-width:900px)" srcset="images/hero-v3-1920.webp"/>
-<img alt="" decoding="async" fetchpriority="high" height="1024" src="images/hero.webp" width="1536"/>
+<img alt="" decoding="async" fetchpriority="high" height="1024" src="images/hero.webp" srcset="images/hero-v3-4k.webp 3840w, images/hero-v3-1920.webp 1920w, images/hero.webp 1536w" sizes="100vw" width="1536"/>
 </picture>
 <div class="hero__sunbeam"></div>
 <div class="hero__bokeh"></div>
@@ -167,7 +167,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <h1 class="v1003-hero-title"><span data-i18n-html="hero.h1a">Relax in<br/>nature,<br/>reconnect with</span> <span class="brushed"><span data-i18n="hero.h1b">you.</span><svg aria-hidden="true" preserveaspectratio="none" viewbox="0 0 1200 120"><use href="#i-brush"></use></svg></span></h1>
 <p class="hero__creed" data-i18n-html="hero.creed">Relax <span class="sep">·</span> Unwind <span class="sep">·</span> Experience</p>
 <p class="hero__sub" data-i18n="hero.sub">A quiet stay on Riverview Road, Tennekumbura — minutes from the Temple of the Tooth, Kandy Lake and the Hantana hills.</p>
-<div aria-label="Resort highlights" class="hero__trust">
+<div aria-label="Resort highlights" class="hero__trust" role="group">
 <span data-i18n-html="hero.t1"><b>Direct</b> booking</span>
 <span data-i18n-html="hero.t2"><b>Free</b> Wi-Fi</span>
 <span data-i18n-html="hero.t3"><b>24/7</b> front desk</span>
@@ -205,7 +205,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 </div>
 </div>
 <!-- ============ NOTICE BOARD ============ -->
-<!-- Switched off until you turn it on in the admin page. -->
+<!-- Notices -->
 <section class="sec sec--notice" id="notices">
 <div class="wrap">
 <div class="sec__head reveal">
@@ -263,19 +263,20 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <h2 data-i18n="fac.h2">Everything the stay needs, nothing it doesn't</h2>
 <p class="lede" data-i18n="fac.lede">No resort fees, no upsells. The things that actually make a room comfortable, and all of them included.</p>
 </div>
-<div class="bento reveal">
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-ac"></use></svg></div><h3 data-i18n="fac.ac.t">AC &amp; non-AC rooms</h3><p data-i18n="fac.ac.d">Pick what suits you. The hill air does most of the work at night.</p></div>
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-bath"></use></svg></div><h3 data-i18n="fac.bath.t">Attached bathrooms</h3><p data-i18n="fac.bath.d">Every room, private, with hot water on tap.</p></div>
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-wifi"></use></svg></div><h3 data-i18n="fac.wifi.t">Free Wi-Fi</h3><p data-i18n="fac.wifi.d">Throughout the property, no vouchers or codes.</p></div>
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-hot"></use></svg></div><h3 data-i18n="fac.hot.t">Hot water</h3><p data-i18n="fac.hot.d">Ready at any hour, for early starts and late returns.</p></div>
-<div class="tile tile--feat">
-<svg aria-hidden="true" class="mark" viewbox="0 0 115 157"><use href="#i-mark"></use></svg>
+<div class="bento facilities-grid-v162 reveal">
+<article class="tile facility-card-v162"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-ac"></use></svg></div><h3 data-i18n="fac.ac.t">AC &amp; non-AC rooms</h3><p data-i18n="fac.ac.d">Pick what suits you. The hill air does most of the work at night.</p></article>
+<article class="tile facility-card-v162"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-bath"></use></svg></div><h3 data-i18n="fac.bath.t">Attached bathrooms</h3><p data-i18n="fac.bath.d">Every room, private, with hot water on tap.</p></article>
+<article class="tile facility-card-v162"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-wifi"></use></svg></div><h3 data-i18n="fac.wifi.t">Free Wi-Fi</h3><p data-i18n="fac.wifi.d">Throughout the property, no vouchers or codes.</p></article>
+<article class="tile facility-card-v162"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-hot"></use></svg></div><h3 data-i18n="fac.hot.t">Hot water</h3><p data-i18n="fac.hot.d">Ready at any hour, for early starts and late returns.</p></article>
+<article class="tile facility-card-v162 facility-card-v162--parking"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-car"></use></svg></div><h3 data-i18n="fac.park.t">Safe parking</h3><p data-i18n="fac.park.d">Off-road, on the property, at no extra charge.</p></article>
+<article class="tile tile--feat facility-feature-v162" data-facility-image="images/gallery6.webp" style="--facility-feature-image:url('images/gallery6.webp')">
+<div class="facility-feature-v162__shade" aria-hidden="true"></div>
 <div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-leaf"></use></svg></div>
 <h3 data-i18n="fac.view.t">Natural view</h3>
 <p data-i18n="fac.view.d">Green hills on one side, the river road on the other. This is why people book here.</p>
-</div>
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-bbq"></use></svg></div><h3 data-i18n="fac.bbq.t">BBQ facility</h3><p data-i18n="fac.bbq.d">Tell us in advance and we'll set it up in the garden.</p></div>
-<div class="tile"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-car"></use></svg></div><h3 data-i18n="fac.park.t">Safe parking</h3><p data-i18n="fac.park.d">Off-road, on the property, at no extra charge.</p></div>
+<span class="facility-feature-v162__badge">Guest favourite</span>
+</article>
+<article class="tile facility-card-v162 facility-card-v162--bbq"><div class="tile__ico"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-bbq"></use></svg></div><h3 data-i18n="fac.bbq.t">BBQ facility</h3><p data-i18n="fac.bbq.d">Tell us in advance and we'll set it up in the garden.</p></article>
 </div>
 </div>
 </section>
@@ -440,7 +441,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <div class="reservation-v9__form reveal">
 <header class="reservation-v9__formhead"><span aria-hidden="true" class="reservation-v9__calendar">▦</span><div><h3 data-i18n="con.form.h3">Tell us your dates</h3><p data-i18n="con.form.p">We’ll come back with availability and today’s rate.</p></div></header>
 <div class="fields">
-<div class="field field--full"><label data-i18n="con.form.name" for="f-name">Your name</label><div class="input-shell"><span aria-hidden="true">♙</span><input autocomplete="name" data-i18n-ph="con.form.name.ph" id="f-name" placeholder="e.g. Nimal Perera" type="text"/></div></div>
+<div class="field field--full"><label data-i18n="con.form.name" for="f-name">Your name</label><div class="input-shell"><span aria-hidden="true" class="input-shell__icon"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg></span><input autocomplete="name" data-i18n-ph="con.form.name.ph" id="f-name" placeholder="e.g. Nimal Perera" type="text"/></div></div>
 <div class="field"><label data-i18n="con.form.in" for="f-in">Check-in</label><input id="f-in" type="date"/></div>
 <div class="field"><label data-i18n="con.form.out" for="f-out">Check-out</label><input id="f-out" type="date"/></div>
 <div class="field"><label data-i18n="con.form.guests" for="f-guests">Guests</label><select id="f-guests"><option>1</option><option selected="">2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>
@@ -448,7 +449,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <div class="field field--full"><label data-i18n="con.form.msg" for="f-msg">Anything else?</label><textarea data-i18n-ph="con.form.msg.ph" id="f-msg" placeholder="AC or non-AC, arrival time, BBQ…"></textarea></div>
 </div>
 <button class="btn reservation-v9__send" id="send" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-wa"></use></svg><span data-i18n="cta.send">Send on WhatsApp</span><span aria-hidden="true">→</span></button>
-<div aria-label="Direct booking benefits" class="reservation-v9__benefits"><span data-i18n-html="res.b1"><b>Best available rate</b><small>Direct enquiry</small></span><span data-i18n-html="res.b2"><b>Flexible plans</b><small>Ask before booking</small></span><span data-i18n-html="res.b3"><b>Local support</b><small>Helpful guidance</small></span><span data-i18n-html="res.b4"><b>Private enquiry</b><small>Sent via WhatsApp</small></span></div>
+<div aria-label="Direct booking benefits" class="reservation-v9__benefits" role="group"><span data-i18n-html="res.b1"><b>Best available rate</b><small>Direct enquiry</small></span><span data-i18n-html="res.b2"><b>Flexible plans</b><small>Ask before booking</small></span><span data-i18n-html="res.b3"><b>Local support</b><small>Helpful guidance</small></span><span data-i18n-html="res.b4"><b>Private enquiry</b><small>Sent via WhatsApp</small></span></div>
 </div>
 </div>
 </section>
@@ -457,7 +458,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <!-- ============ LOCATION — PAGE BOTTOM ============ -->
 <section aria-label="Salido Resort location and booking benefits" class="v3-location" id="location-preview">
 <div class="wrap v3-location__wrap">
-<div aria-label="Interactive map showing Salido Resort in Tennekumbura, Kandy" class="map-v3 reveal is-visible">
+<div aria-label="Interactive map showing Salido Resort in Tennekumbura, Kandy" class="map-v3 reveal is-visible" role="group">
 <div class="map map--luxury">
 <div class="map__canvas" id="resortMap">
 <iframe class="map__embed-fallback" width="800" height="520" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=7.2844504,80.6651848&amp;z=15&amp;output=embed" title="Map showing Salido Resort, Tennekumbura, Kandy"></iframe>
@@ -485,7 +486,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <a class="review-text-link" href="https://www.google.com/travel/search?q=salido%20resort&amp;g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73064764%2C73249150%2C121529350%2C121608705%2C121738283%2C121762713&amp;hl=en-LK&amp;gl=lk&amp;cs=1&amp;ssta=1&amp;ts=CAEaRwopEicyJTB4M2FlMzY3MjY3MjIyOTU0NzoweDM3YWJhYmNhNzcyYzBiMTcSGhIUCgcI6g8QBxgdEgcI6g8QBxgeGAEyAhAA&amp;qs=CAEyE0Nnb0lsNWF3dWFmNTZ0VTNFQUU4AkIJCRcLLHfKq6s3QgkJFwssd8qrqzc&amp;ap=ugEHcmV2aWV3cw&amp;ictx=111&amp;ved=0CAAQ5JsGahcKEwjon8Oqx_OVAxUAAAAAHQAAAAAQBg" rel="noopener" target="_blank"><span data-i18n="rev.readall">Read all on Google ↗</span></a>
 </div>
 </section>
-<div aria-label="Accepted payment methods" class="payment-methods">
+<div aria-label="Accepted payment methods" class="payment-methods" role="group">
 <span class="payment-methods__title" data-i18n="pay.title">Cards welcome</span>
 <div class="payment-methods__logos">
 <span class="payment-logo payment-logo--visa"><img alt="Visa" decoding="async" fetchpriority="low" height="180" loading="lazy" src="images/payment/visa-card.svg?v=4.4.10" width="320"/></span>
@@ -495,7 +496,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 </div>
 </aside>
 </div>
-<div aria-label="Booking benefits" class="trust-strip reveal is-visible">
+<div aria-label="Booking benefits" class="trust-strip reveal is-visible" role="group">
 <div data-i18n-html="loc.t1"><b>Best price guarantee</b><span>Get the best available rate</span></div>
 <div data-i18n-html="loc.t2"><b>Direct booking</b><span>Fast confirmation on WhatsApp</span></div>
 <div data-i18n-html="loc.t3"><b>Secure stay</b><span>Safe parking and support</span></div>
@@ -543,20 +544,8 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <a aria-label="Message Salido Resort on WhatsApp" class="dock__wa" href="https://wa.me/94742698328" rel="noopener" target="_blank"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-wa"></use></svg></a>
 <a aria-label="Call Salido Resort" class="dock__call" href="tel:+94711596390"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-phone"></use></svg></a>
 </div>
-<script crossorigin="" defer="" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script defer="" src="js/script.js?v=16.0.0"></script>
-<script>
-(function(){
-  var intro=document.getElementById('brandIntro');
-  if(!intro) return;
-  var reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var delay=reduce ? 450 : 5200;
-  window.setTimeout(function(){
-    intro.classList.add('is-leaving');
-    window.setTimeout(function(){ intro.remove(); }, reduce ? 80 : 750);
-  }, delay);
-})();
-</script>
+<script crossorigin="anonymous" defer="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer="" src="js/script.js?v=17.0.0"></script>
 <script>
 (function(){
   function check(){

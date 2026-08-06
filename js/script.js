@@ -43,23 +43,7 @@
   /* cinematic "live image" hero: gentle scroll parallax and pointer-responsive depth */
   var hero = document.querySelector('.hero');
   var heroImg = document.querySelector('.hero__media');
-  var heroVideo = document.querySelector('.hero__video');
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(heroVideo){
-    var markVideoReady = function(){ hero && hero.classList.add('is-video-ready'); };
-    if(heroVideo.readyState >= 3) markVideoReady();
-    else heroVideo.addEventListener('canplay', markVideoReady, {once:true});
-    if(reduceMotion){ heroVideo.pause(); }
-    if('IntersectionObserver' in window && !reduceMotion){
-      var videoObserver = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting){ var playPromise=heroVideo.play(); if(playPromise&&playPromise.catch) playPromise.catch(function(){}); }
-          else heroVideo.pause();
-        });
-      }, {threshold:.05});
-      videoObserver.observe(heroVideo);
-    }
-  }
   if(hero && heroImg && !reduceMotion && !(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)){
     var glow = document.createElement('span');
     glow.className = 'hero__glow';
@@ -324,7 +308,7 @@
       var promise=smVideo.play();
       if(promise && promise.then){
         promise.then(function(){ smVideo.controls=true; smMedia.classList.add('is-playing'); })
-          .catch(function(err){ console.warn('Attraction video could not play:',err); });
+          .catch(function(){ /* autoplay/play rejected — nothing to do */ });
       }else{ smVideo.controls=true; smMedia.classList.add('is-playing'); }
     }
     function closeSpot(){ resetSpotVideo(); sm.classList.remove('open'); document.body.style.overflow=''; if(smLast) smLast.focus(); }
@@ -343,7 +327,13 @@
     sm.addEventListener('click', function(e){ if(e.target===sm) closeSpot(); });
     sm.addEventListener('keydown', function(e){
       if(e.key==='Escape'){ closeSpot(); return; }
-      if(e.key==='Tab'){ var f=[smX,smDir]; var idx=f.indexOf(document.activeElement); e.preventDefault(); f[(idx+(e.shiftKey?-1:1)+f.length)%f.length].focus(); }
+      if(e.key==='Tab'){
+        var f=[smX];
+        if(smPlay && !smPlay.hidden) f.push(smPlay);
+        f.push(smDir);
+        var idx=f.indexOf(document.activeElement); e.preventDefault();
+        f[(idx+(e.shiftKey?-1:1)+f.length)%f.length].focus();
+      }
     });
   }
 
@@ -466,14 +456,9 @@
     spyTargets.forEach(function(el){ spy.observe(el); });
   }
 
-  /* dates: no past check-in, check-out follows check-in */
+  /* dates: element refs only — the date-range min/change handling (single local-tz
+     baseline, snaps check-out up to check-in) is consolidated in the block below */
   var fin = document.getElementById('f-in'), fout = document.getElementById('f-out');
-  var today = new Date().toISOString().slice(0,10);
-  fin.min = today; fout.min = today;
-  fin.addEventListener('change', function(){
-    fout.min = fin.value || today;
-    if(fout.value && fout.value < fin.value) fout.value = '';
-  });
 
   /* build a WhatsApp message from the form */
   var pretty = function(v){
@@ -501,11 +486,6 @@
   /* quick-book bar under the hero — compact mirror of the contact form */
   var qin = document.getElementById('qb-in'), qout = document.getElementById('qb-out');
   if(qin && qout){
-    qin.min = today; qout.min = today;
-    qin.addEventListener('change', function(){
-      qout.min = qin.value || today;
-      if(qout.value && qout.value < qin.value) qout.value = '';
-    });
     document.getElementById('qb-send').addEventListener('click', function(){
       var ci = pretty(qin.value), co = pretty(qout.value);
       var g = document.getElementById('qb-guests').value;
@@ -540,7 +520,10 @@
       var t = Math.round(c.temperature_2m),
           hi = Math.round(day.temperature_2m_max[0]),
           lo = Math.round(day.temperature_2m_min[0]);
-      var updated = new Date(c.time || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      /* c.time is a tz-less local string for Asia/Colombo (UTC+5:30, no DST);
+         pin it to that offset so the label is correct for any viewer location */
+      var updated = new Date(c.time ? c.time + '+05:30' : Date.now())
+        .toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Colombo'});
       wx.innerHTML =
         '<div class="wx__top"><span class="wx__live"><i></i> Live weather</span><span class="wx__updated">Updated ' + updated + '</span></div>' +
         '<div class="wx__main"><div class="wx__ico">' + ICON[pick(c.weather_code)] + '</div>' +
@@ -663,7 +646,15 @@
       styleLabel();
       window.SALIDO_ON_LANG.push(styleLabel);
     }
-    setTimeout(function(){resortMap.invalidateSize();},350);
+    function refreshMapSize(){ resortMap.invalidateSize({pan:false}); }
+    setTimeout(refreshMapSize,120);
+    setTimeout(refreshMapSize,500);
+    window.addEventListener('load',refreshMapSize,{once:true});
+    window.addEventListener('resize',refreshMapSize);
+    if('ResizeObserver' in window){
+      var mapResizeObserver=new ResizeObserver(refreshMapSize);
+      mapResizeObserver.observe(mapNode);
+    }
   }else if(mapNode){
     mapNode.classList.add('map__canvas--fallback');
     var fallbackToggle=document.getElementById('mapStyleToggle');

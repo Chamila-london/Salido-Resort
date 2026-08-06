@@ -91,7 +91,12 @@ export default async (req) => {
       .filter(n => n.type === 'blob' && /^(images\/[^/]+\.(webp|png|jpg|jpeg|svg)|videos\/[^/]+\.(mp4|webm))$/i.test(n.path))
       .map(n => ({ path: n.path, size: n.size || 0 }))
       .sort((a, b) => a.path.localeCompare(b.path));
-    return json(200, { user: s.u, repo, branch, headSha, platform: 'Netlify', images });
+    /* Largest total payload a publish can accept on this platform (bytes).
+       Netlify caps a function request body at ~6 MB, so keep this in sync with
+       MAX_TOTAL in publish.mjs. The editor uses it to block oversized uploads
+       before sending instead of failing at the server. */
+    const maxUpload = 4 * 1024 * 1024;
+    return json(200, { user: s.u, repo, branch, headSha, platform: 'Netlify', maxUpload, images });
   } catch (e) {
     console.error(e);
     return json(502, { error: 'Could not read the website repository. Check the deployment logs and repository settings.' });
