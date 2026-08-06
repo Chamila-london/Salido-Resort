@@ -1,0 +1,22 @@
+SALIDO V17.1.1 — Dual Hosting Admin API
+
+This package supports both:
+1. Cloudflare Pages Functions: functions/api/*.js
+2. Netlify Functions: netlify/functions/*.mjs
+
+The working "OK 2" package used Cloudflare Pages Functions. V17.1 removed
+functions/api, which caused /api/login to be handled as a static route and
+return 405. V17.1.1 restores those Cloudflare API files while retaining the
+Netlify implementation.
+
+Cloudflare environment variables:
+ADMIN_USER
+ADMIN_PASSWORD
+SESSION_SECRET
+GITHUB_TOKEN
+GITHUB_REPO
+GITHUB_BRANCH (optional, defaults to main)
+SESSION_HOURS (optional)
+
+Deploy the CONTENTS of this folder at repository root. Do not place the entire
+folder one level below the repository root.
