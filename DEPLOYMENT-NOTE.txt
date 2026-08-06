@@ -1,5 +1,5 @@
-SALIDO V18.0
+SALIDO V18.0.1
 
-Major fix: the Natural View photograph now uses a real <img> element as the single source of truth. Admin Preview and the live website therefore read the exact same image path. No CSS variable or inline-style synchronization is required.
+Fix: Natural View image selection is applied immediately to the Admin draft, Preview, and published website. Each replacement uses a unique filename to bypass immutable browser and Cloudflare caches.
 
-Deploy the CONTENTS of this folder to the repository root. After deployment, hard refresh /admin/ and the public page.
+Deploy the CONTENTS of this folder to the repository root. Hard-refresh /admin/ after deployment.

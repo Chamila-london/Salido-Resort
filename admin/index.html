@@ -401,7 +401,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido Admin Studio V18.0</h1>
+      <h1>Salido Admin Studio V18.0.1</h1>
       <p class="gate__sub">Sign in to edit the website.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -419,7 +419,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
   <header class="top">
     <svg class="top__mark" viewBox="0 0 115 157" aria-hidden="true"><use href="#i-mark"/></svg>
     <div class="top__name">Admin Studio<small>Salido Resort website management</small></div>
-    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #644282;border-radius:999px;background:#1c0f31;color:#DDD1FF">V18.0</span><div class="top__sp"></div>
+    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #644282;border-radius:999px;background:#1c0f31;color:#DDD1FF">V18.0.1</span><div class="top__sp"></div>
     <div class="langs" id="langs" hidden>
       <button type="button" data-l="en" aria-pressed="true">EN</button>
       <button type="button" data-l="si" lang="si" aria-pressed="false">සිං</button>
@@ -1160,7 +1160,7 @@ function viewGroup(m,g){
 }
 
 
-/* ---------- facilities feature image — V18 single source ---------- */
+/* ---------- facilities feature image — V18.0.1 reliable upload ---------- */
 function facilityImageControl(m){
   const card=S.doc.querySelector('#facilities .facility-feature-v162');
   if(!card) return;
@@ -1175,36 +1175,54 @@ function facilityImageControl(m){
   }
   const current=media.getAttribute('src')||card.getAttribute('data-facility-image')||'';
   const c=document.createElement('div'); c.className='card';
-  c.innerHTML='<div class="card__t"><div><h3>Natural View feature image</h3><p class="hint" style="margin:.25rem 0 0">Upload, replace or remove the photograph used by both Preview and the live website.</p></div></div>'+
+  c.innerHTML='<div class="card__t"><div><h3>Natural View feature image</h3><p class="hint" style="margin:.25rem 0 0">Choose a photo and it is applied to the Admin draft immediately. Preview it, then Publish to update the live website.</p></div></div>'+ 
     '<div style="display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:1rem;align-items:center">'+
       '<div id="facilityImagePreview" style="min-height:150px;border-radius:14px;background:linear-gradient(135deg,#6f2bb9,#9a55df);overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:700">'+
         (current?'<img src="'+esc(imgURL(current))+'" alt="Current Natural View image" style="width:100%;height:170px;object-fit:cover">':'No image — purple gradient only')+
-      '</div>'+
-      '<div><input type="file" id="facilityImageFile" accept="image/*" style="max-width:100%">'+
-      '<p class="hint">JPG, PNG or WebP. The Admin resizes it to a maximum of 1800px and saves it as WebP.</p>'+
-      '<div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.75rem"><button type="button" class="b b--go" id="facilityImageSave">'+(current?'Replace image':'Add image')+'</button>'+
+      '</div>'+ 
+      '<div><input type="file" id="facilityImageFile" accept="image/jpeg,image/png,image/webp" style="max-width:100%">'+
+      '<p class="hint">JPG, PNG or WebP. Choosing a file automatically resizes it to a maximum of 1800px and saves it as WebP.</p>'+ 
+      '<p class="hint" id="facilityImageStatus" style="font-weight:700;color:#bca8e8"></p>'+ 
+      '<div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.75rem"><button type="button" class="b b--go" id="facilityImageSave">Choose / replace image</button>'+ 
       (current?'<button type="button" class="b b--bad" id="facilityImageRemove">Remove image</button>':'')+'</div></div></div>';
   m.appendChild(c);
-  const inp=$('#facilityImageFile'), prev=$('#facilityImagePreview');
-  inp.addEventListener('change',()=>{ const f=inp.files[0]; if(!f) return; prev.innerHTML='<img src="'+URL.createObjectURL(f)+'" alt="New image preview" style="width:100%;height:170px;object-fit:cover">'; });
-  $('#facilityImageSave').addEventListener('click',async()=>{
-    const f=inp.files[0]; if(!f){ toast('Choose an image first'); return; }
+  const inp=$('#facilityImageFile'), prev=$('#facilityImagePreview'), status=$('#facilityImageStatus'), save=$('#facilityImageSave');
+
+  async function applySelected(){
+    const f=inp.files && inp.files[0];
+    if(!f){ toast('Choose an image first'); return false; }
+    save.disabled=true; status.textContent='Processing '+f.name+'…';
     let out;
-    try{ out=await toWebp(f,1800); }catch(e){ toast('That image could not be processed — try a JPG or PNG.'); return; }
-    const name=freeName('facility-view-','webp');
-    S.files.set(name,out.data); CHANGED.add(name);
+    try{ out=await toWebp(f,1800); }
+    catch(e){ save.disabled=false; status.textContent='Could not process this image.'; toast('That image could not be processed — try a JPG or PNG.'); return false; }
+    /* A new filename on every replacement avoids immutable browser/CDN caches. */
+    const stamp=Date.now().toString(36);
+    const name='images/facility-view-'+stamp+'.webp';
+    S.files.set(name,out.data); CHANGED.add(name); freeURL(name);
     media.setAttribute('src',name);
+    media.removeAttribute('hidden');
+    media.setAttribute('width',String(out.w));
+    media.setAttribute('height',String(out.h));
     card.setAttribute('data-facility-image',name);
     card.removeAttribute('style');
-    S.dirty=true; renderRail(); show(S.view); toast(current?'Facility image replaced':'Facility image added');
-  });
+    const u=imgURL(name);
+    prev.innerHTML='<img src="'+esc(u)+'" alt="New Natural View image" style="width:100%;height:170px;object-fit:cover">';
+    status.textContent='New image added to the draft. Open Preview, then Publish.';
+    save.disabled=false;
+    S.dirty=true; renderRail(); schedulePreviewPaint();
+    toast('New Natural View image added to the draft');
+    return true;
+  }
+
+  inp.addEventListener('change',()=>{ if(inp.files && inp.files[0]) applySelected(); });
+  save.addEventListener('click',()=>{ if(inp.files && inp.files[0]) applySelected(); else inp.click(); });
+
   const rm=$('#facilityImageRemove'); if(rm) rm.addEventListener('click',async()=>{
     if(!await confirmBox('Remove this facility image?','The highlighted Natural View card will keep its purple gradient, wording and icon, but no photograph.','Remove image')) return;
-    media.removeAttribute('src');
-    media.setAttribute('hidden','');
-    card.removeAttribute('data-facility-image');
-    card.removeAttribute('style');
-    S.dirty=true; renderRail(); show(S.view); toast('Facility image removed');
+    media.removeAttribute('src'); media.setAttribute('hidden','');
+    card.removeAttribute('data-facility-image'); card.removeAttribute('style');
+    prev.textContent='No image — purple gradient only'; status.textContent='Image removed from the draft. Publish to update the live website.';
+    S.dirty=true; renderRail(); schedulePreviewPaint(); toast('Facility image removed from the draft');
   });
 }
 
