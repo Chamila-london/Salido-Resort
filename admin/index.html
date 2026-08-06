@@ -401,7 +401,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido Admin Studio V17.1.1</h1>
+      <h1>Salido Admin Studio V17.1.2.1</h1>
       <p class="gate__sub">Sign in to edit the website.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -640,15 +640,32 @@ async function loadFromLive(pre){
 /* ---- preview: the edited page, pointed at the live css/fonts/photos ---- */
 async function previewCloud(){
   writeBack();
-  let html = '<!DOCTYPE html>\n' + S.doc.documentElement.outerHTML;
-  html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + location.origin + '/">');
-  const jsu = URL.createObjectURL(new Blob([S.js], {type:'text/javascript'}));
-  const cssu = URL.createObjectURL(new Blob([S.css || ''], {type:'text/css'}));
-  html = html.replace(/src="(\.\/)?js\/script\.js(?:\?[^"]*)?"/, 'src="' + jsu + '"');
-  html = html.replace(/href="(\.\/)?css\/style\.css(?:\?[^"]*)?"/, 'href="' + cssu + '"');
-  CHANGED.forEach(k=>{ const u = imgURL(k); if(u) html = html.split('"' + k + '"').join('"' + u + '"'); });
-  const u = URL.createObjectURL(new Blob([html], {type:'text/html'}));
-  window.open(u, '_blank');
+  const siteRoot = new URL('../', location.href).href;
+  const clone = S.doc.cloneNode(true);
+  clone.querySelectorAll('link[rel="stylesheet"]').forEach(x=>{
+    if(/css\/style\.css/i.test(x.getAttribute('href')||'')) x.remove();
+  });
+  clone.querySelectorAll('script[src]').forEach(x=>{
+    if(/js\/script\.js/i.test(x.getAttribute('src')||'')) x.remove();
+  });
+  const base=clone.createElement('base'); base.href=siteRoot; clone.head.prepend(base);
+  const style=clone.createElement('style'); style.textContent=S.css||''; clone.head.appendChild(style);
+  const script=clone.createElement('script'); script.textContent=S.js||''; clone.body.appendChild(script);
+
+  /* Existing images use the live absolute URL. Newly uploaded images use a
+     blob URL until Publish commits them to GitHub. Rewrite both attributes
+     and CSS custom-property URLs so the Natural View photo is visible. */
+  const paths=new Set();
+  S.files.forEach((_v,k)=>{ if(/^images\//i.test(k)) paths.add(k); });
+  CHANGED.forEach(k=>{ if(/^images\//i.test(k)) paths.add(k); });
+  let html='<!DOCTYPE html>\n'+clone.documentElement.outerHTML;
+  paths.forEach(k=>{
+    const u=imgURL(k); if(!u) return;
+    html=html.split(k).join(u);
+  });
+  const w=window.open('about:blank','_blank');
+  if(!w){ toast('The browser blocked the preview window. Allow pop-ups and try again.'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
 }
 
 function pendingFiles(){
@@ -1000,8 +1017,15 @@ function imgURL(src){
   const k=src.replace(/^\.\//,'');
   if(URLC.has(k)) return URLC.get(k);
   const f=S.files.get(k);
-  if(f==null) return (CLOUD && S.files.has(k)) ? new URL(k, new URL('../', location.href)).href : '';
-  const u=URL.createObjectURL(new Blob([f],{type: k.endsWith('.png')?'image/png':'image/webp'}));
+  /* In cloud mode the image list deliberately stores existing live images as
+     null to avoid downloading every photo into the editor. Resolve those
+     paths against the live site instead of treating null as a missing file. */
+  if(f==null){
+    if(CLOUD && S.files.has(k)) return new URL(k, new URL('../', location.href)).href;
+    return '';
+  }
+  const type=/\.png$/i.test(k)?'image/png':/\.jpe?g$/i.test(k)?'image/jpeg':/\.svg$/i.test(k)?'image/svg+xml':'image/webp';
+  const u=URL.createObjectURL(new Blob([f],{type}));
   URLC.set(k,u); return u;
 }
 function freeURL(k){ if(URLC.has(k)){ URL.revokeObjectURL(URLC.get(k)); URLC.delete(k); } }
@@ -1549,6 +1573,7 @@ function livePreviewHTML(mode='desktop'){
   html.salido-preview-tablet .nav,html.salido-preview-mobile .nav{display:none!important}
   html.salido-preview-tablet .burger,html.salido-preview-mobile .burger{display:flex!important}
   `;
+  clone.querySelectorAll('[src]').forEach(el=>{ const p=(el.getAttribute('src')||'').replace(/^\.\//,''); if(/^images\//i.test(p)){ const u=imgURL(p); if(u) el.setAttribute('src',u); } });
   const feature=clone.querySelector('[data-facility-image]');
   if(feature){ const p=feature.getAttribute('data-facility-image'); const u=imgURL(p); if(u) feature.style.setProperty('--facility-feature-image',"url('"+u+"')"); }
   const base=clone.createElement('base'); base.href='../';
