@@ -4960,3 +4960,41 @@ body.concept-v3 #notices.sec--notice {
   font-size:1.18rem;font-weight:800;color:var(--violet-text,#7E36CF);
   letter-spacing:.01em;
 }
+
+
+/* ==========================================================================
+   V15.0 — SALIDO ROYAL PURPLE LUXURY THEME
+   Unified public-site palette: royal purple, deep plum, lavender and champagne.
+   ========================================================================== */
+:root{
+  --paper:#FBF9FF;
+  --lavender:#F0EAFE;
+  --lavender-2:#E4D8FB;
+  --gold:#D6B36A;
+  --forest:#352054;
+  --cream:#FFF9EE;
+  --violet:#6D28D9;
+  --plum:#24103F;
+  --violet-text:#5B21B6;
+  --violet-fill:#6D28D9;
+  --violet-hi:#C4B5FD;
+  --plum-2:#3B1765;
+  --ink:#1F1633;
+  --muted:#716580;
+  --line:rgba(91,33,182,.14);
+  --line-dk:rgba(255,255,255,.18);
+  --shadow:0 2px 5px rgba(36,16,63,.04),0 14px 34px -18px rgba(91,33,182,.28),0 34px 70px -34px rgba(36,16,63,.24);
+  --shadow-lg:0 3px 9px rgba(36,16,63,.06),0 28px 62px -28px rgba(91,33,182,.38),0 60px 110px -50px rgba(36,16,63,.32);
+}
+body{background:linear-gradient(180deg,#FBF9FF 0%,#F7F2FF 48%,#FBF9FF 100%)}
+::selection{background:#6D28D9;color:#fff}
+.btn{background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 58%,#8B5CF6 100%);box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 14px 30px -14px rgba(91,33,182,.72)}
+.btn:hover{background:linear-gradient(135deg,#D6B36A,#F0D59B);color:#24103F;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 20px 38px -15px rgba(214,179,106,.72)}
+.btn--ink{background:linear-gradient(135deg,#24103F,#3B1765)}
+.head.is-stuck{background:rgba(251,249,255,.9);box-shadow:0 1px 0 rgba(91,33,182,.12),0 14px 34px -24px rgba(36,16,63,.55)}
+.head.is-stuck .nav a:hover,.head.is-stuck .nav a:focus-visible{background:#F0EAFE}
+.head.is-stuck .nav a[aria-current="page"]{background:linear-gradient(135deg,#5B21B6,#7C3AED);color:#fff}
+.card,.room-card,.tile,.notice-card{border-color:rgba(91,33,182,.13)}
+footer,.foot{background:linear-gradient(145deg,#1D0B34 0%,#2B114A 50%,#35145A 100%)}
+.map-card__rate b{color:#5B21B6}
+@media(max-width:860px){body.concept-v3 .head .nav,body.concept-v3 .head.is-stuck .nav{background:rgba(251,249,255,.98)!important;box-shadow:0 22px 44px -22px rgba(36,16,63,.48)!important}body.concept-v3 .head .nav a[aria-current="page"]{background:rgba(109,40,217,.13)!important}}
