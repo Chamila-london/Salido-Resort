@@ -43,7 +43,7 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-  force = false
+  force = true
 
 [[headers]]
   for = "/videos/*"
