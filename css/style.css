@@ -4998,3 +4998,64 @@ body{background:linear-gradient(180deg,#FBF9FF 0%,#F7F2FF 48%,#FBF9FF 100%)}
 footer,.foot{background:linear-gradient(145deg,#1D0B34 0%,#2B114A 50%,#35145A 100%)}
 .map-card__rate b{color:#5B21B6}
 @media(max-width:860px){body.concept-v3 .head .nav,body.concept-v3 .head.is-stuck .nav{background:rgba(251,249,255,.98)!important;box-shadow:0 22px 44px -22px rgba(36,16,63,.48)!important}body.concept-v3 .head .nav a[aria-current="page"]{background:rgba(109,40,217,.13)!important}}
+
+
+/* ========================================================================== 
+   V16.0 — PURPLE LUXURY REFINEMENT
+   A cohesive production polish pass for navigation, section rhythm, cards,
+   booking, gallery, map and footer. Existing content and behaviour are kept.
+   ========================================================================== */
+:root{
+  --v16-purple:#6D28D9;
+  --v16-purple-deep:#4C1D95;
+  --v16-plum:#1B0A2E;
+  --v16-lavender:#F4EFFF;
+  --v16-gold:#D6B36A;
+  --v16-radius:22px;
+}
+body.concept-v3{background:linear-gradient(180deg,#FCFAFF 0%,#F7F1FF 46%,#FCFAFF 100%)}
+body.concept-v3 .head .head__in,
+body.concept-v3 .head.is-stuck .head__in{
+  border-color:rgba(196,181,253,.34)!important;
+  box-shadow:0 16px 50px -28px rgba(76,29,149,.72),inset 0 1px rgba(255,255,255,.12)!important;
+}
+body.concept-v3 .head.is-stuck .head__in{background:rgba(28,10,48,.92)!important;backdrop-filter:blur(22px) saturate(140%)}
+body.concept-v3 .head.is-stuck .nav a{color:#F7F2FF!important}
+body.concept-v3 .head .nav a{transition:background .22s ease,color .22s ease,transform .22s ease!important}
+body.concept-v3 .head .nav a:hover{transform:translateY(-1px)}
+body.concept-v3 .head .nav a[aria-current="page"]{background:linear-gradient(135deg,rgba(109,40,217,.24),rgba(139,92,246,.12))!important;box-shadow:inset 0 0 0 1px rgba(196,181,253,.22)!important}
+.hero__copy p,.hero__trust{color:rgba(255,255,255,.88)!important}
+.hero__copy h1{max-width:12ch;text-wrap:balance;text-shadow:0 14px 36px rgba(20,4,35,.35)}
+.sec{scroll-margin-top:92px}
+.sec__head h2,.main-title{text-wrap:balance}
+.card,.room-card,.tile,.notice-card,.gallery-card,.travel-card{
+  border-radius:var(--v16-radius)!important;
+  box-shadow:0 18px 48px -34px rgba(76,29,149,.52),0 1px 0 rgba(255,255,255,.75) inset!important;
+}
+.card:hover,.room-card:hover,.tile:hover,.notice-card:hover{
+  box-shadow:0 28px 62px -34px rgba(91,33,182,.62),0 1px 0 rgba(255,255,255,.8) inset!important;
+}
+.facility-card svg,.facility-card .ico{filter:drop-shadow(0 8px 14px rgba(109,40,217,.18))}
+.gallery img,.room-card img,.spot img{transition:transform .65s cubic-bezier(.16,1,.3,1),filter .4s ease}
+.gallery a:hover img,.room-card:hover img,.spot:hover img{transform:scale(1.035);filter:saturate(1.05) contrast(1.02)}
+.booking,.reserve,.contact-sec{background:linear-gradient(145deg,#19082D 0%,#281044 52%,#35145A 100%)!important}
+.booking .f input,.booking .f select,.booking .f textarea,
+.reserve input,.reserve select,.reserve textarea{
+  border-color:rgba(196,181,253,.22)!important;background:rgba(255,255,255,.075)!important;color:#fff!important;
+}
+.booking .f input:focus,.booking .f select:focus,.booking .f textarea:focus,
+.reserve input:focus,.reserve select:focus,.reserve textarea:focus{
+  border-color:#A78BFA!important;box-shadow:0 0 0 4px rgba(139,92,246,.18)!important;
+}
+.map-card{border-color:rgba(196,181,253,.18)!important;background:linear-gradient(160deg,rgba(31,16,49,.98),rgba(20,10,32,.98))!important}
+.map-card__rate b{color:#A78BFA!important}
+.foot{border-top:1px solid rgba(214,179,106,.18)}
+.foot::before{content:"";display:block;width:min(1120px,calc(100% - 40px));height:1px;margin:0 auto;background:linear-gradient(90deg,transparent,rgba(214,179,106,.55),transparent)}
+:where(.btn,a,button):focus-visible{outline:3px solid rgba(214,179,106,.82)!important;outline-offset:3px}
+@media(max-width:860px){
+ body.concept-v3 .head .nav,body.concept-v3 .head.is-stuck .nav{background:rgba(28,10,48,.98)!important}
+ body.concept-v3 .head .nav a{color:#F7F2FF!important}
+ body.concept-v3 .head .nav a[aria-current="page"]{background:rgba(139,92,246,.2)!important}
+ .card,.room-card,.tile,.notice-card{border-radius:18px!important}
+}
+@media(prefers-reduced-motion:reduce){.gallery img,.room-card img,.spot img{transition:none!important}}
