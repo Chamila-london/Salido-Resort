@@ -1,9 +1,5 @@
-SALIDO V17.1.3 — FACILITY IMAGE LIVE-SITE HOTFIX
+SALIDO V18.0
 
-Fixes the Natural View image appearing in Admin Preview but not on the published Cloudflare/Netlify website.
+Major fix: the Natural View photograph now uses a real <img> element as the single source of truth. Admin Preview and the live website therefore read the exact same image path. No CSS variable or inline-style synchronization is required.
 
-Cause: the image path was stored in an inline style/custom property. The production security policy can block inline styles.
-
-Fix: the Admin now writes the Natural View image URL into the external css/style.css file, which is allowed by the site CSP. Publishing an image now includes index.html, css/style.css and the WebP image.
-
-Deploy every file inside this folder to the repository root.
+Deploy the CONTENTS of this folder to the repository root. After deployment, hard refresh /admin/ and the public page.

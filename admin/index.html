@@ -401,7 +401,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido Admin Studio V17.1.3.1</h1>
+      <h1>Salido Admin Studio V18.0</h1>
       <p class="gate__sub">Sign in to edit the website.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -419,7 +419,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
   <header class="top">
     <svg class="top__mark" viewBox="0 0 115 157" aria-hidden="true"><use href="#i-mark"/></svg>
     <div class="top__name">Admin Studio<small>Salido Resort website management</small></div>
-    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #644282;border-radius:999px;background:#1c0f31;color:#DDD1FF">V15.0.0</span><div class="top__sp"></div>
+    <span style="font-size:.68rem;font-weight:800;letter-spacing:.09em;padding:.25rem .55rem;border:1px solid #644282;border-radius:999px;background:#1c0f31;color:#DDD1FF">V18.0</span><div class="top__sp"></div>
     <div class="langs" id="langs" hidden>
       <button type="button" data-l="en" aria-pressed="true">EN</button>
       <button type="button" data-l="si" lang="si" aria-pressed="false">සිං</button>
@@ -1160,20 +1160,22 @@ function viewGroup(m,g){
 }
 
 
-/* ---------- facilities feature image ---------- */
-function setFacilityImageCss(path){
-  const cssPath = path ? "../" + String(path).replace(/^\/+/,"") : "none";
-  const value = path ? "url('" + cssPath.replace(/'/g,"\\'") + "')" : "none";
-  const decl = ':root{--facility-feature-image:' + value + ';}';
-  const re = /:root\s*\{\s*--facility-feature-image\s*:[^;]*;\s*\}/i;
-  S.css = re.test(S.css) ? S.css.replace(re,decl) : decl + "\n" + S.css;
-}
+/* ---------- facilities feature image — V18 single source ---------- */
 function facilityImageControl(m){
   const card=S.doc.querySelector('#facilities .facility-feature-v162');
   if(!card) return;
-  const current=card.getAttribute('data-facility-image')||'';
+  let media=card.querySelector('.facility-feature-v18__media');
+  if(!media){
+    media=S.doc.createElement('img');
+    media.className='facility-feature-v18__media';
+    media.alt='Scenic natural view near Salido Resort';
+    media.setAttribute('loading','lazy');
+    media.setAttribute('decoding','async');
+    card.insertBefore(media,card.firstChild);
+  }
+  const current=media.getAttribute('src')||card.getAttribute('data-facility-image')||'';
   const c=document.createElement('div'); c.className='card';
-  c.innerHTML='<div class="card__t"><div><h3>Natural View feature image</h3><p class="hint" style="margin:.25rem 0 0">Upload, replace or remove the large image behind the highlighted facility card.</p></div></div>'+
+  c.innerHTML='<div class="card__t"><div><h3>Natural View feature image</h3><p class="hint" style="margin:.25rem 0 0">Upload, replace or remove the photograph used by both Preview and the live website.</p></div></div>'+
     '<div style="display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:1rem;align-items:center">'+
       '<div id="facilityImagePreview" style="min-height:150px;border-radius:14px;background:linear-gradient(135deg,#6f2bb9,#9a55df);overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:700">'+
         (current?'<img src="'+esc(imgURL(current))+'" alt="Current Natural View image" style="width:100%;height:170px;object-fit:cover">':'No image — purple gradient only')+
@@ -1191,16 +1193,17 @@ function facilityImageControl(m){
     try{ out=await toWebp(f,1800); }catch(e){ toast('That image could not be processed — try a JPG or PNG.'); return; }
     const name=freeName('facility-view-','webp');
     S.files.set(name,out.data); CHANGED.add(name);
+    media.setAttribute('src',name);
     card.setAttribute('data-facility-image',name);
     card.removeAttribute('style');
-    setFacilityImageCss(name);
     S.dirty=true; renderRail(); show(S.view); toast(current?'Facility image replaced':'Facility image added');
   });
   const rm=$('#facilityImageRemove'); if(rm) rm.addEventListener('click',async()=>{
     if(!await confirmBox('Remove this facility image?','The highlighted Natural View card will keep its purple gradient, wording and icon, but no photograph.','Remove image')) return;
+    media.removeAttribute('src');
+    media.setAttribute('hidden','');
     card.removeAttribute('data-facility-image');
     card.removeAttribute('style');
-    setFacilityImageCss('');
     S.dirty=true; renderRail(); show(S.view); toast('Facility image removed');
   });
 }
@@ -1583,8 +1586,6 @@ function livePreviewHTML(mode='desktop'){
   html.salido-preview-tablet .burger,html.salido-preview-mobile .burger{display:flex!important}
   `;
   clone.querySelectorAll('[src]').forEach(el=>{ const p=(el.getAttribute('src')||'').replace(/^\.\//,''); if(/^images\//i.test(p)){ const u=imgURL(p); if(u) el.setAttribute('src',u); } });
-  const feature=clone.querySelector('[data-facility-image]');
-  if(feature){ const p=feature.getAttribute('data-facility-image'); const u=imgURL(p); if(u) feature.style.setProperty('--facility-feature-image',"url('"+u+"')"); }
   const base=clone.createElement('base'); base.href='../';
   const style=clone.createElement('style'); style.textContent=css;
   clone.head.prepend(base); clone.head.appendChild(style);
