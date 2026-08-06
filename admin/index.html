@@ -401,7 +401,7 @@ dialog{border-radius:20px!important;overflow:hidden!important;background:linear-
     </div>
 
     <div id="gateLogin" hidden>
-      <h1>Salido Admin Studio V17.1.2.1</h1>
+      <h1>Salido Admin Studio V17.1.3.1</h1>
       <p class="gate__sub">Sign in to edit the website.</p>
       <div id="liErr" class="err" hidden></div>
       <label class="f"><span>Username</span><input id="liUser" autocomplete="username" spellcheck="false"></label>
@@ -1161,6 +1161,13 @@ function viewGroup(m,g){
 
 
 /* ---------- facilities feature image ---------- */
+function setFacilityImageCss(path){
+  const cssPath = path ? "../" + String(path).replace(/^\/+/,"") : "none";
+  const value = path ? "url('" + cssPath.replace(/'/g,"\\'") + "')" : "none";
+  const decl = ':root{--facility-feature-image:' + value + ';}';
+  const re = /:root\s*\{\s*--facility-feature-image\s*:[^;]*;\s*\}/i;
+  S.css = re.test(S.css) ? S.css.replace(re,decl) : decl + "\n" + S.css;
+}
 function facilityImageControl(m){
   const card=S.doc.querySelector('#facilities .facility-feature-v162');
   if(!card) return;
@@ -1185,13 +1192,15 @@ function facilityImageControl(m){
     const name=freeName('facility-view-','webp');
     S.files.set(name,out.data); CHANGED.add(name);
     card.setAttribute('data-facility-image',name);
-    card.style.setProperty('--facility-feature-image',"url('"+name+"')");
+    card.removeAttribute('style');
+    setFacilityImageCss(name);
     S.dirty=true; renderRail(); show(S.view); toast(current?'Facility image replaced':'Facility image added');
   });
   const rm=$('#facilityImageRemove'); if(rm) rm.addEventListener('click',async()=>{
     if(!await confirmBox('Remove this facility image?','The highlighted Natural View card will keep its purple gradient, wording and icon, but no photograph.','Remove image')) return;
     card.removeAttribute('data-facility-image');
-    card.style.setProperty('--facility-feature-image','none');
+    card.removeAttribute('style');
+    setFacilityImageCss('');
     S.dirty=true; renderRail(); show(S.view); toast('Facility image removed');
   });
 }

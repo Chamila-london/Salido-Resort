@@ -1,3 +1,5 @@
+/* V17.1.3: external facility image variable (CSP-safe) */
+:root{--facility-feature-image:url('../images/gallery6.webp');}
 /* Salido Resort — styles */
 /* fonts (subset to Latin, WOFF) */
 @font-face{font-family:'Outfit';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/outfit-400.woff2) format('woff2'),url(../fonts/outfit-400.woff) format('woff')}
