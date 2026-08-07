@@ -87,7 +87,10 @@ export async function onRequest(context) {
       .filter(n => n.type === 'blob' && /^(images\/[^/]+\.(webp|png|jpg|jpeg|svg)|videos\/[^/]+\.(mp4|webm))$/i.test(n.path))
       .map(n => ({ path: n.path, size: n.size || 0 }))
       .sort((a, b) => a.path.localeCompare(b.path));
-    return json(200, { user: s.u, repo, branch, headSha, platform: 'Cloudflare Pages', images });
+    /* Keep in sync with MAX_TOTAL in functions/api/publish.js so the editor
+       enforces the real Cloudflare limit instead of a hardcoded fallback. */
+    const maxUpload = 26 * 1024 * 1024;
+    return json(200, { user: s.u, repo, branch, headSha, platform: 'Cloudflare Pages', maxUpload, images });
   } catch (e) {
     console.error(e);
     return json(502, { error: 'Could not read the website repository. Check the deployment logs and repository settings.' });

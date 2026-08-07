@@ -72,13 +72,15 @@
 
   var burger = document.getElementById('burger');
   var nav = document.getElementById('nav');
-  burger.addEventListener('click', function(){
-    var open = document.body.classList.toggle('is-open');
-    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  nav.addEventListener('click', function(e){
-    if(e.target.tagName === 'A'){ document.body.classList.remove('is-open'); burger.setAttribute('aria-expanded','false'); }
-  });
+  if(burger && nav){
+    burger.addEventListener('click', function(){
+      var open = document.body.classList.toggle('is-open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A'){ document.body.classList.remove('is-open'); burger.setAttribute('aria-expanded','false'); }
+    });
+  }
 
   document.getElementById('yr').textContent = new Date().getFullYear();
 
@@ -432,7 +434,6 @@
       if(!lb.classList.contains('open'))return;
       if(e.key==='Escape')closePhoto(); if(e.key==='ArrowLeft')showPhoto(cur-1); if(e.key==='ArrowRight')showPhoto(cur+1);
     });
-    applyGalleryFilter('gallery');
   }
 
   /* scroll-spy: highlight the nav link for the section in view */
@@ -467,7 +468,10 @@
     if(isNaN(d)) return v;
     return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   };
-  document.getElementById('send').addEventListener('click', function(){
+  var sendBtn = document.getElementById('send');
+  var bookingForm = document.getElementById('booking-form');
+  function sendBooking(){
+    if(!fin || !fout || !document.getElementById('f-name')) return;
     var name = document.getElementById('f-name').value.trim();
     var ci = pretty(fin.value), co = pretty(fout.value);
     var g = document.getElementById('f-guests').value;
@@ -481,12 +485,14 @@
     lines.push('Rooms: ' + r);
     if(m) lines.push('Note: ' + m);
     window.open('https://wa.me/94742698328?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
-  });
+  }
+  if(bookingForm){ bookingForm.addEventListener('submit', function(e){ e.preventDefault(); sendBooking(); }); }
+  else if(sendBtn){ sendBtn.addEventListener('click', sendBooking); }
 
   /* quick-book bar under the hero — compact mirror of the contact form */
   var qin = document.getElementById('qb-in'), qout = document.getElementById('qb-out');
   if(qin && qout){
-    document.getElementById('qb-send').addEventListener('click', function(){
+    var sendQuick = function(){
       var ci = pretty(qin.value), co = pretty(qout.value);
       var g = document.getElementById('qb-guests').value;
       var lines = ['Hello Salido Resort, I would like to check availability.'];
@@ -494,7 +500,10 @@
       if(co) lines.push('Check-out: ' + co);
       lines.push('Guests: ' + g);
       window.open('https://wa.me/94742698328?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
-    });
+    };
+    var qbForm = document.getElementById('qb-form'), qbSend = document.getElementById('qb-send');
+    if(qbForm){ qbForm.addEventListener('submit', function(e){ e.preventDefault(); sendQuick(); }); }
+    else if(qbSend){ qbSend.addEventListener('click', sendQuick); }
   }
 
   /* live Kandy weather — Open-Meteo (free, no API key). Only loads when online. */
@@ -530,10 +539,10 @@
         '<div class="wx__body"><span class="wx__loc">Kandy right now</span>' +
         '<span class="wx__temp">' + t + '\u00B0C</span>' +
         '<span class="wx__cond">' + (WCODE[c.weather_code] || '\u2014') + '</span></div></div>' +
-        '<div class="wx__stats"><span><b>' + hi + '\u00B0</b> High</span><span><b>' + lo + '\u00B0</b> Low</span><span><b>' + c.relative_humidity_2m + '%</b> Humidity</span></div>';
+        '<div class="wx__stats"><span><b>' + hi + '\u00B0</b> High</span><span><b>' + lo + '\u00B0</b> Low</span><span><b>' + Math.round(c.relative_humidity_2m) + '%</b> Humidity</span></div>';
       wx.classList.add('is-loaded');
     }).catch(function(){
-      wx.innerHTML = '<span class="wx__off">Live Kandy weather shows here once the site is online.</span>';
+      wx.innerHTML = '<span class="wx__off">Live Kandy weather is unavailable right now.</span>';
     });
   }
 })();
@@ -661,7 +670,7 @@
     if(fallbackToggle) fallbackToggle.hidden=true;
   }
 
-  /* Official Google Places review loader. Google returns up to five reviews. */
+  /* Official Google Places review loader. We display the most recent review. */
   (function(){
     var section=document.getElementById('google-reviews');
     if(!section) return;

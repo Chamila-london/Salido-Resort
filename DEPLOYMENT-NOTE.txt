@@ -1,5 +1,18 @@
-SALIDO V18.0.1
+SALIDO V21.0
 
-Fix: Natural View image selection is applied immediately to the Admin draft, Preview, and published website. Each replacement uses a unique filename to bypass immutable browser and Cloudflare caches.
+Polish release. Version numbers are now consistent across the site, the admin
+Studio, and the /api/health endpoint (all report V21.0 / 21.0).
 
-Deploy the CONTENTS of this folder to the repository root. Hard-refresh /admin/ after deployment.
+Fixes in this build:
+- Booking bar and contact enquiry are now real <form> elements, so Enter submits
+  and the WhatsApp message is still built exactly as before.
+- Admin editor: HTML-escaping now covers quotes; a network/server hiccup no
+  longer signs you out (only an expired session does).
+- Cloudflare deploys now report the upload limit to the editor (matches Netlify).
+- Weather humidity is rounded; the offline message is clearer.
+- Removed an unused preconnect and a duplicate gallery init; gallery tabs now
+  reference their panel for screen readers.
+- CSS/JS cache-bust bumped to ?v=21.0.0.
+
+Deploy the CONTENTS of this folder to the repository root. Hard-refresh /admin/
+after deployment (Ctrl+Shift+R).
