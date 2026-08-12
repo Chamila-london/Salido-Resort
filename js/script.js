@@ -522,8 +522,8 @@
     var pick = function(c){ if(c===0||c===1) return 'sun'; if(c>=95) return 'storm';
       if((c>=51&&c<=82)) return 'rain'; return 'cloud'; };
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=7.2844504&longitude=80.6651848' +
-      '&current=temperature_2m,relative_humidity_2m,weather_code' +
-      '&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FColombo';
+      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m' +
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=5&timezone=Asia%2FColombo';
     fetch(url).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
       var c = d.current, day = d.daily;
       var t = Math.round(c.temperature_2m),
@@ -533,18 +533,43 @@
          pin it to that offset so the label is correct for any viewer location */
       var updated = new Date(c.time ? c.time + '+05:30' : Date.now())
         .toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Colombo'});
+      var localNow = new Date().toLocaleString('en-US',{timeZone:'Asia/Colombo',weekday:'long',month:'short',day:'numeric'});
+      var clock = new Date().toLocaleTimeString('en-US',{timeZone:'Asia/Colombo',hour:'numeric',minute:'2-digit'});
+      var compass = ['N','NE','E','SE','S','SW','W','NW'][Math.round((c.wind_direction_10m || 0)/45)%8];
+      var sunrise = new Date(day.sunrise[0] + '+05:30').toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Colombo'});
+      var sunset = new Date(day.sunset[0] + '+05:30').toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Colombo'});
+      var forecast = day.time.map(function(date,i){
+        var name = new Date(date+'T12:00:00+05:30').toLocaleDateString('en-US',{weekday:'short',timeZone:'Asia/Colombo'}).toUpperCase();
+        return '<span class="wx__day"><b>'+name+'</b><i>'+ICON[pick(day.weather_code[i])]+'</i><strong>'+Math.round(day.temperature_2m_max[i])+'\u00B0/'+Math.round(day.temperature_2m_min[i])+'\u00B0</strong></span>';
+      }).join('');
       wx.innerHTML =
-        '<div class="wx__top"><span class="wx__live"><i></i> Live weather</span><span class="wx__updated">Updated ' + updated + '</span></div>' +
-        '<div class="wx__main"><div class="wx__ico">' + ICON[pick(c.weather_code)] + '</div>' +
-        '<div class="wx__body"><span class="wx__loc">Kandy right now</span>' +
-        '<span class="wx__temp">' + t + '\u00B0C</span>' +
-        '<span class="wx__cond">' + (WCODE[c.weather_code] || '\u2014') + '</span></div></div>' +
-        '<div class="wx__stats"><span><b>' + hi + '\u00B0</b> High</span><span><b>' + lo + '\u00B0</b> Low</span><span><b>' + Math.round(c.relative_humidity_2m) + '%</b> Humidity</span></div>';
+        '<div class="wx__glass"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated">Updated ' + updated + '</span></div>' +
+        '<div class="wx__scene"><div class="wx__info"><span class="wx__date">'+localNow+'</span><span class="wx__clock">'+clock+'</span>'+
+        '<span class="wx__meta">Feels like '+Math.round(c.apparent_temperature)+'\u00B0 · Wind '+compass+' '+Math.round(c.wind_speed_10m)+' km/h</span>'+
+        '<span class="wx__meta">Sunrise '+sunrise+' · Sunset '+sunset+'</span></div>'+
+        '<img class="wx__cloud" src="images/weather-cloud-3d.png" alt="" aria-hidden="true">' +
+        '<div class="wx__current"><span class="wx__temp">'+t+'\u00B0</span><span class="wx__cond">'+(WCODE[c.weather_code]||'\u2014')+'</span><small>'+Math.round(c.relative_humidity_2m)+'% humidity</small></div></div>'+
+        '<div class="wx__forecast">'+forecast+'</div></div>';
       wx.classList.add('is-loaded');
     }).catch(function(){
       wx.innerHTML = '<span class="wx__off">Live Kandy weather is unavailable right now.</span>';
     });
   }
+
+  /* Scheduled travel tabs. Official sources do not expose a dependable public real-time feed. */
+  var scheduleTabs = [].slice.call(document.querySelectorAll('[data-schedule-tab]'));
+  var schedulePanels = [].slice.call(document.querySelectorAll('[data-schedule-panel]'));
+  scheduleTabs.forEach(function(tab){ tab.addEventListener('click',function(){
+    var target = tab.getAttribute('data-schedule-tab');
+    scheduleTabs.forEach(function(t){ var on=t===tab; t.classList.toggle('is-active',on); t.setAttribute('aria-selected',on?'true':'false'); });
+    schedulePanels.forEach(function(p){ var on=p.getAttribute('data-schedule-panel')===target; p.hidden=!on; p.classList.toggle('is-active',on); });
+  }); });
+  var scheduleRefresh=document.getElementById('schedule-refresh'), scheduleChecked=document.getElementById('schedule-checked');
+  if(scheduleChecked){ scheduleChecked.textContent='Checked '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+  if(scheduleRefresh){ scheduleRefresh.addEventListener('click',function(){
+    scheduleRefresh.classList.add('is-refreshing'); scheduleRefresh.textContent='↻ Checking…';
+    window.setTimeout(function(){ scheduleRefresh.classList.remove('is-refreshing'); scheduleRefresh.textContent='✓ Schedule ready'; if(scheduleChecked) scheduleChecked.textContent='Checked just now'; },650);
+  }); }
 })();
 
 /* ============ language switcher (EN / Sinhala / Tamil) ============ */

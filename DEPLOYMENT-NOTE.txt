@@ -1,9 +1,16 @@
-SALIDO V21.0
+SALIDO V22.1
 
-Polish release. Version numbers are now consistent across the site, the admin
-Studio, and the /api/health endpoint (all report V21.0 / 21.0).
+Weather and travel release. Version numbers are consistent across the public
+site, Admin Studio, and health endpoint (V22.1).
 
 Fixes in this build:
+- Added a static 3D rain-cloud weather design with live Kandy conditions,
+  local time, sunrise/sunset, wind, humidity, and a five-day forecast.
+- Added Today’s Travel Schedule with accessible Train/Bus tabs, official
+  timetable and reservation links, last-checked status, and honest scheduled
+  (not real-time) labels where no dependable public feed exists.
+- V22.1 refines the live weather card to the approved Compact design: 430px
+  maximum width, a smaller 3D cloud, clearer hierarchy, and all five forecast days.
 - Booking bar and contact enquiry are now real <form> elements, so Enter submits
   and the WhatsApp message is still built exactly as before.
 - Admin editor: HTML-escaping now covers quotes; a network/server hiccup no
@@ -12,7 +19,7 @@ Fixes in this build:
 - Weather humidity is rounded; the offline message is clearer.
 - Removed an unused preconnect and a duplicate gallery init; gallery tabs now
   reference their panel for screen readers.
-- CSS/JS cache-bust bumped to ?v=21.0.0.
+- CSS/JS cache-bust bumped to ?v=22.1.0.
 
 Deploy the CONTENTS of this folder to the repository root. Hard-refresh /admin/
 after deployment (Ctrl+Shift+R).

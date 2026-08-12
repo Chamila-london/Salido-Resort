@@ -29,7 +29,7 @@ export default async (req) => {
   return json(200, {
     ok: true,
     service: 'salido-admin-api',
-    version: '21.0',
+    version: '22.1',
     platform: 'Netlify Functions',
     loginConfigured,
     publishingConfigured,
