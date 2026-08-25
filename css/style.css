@@ -1718,7 +1718,7 @@ body.concept-v3{background:#09070f;color:var(--ink)}
   .brand-intro__aurora,.brand-intro__orbit,.brand-intro__flare,.brand-intro__vignette{animation:none!important}
 }
 
-/* ===== V22.1 — 3D live Kandy weather + verified travel schedule ===== */
+/* ===== V22.3 — 3D live Kandy weather + verified travel schedule ===== */
 #getting .getting__head{align-items:center;overflow:visible;margin-bottom:2.2rem}
 #getting .getting__intro{max-width:48ch}
 .wx{width:min(100%,510px)!important;min-width:440px!important;padding:0!important;border-radius:22px!important;background:transparent!important;box-shadow:0 24px 48px rgba(26,15,42,.28)!important;overflow:visible!important;color:#fff}
@@ -2731,6 +2731,19 @@ h3{font-size:clamp(1rem,1.45vw,1.25rem)}
   .payment-methods__logos .payment-logo--mastercard,
   .payment-methods__logos .payment-logo--amex{width:72px;min-width:72px;height:41px}
 }
+
+/* ===== V22.3 — two-way, 30-day train journey search ===== */
+.train-search{display:grid;grid-template-columns:minmax(210px,1.4fr) 42px minmax(170px,1fr) auto;align-items:end;gap:.65rem;padding:0 1.5rem 1rem;border-bottom:1px solid var(--line)}
+.train-search label{display:flex;flex-direction:column;gap:.35rem}.train-search label span{color:var(--muted);font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.train-search select,.train-search input{width:100%;height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 .75rem;color:var(--ink);font:600 .78rem var(--body)}
+.train-search select:focus,.train-search input:focus{outline:3px solid rgba(128,69,205,.14);border-color:var(--violet-hi)}
+.train-swap{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--violet-text);font-size:1.1rem;cursor:pointer}
+.train-search__button{height:42px;border:0;border-radius:999px;background:var(--violet-fill);padding:0 1rem;color:#fff;font:700 .74rem var(--body);cursor:pointer;white-space:nowrap}
+.train-search__status{min-height:1.7rem;margin:0;padding:.55rem 1.5rem 0;color:var(--muted);font-size:.68rem}
+.schedule__rdmns{background:linear-gradient(135deg,#5a2f82,#874bc1)!important;border-color:transparent!important}
+.train-results__notice{grid-column:1/-1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between;gap:1rem!important}.train-results__notice span{max-width:60ch!important}
+@media(max-width:760px){.train-search{grid-template-columns:1fr 42px}.train-search label:nth-of-type(2){grid-column:1/2}.train-search__button{grid-column:2/3}.train-results__notice{flex-direction:column!important;align-items:flex-start!important}}
+@media(max-width:430px){.train-search{grid-template-columns:1fr;padding-inline:1.1rem}.train-swap,.train-search__button,.train-search label:nth-of-type(2){grid-column:1}.train-swap{width:42px}.train-search__button{width:100%}.train-search__status{padding-inline:1.1rem}}
 
 /* Respect users who request reduced motion and reduce GPU load. */
 @media(prefers-reduced-motion:reduce){
@@ -5217,7 +5230,7 @@ img{max-width:100%}
   #facilities .facility-feature-v162{transition:none}
 }
 
-/* ===== V22.1 — Compact five-day live weather ===== */
+/* ===== V22.3 — Compact five-day live weather ===== */
 #getting .wx{
   width:min(100%,430px)!important;
   min-width:390px!important;
@@ -5243,6 +5256,10 @@ img{max-width:100%}
   width:43%!important;
   filter:drop-shadow(0 10px 9px rgba(3,9,26,.38))!important;
 }
+#getting .wx__cloud--sun{top:-42px!important;left:45%!important;width:35%!important}
+#getting .wx__cloud--cloud{top:-37px!important;left:43%!important;width:38%!important}
+#getting .wx__cloud--rain{top:-56px!important;left:40%!important;width:43%!important}
+#getting .wx__cloud--storm{top:-48px!important;left:41%!important;width:41%!important}
 #getting .wx__current{padding:0 0 5px 4px!important}
 #getting .wx__temp{font-size:2.2rem!important}
 #getting .wx__cond{font-size:.66rem!important}
@@ -5260,6 +5277,425 @@ img{max-width:100%}
   #getting .wx{width:100%!important}
   #getting .wx__scene{min-height:132px!important}
   #getting .wx__cloud{top:-43px!important;left:43%!important;width:45%!important}
+  #getting .wx__cloud--sun{top:-31px!important;left:46%!important;width:37%!important}
+  #getting .wx__cloud--cloud{top:-29px!important;left:45%!important;width:39%!important}
+  #getting .wx__cloud--rain{top:-43px!important;left:43%!important;width:45%!important}
+  #getting .wx__cloud--storm{top:-38px!important;left:43%!important;width:43%!important}
   #getting .wx__clock{font-size:1.95rem!important}
   #getting .wx__meta{font-size:.51rem!important}
+}
+
+/* ===== V22.5 — smaller weather card + clearer temperature position ===== */
+#getting .getting__head{
+  align-items:center!important;
+  gap:clamp(1.5rem,4vw,3.5rem)!important;
+}
+#getting .wx{
+  width:min(100%,380px)!important;
+  min-width:350px!important;
+  justify-self:end!important;
+  border-radius:18px!important;
+}
+#getting .wx__glass{border-radius:18px!important}
+#getting .wx__top{
+  height:33px!important;
+  padding:10px 14px 0!important;
+}
+#getting .wx__scene{
+  min-height:116px!important;
+  display:block!important;
+  padding:5px 14px 9px!important;
+}
+#getting .wx__clock{font-size:1.95rem!important}
+#getting .wx__cloud{
+  top:-47px!important;
+  left:38%!important;
+  width:39%!important;
+}
+#getting .wx__cloud--sun{top:-35px!important;left:42%!important;width:33%!important}
+#getting .wx__cloud--cloud{top:-31px!important;left:41%!important;width:35%!important}
+#getting .wx__cloud--rain{top:-47px!important;left:38%!important;width:39%!important}
+#getting .wx__cloud--storm{top:-41px!important;left:39%!important;width:38%!important}
+#getting .wx__current{
+  position:absolute!important;
+  right:13px!important;
+  top:40px!important;
+  min-width:82px!important;
+  padding:8px 10px 7px!important;
+  align-items:center!important;
+  text-align:center!important;
+  border:1px solid rgba(255,255,255,.2)!important;
+  border-radius:13px!important;
+  background:rgba(5,17,48,.68)!important;
+  box-shadow:0 8px 22px rgba(2,8,25,.28)!important;
+  backdrop-filter:blur(8px)!important;
+  -webkit-backdrop-filter:blur(8px)!important;
+}
+#getting .wx__temp{
+  font-size:1.9rem!important;
+  font-weight:500!important;
+  line-height:.9!important;
+  color:#fff!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.5)!important;
+}
+#getting .wx__cond{margin-top:5px!important;font-size:.58rem!important;font-weight:700!important;color:#fff!important}
+#getting .wx__current small{font-size:.46rem!important;color:rgba(255,255,255,.8)!important}
+#getting .wx__forecast{padding:6px 4px 8px!important;border-radius:0 0 18px 18px!important}
+#getting .wx__day i{height:20px!important}
+#getting .wx__day svg{width:19px!important;height:19px!important}
+@media(max-width:900px){
+  #getting .wx{width:min(100%,380px)!important;min-width:0!important;justify-self:center!important;margin:1.6rem auto 0!important}
+}
+@media(max-width:480px){
+  #getting .wx{width:min(100%,350px)!important}
+  #getting .wx__scene{min-height:112px!important}
+  #getting .wx__cloud{left:37%!important;width:40%!important}
+  #getting .wx__current{right:10px!important;top:37px!important;min-width:77px!important;padding:7px 8px!important}
+  #getting .wx__temp{font-size:1.75rem!important}
+}
+
+/* ===== V23.7 — visibly live, professional condition effects ===== */
+#getting .wx__glass{isolation:isolate;transition:background .65s ease!important}
+#getting .wx__glass.is-night{
+  background:radial-gradient(circle at 50% 31%,rgba(65,89,171,.28),transparent 30%),linear-gradient(145deg,#081638 0%,#10163d 60%,#190d35 100%)!important;
+}
+#getting .wx__updated{display:flex!important;align-items:center;gap:7px}
+#getting .wx__refresh{
+  width:23px;height:23px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.18);border-radius:50%;
+  background:rgba(255,255,255,.07);color:#fff;font:700 .75rem/1 var(--body);cursor:pointer;transition:background .2s ease,transform .25s ease;
+}
+#getting .wx__refresh:hover{background:rgba(255,255,255,.15);transform:rotate(35deg)}
+#getting .wx__refresh.is-loading{animation:wxRefresh .85s linear infinite;pointer-events:none}
+@keyframes wxRefresh{to{transform:rotate(360deg)}}
+#getting .wx__status{
+  display:flex;align-items:center;justify-content:center;gap:6px;min-height:22px;border-top:1px solid rgba(255,255,255,.08);
+  background:rgba(3,12,38,.5);color:rgba(225,234,255,.72);font-size:.48rem;letter-spacing:.035em;
+}
+#getting .wx__status i,#getting .wx__live i{
+  width:6px;height:6px;border-radius:50%;background:#76efae;box-shadow:0 0 0 4px rgba(118,239,174,.12);animation:wxLivePulse 2.4s ease-in-out infinite!important;
+}
+@keyframes wxLivePulse{50%{box-shadow:0 0 0 8px rgba(118,239,174,0)}}
+#getting .wx__halo,#getting .wx__moon,#getting .wx__rain,#getting .wx__fog,#getting .wx__bolt,#getting .wx__wind,#getting .wx__snow{pointer-events:none;position:absolute;display:none}
+#getting .wx__halo{z-index:1;left:57%;top:21%;width:145px;height:95px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,207,70,.4),transparent 68%);filter:blur(7px);animation:wxHalo 3.4s ease-in-out infinite}
+#getting [data-effect="sun"] .wx__halo{display:block}
+@keyframes wxHalo{50%{opacity:.56;transform:translate(-50%,-50%) scale(1.1)}}
+#getting .wx__moon{z-index:1;left:51%;top:14%;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#d8e4ff 58%,#91a8d8);box-shadow:0 0 22px #aec9ff,0 0 45px rgba(119,151,230,.38)}
+#getting .wx__glass.is-night .wx__moon{display:block}
+#getting .wx__rain{z-index:5;left:54%;top:20%;width:95px;height:96px;overflow:hidden;transform:translateX(-50%) skewX(-8deg)}
+#getting [data-effect="drizzle"] .wx__rain,#getting [data-effect="rain"] .wx__rain,#getting [data-effect="heavy"] .wx__rain,#getting [data-effect="showers"] .wx__rain,#getting [data-effect="storm"] .wx__rain{display:block}
+#getting .wx__rain i{position:absolute;top:-27px;width:2px;height:24px;border-radius:99px;background:linear-gradient(transparent,#65deff);box-shadow:0 0 6px rgba(80,210,255,.78);animation:wxRain var(--wx-speed,.9s) linear infinite}
+#getting .wx__rain i:nth-child(1){left:2px;animation-delay:-.1s}#getting .wx__rain i:nth-child(2){left:17px;animation-delay:-.4s}#getting .wx__rain i:nth-child(3){left:32px;animation-delay:-.67s}#getting .wx__rain i:nth-child(4){left:47px;animation-delay:-.23s}#getting .wx__rain i:nth-child(5){left:62px;animation-delay:-.76s}#getting .wx__rain i:nth-child(6){left:77px;animation-delay:-.52s}#getting .wx__rain i:nth-child(7){left:91px;animation-delay:-.3s}
+@keyframes wxRain{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(125px);opacity:.05}}
+#getting [data-effect="drizzle"] .wx__rain i{height:16px;--wx-speed:1.3s;opacity:.65}#getting [data-effect="heavy"] .wx__rain i{width:3px;height:33px;--wx-speed:.58s}
+#getting .wx__fog{z-index:6;left:37%;top:18%;width:145px}#getting [data-effect="fog"] .wx__fog{display:block}
+#getting .wx__fog i{display:block;height:10px;margin:7px 0;border-radius:99px;background:linear-gradient(90deg,transparent,rgba(229,238,255,.78),transparent);filter:blur(3px);animation:wxFog 5.2s ease-in-out infinite alternate}#getting .wx__fog i:nth-child(2){margin-left:24px;animation-delay:-2s}#getting .wx__fog i:nth-child(3){margin-left:8px;animation-delay:-3.5s}
+@keyframes wxFog{to{transform:translateX(29px);opacity:.4}}
+#getting .wx__bolt{z-index:6;left:52%;top:33%;width:17px;height:43px;background:#fff279;clip-path:polygon(47% 0,100% 0,69% 40%,100% 40%,25% 100%,43% 54%,10% 54%);filter:drop-shadow(0 0 8px #ffe959);animation:wxFlash 3.8s steps(1) infinite}#getting [data-effect="storm"] .wx__bolt{display:block}
+@keyframes wxFlash{0%,75%,82%,100%{opacity:0}76%,79%{opacity:1}}
+#getting .wx__wind{z-index:5;left:34%;top:15%;width:128px}#getting .wx__glass.is-windy .wx__wind{display:block}
+#getting .wx__wind i{display:block;width:120px;height:2px;margin:12px 0;border-radius:99px;background:linear-gradient(90deg,transparent,#d2e5ff,transparent);animation:wxWind 1.8s ease-in-out infinite}#getting .wx__wind i:nth-child(2){width:90px;margin-left:20px;animation-delay:-.6s}#getting .wx__wind i:nth-child(3){width:105px;margin-left:7px;animation-delay:-1.15s}
+@keyframes wxWind{0%{transform:translateX(-45px);opacity:0}40%{opacity:.85}100%{transform:translateX(58px);opacity:0}}
+#getting .wx__snow{z-index:5;left:42%;top:18%;width:112px;height:90px;overflow:hidden}#getting [data-effect="snow"] .wx__snow{display:block}
+#getting .wx__snow i{position:absolute;top:-14px;color:#fff;font-size:10px;animation:wxSnow 3s linear infinite}#getting .wx__snow i:nth-child(1){left:4px}#getting .wx__snow i:nth-child(2){left:28px;animation-delay:-1.1s}#getting .wx__snow i:nth-child(3){left:54px;animation-delay:-2.1s}#getting .wx__snow i:nth-child(4){left:80px;animation-delay:-.5s}#getting .wx__snow i:nth-child(5){left:106px;animation-delay:-1.7s}
+@keyframes wxSnow{to{transform:translate3d(13px,110px,0) rotate(1turn);opacity:.15}}
+@media(max-width:480px){#getting .wx__status{font-size:.45rem}#getting .wx__rain{left:55%;transform:translateX(-50%) scale(.9)}}
+@media(prefers-reduced-motion:reduce){#getting .wx__refresh,#getting .wx__live i,#getting .wx__status i,#getting .wx__halo,#getting .wx__rain i,#getting .wx__fog i,#getting .wx__bolt,#getting .wx__wind i,#getting .wx__snow i{animation:none!important}}
+
+/* ===== V22.6 — consistent full-section navigation landing ===== */
+html{scroll-padding-top:104px!important}
+body.concept-v3 section[id],
+body.concept-v3 main[id]{scroll-margin-top:104px!important}
+@media(max-width:860px){
+  html{scroll-padding-top:92px!important}
+  body.concept-v3 section[id],
+  body.concept-v3 main[id]{scroll-margin-top:92px!important}
+}
+
+/* ===== V22.7 — navigation lands on the visible section content ===== */
+body.concept-v3 section[id]>.wrap{scroll-margin-top:104px!important}
+@media(max-width:860px){
+  body.concept-v3 section[id]>.wrap{scroll-margin-top:92px!important}
+}
+
+/* ===== V22.8 — fixed navigation flush with viewport top ===== */
+body.concept-v3 .head,
+body.concept-v3 .head.is-stuck,
+body.concept-v3 .head.is-stuck.is-hidden{
+  top:0!important;
+  padding-top:0!important;
+}
+
+/* ===== V22.9 — smoother up/down scrolling ===== */
+html{scrollbar-gutter:stable}
+body.concept-v3 .head,
+body.concept-v3 .head__in,
+.dock{
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+body.is-scrolling.concept-v3 .head__in{
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  background:rgba(28,10,48,.985)!important;
+  box-shadow:0 8px 20px rgba(8,4,14,.22)!important;
+}
+body.is-scrolling.concept-v3 .head__in::before,
+body.is-scrolling .v43-option-a,
+body.is-scrolling .luxury-marker,
+body.is-scrolling .mark .glint{
+  animation-play-state:paused!important;
+}
+body.is-scrolling .hero__media,
+body.is-scrolling .hero__picture img,
+body.is-scrolling .reveal,
+body.is-scrolling .tile,
+body.is-scrolling .gallery-card,
+body.is-scrolling .room-card{
+  transition:none!important;
+}
+@media(max-width:860px){
+  body.concept-v3 .head__in{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  section:not(.hero){contain-intrinsic-size:auto 620px}
+}
+
+/* ===== V23.0 — continuous GPU-driven navigation glow ===== */
+@media(min-width:861px){
+  .nav-guided-light{
+    --glow-travel:calc(min(100vw - 32px,1720px) - 330px);
+    left:44px!important;
+    opacity:0;
+    filter:blur(5px)!important;
+    contain:strict;
+    will-change:transform,opacity;
+    animation:salidoGuidedLightSmooth 7.2s linear infinite!important;
+  }
+  body.is-scrolling .nav-guided-light{
+    animation-play-state:running!important;
+  }
+  body.concept-v3 .head>.head__in>.btn{
+    animation:salidoGuidedBloomSmooth 7.2s linear infinite!important;
+  }
+}
+@keyframes salidoGuidedLightSmooth{
+  0%{opacity:0;transform:translate3d(-50%,-50%,0)}
+  7%{opacity:.92}
+  86%{opacity:.9;transform:translate3d(calc(var(--glow-travel) - 50%),-50%,0)}
+  94%,100%{opacity:0;transform:translate3d(calc(var(--glow-travel) - 50%),-50%,0)}
+}
+@keyframes salidoGuidedBloomSmooth{
+  0%,78%,100%{filter:brightness(1) drop-shadow(0 0 0 rgba(178,92,255,0))}
+  88%{filter:brightness(1.2) drop-shadow(0 0 18px rgba(178,92,255,.78))}
+}
+@media(prefers-reduced-motion:reduce){
+  .nav-guided-light{animation:none!important}
+  body.concept-v3 .head>.head__in>.btn{animation:none!important}
+}
+
+/* ===== V23.1 — Champagne–Violet premium edge runner ===== */
+@media(min-width:861px){
+  body.concept-v3 .head .head__in,
+  body.concept-v3 .head.is-stuck .head__in,
+  body.concept-v3 .head.is-stuck.is-hidden .head__in{
+    position:relative!important;
+    isolation:isolate!important;
+    overflow:hidden!important;
+    border-color:transparent!important;
+  }
+  body.concept-v3 .head__in::before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:0!important;
+    inset:-850px -120px!important;
+    border-radius:50%!important;
+    opacity:1!important;
+    background:conic-gradient(transparent 0 76%,rgba(136,50,201,.08) 79%,#9f45e4 83%,#d9a9f8 86%,#fff6da 88%,#e8c778 90%,rgba(232,199,120,.12) 94%,transparent 99%)!important;
+    transform:translateZ(0);
+    transform-origin:center!important;
+    animation:salidoPremiumEdgeOrbit 6.8s linear infinite!important;
+    will-change:transform!important;
+    pointer-events:none!important;
+  }
+  body.concept-v3 .head__in::after{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:1!important;
+    inset:2px!important;
+    border-radius:22px!important;
+    background:linear-gradient(103deg,rgba(16,8,23,.995),rgba(42,23,52,.985) 52%,rgba(52,31,51,.98))!important;
+    box-shadow:inset 0 1px rgba(255,255,255,.055),inset 0 0 42px rgba(116,45,164,.08)!important;
+    pointer-events:none!important;
+  }
+  body.concept-v3 .head__in>*{position:relative!important;z-index:2!important}
+  .nav-guided-light{display:none!important}
+  body.concept-v3 .head>.head__in>.btn{animation:none!important}
+  body.is-scrolling.concept-v3 .head__in::before{animation-play-state:running!important}
+}
+@keyframes salidoPremiumEdgeOrbit{
+  to{transform:translateZ(0) rotate(1turn)}
+}
+@media(prefers-reduced-motion:reduce){
+  body.concept-v3 .head__in::before{animation:none!important}
+}
+
+/* ===== V23.3 — recommended premium typography system ===== */
+/* Instrument Sans remains the functional UI and reading typeface. */
+html[lang="en"] body.concept-v3,
+html[lang="en"] body.concept-v3 .nav,
+html[lang="en"] body.concept-v3 .btn,
+html[lang="en"] body.concept-v3 button,
+html[lang="en"] body.concept-v3 input,
+html[lang="en"] body.concept-v3 select,
+html[lang="en"] body.concept-v3 textarea{
+  font-family:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+}
+/* Cormorant Garamond is reserved for prominent editorial headings. */
+html[lang="en"] body.concept-v3 h1,
+html[lang="en"] body.concept-v3 h2,
+html[lang="en"] body.concept-v3 .v1003-hero-title,
+html[lang="en"] body.concept-v3 .reservation-v9__intro h2,
+html[lang="en"] body.concept-v3 .reservation-v9__formhead h3{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-weight:500!important;
+}
+
+/* ===== V23.4 — automatic Kandy-time map themes ===== */
+#resortMap{transition:background-color .8s ease,filter .8s ease}
+#resortMap .leaflet-tile-pane{transition:opacity .65s ease,filter .8s ease}
+#resortMap.map-theme-day{background:#dcecf3}
+#resortMap.map-theme-day .leaflet-tile-pane{filter:saturate(.92) contrast(1.02) brightness(1.02)}
+#resortMap.map-theme-night{background:#151020}
+#resortMap.map-theme-night .leaflet-tile-pane{filter:saturate(.86) contrast(1.08) brightness(.94)}
+#resortMap.map-theme-satellite .leaflet-tile-pane{filter:saturate(1.05) contrast(1.04)}
+.map__style{transition:background-color .25s ease,color .25s ease,transform .25s ease,box-shadow .25s ease!important}
+.map__style:hover{transform:translateY(-1px)}
+@media(prefers-reduced-motion:reduce){
+  #resortMap,#resortMap .leaflet-tile-pane{transition:none!important}
+}
+
+/* ===== V23.5 — accessible RDMNS button contrast ===== */
+.schedule__actions .schedule__rdmns,
+.schedule__actions .schedule__rdmns:link,
+.schedule__actions .schedule__rdmns:visited{
+  color:#fff!important;
+  background:linear-gradient(135deg,#5f2699,#8c43cf)!important;
+  border-color:transparent!important;
+  box-shadow:0 8px 20px rgba(95,38,153,.2)!important;
+}
+.schedule__actions .schedule__rdmns:hover,
+.schedule__actions .schedule__rdmns:focus-visible{
+  color:#fff!important;
+  background:linear-gradient(135deg,#7130b4,#a04fe5)!important;
+  transform:translateY(-1px);
+  box-shadow:0 11px 24px rgba(95,38,153,.28)!important;
+}
+
+/* ========================================================================== 
+   V23.6 — AUTHORITATIVE RESPONSIVE TYPOGRAPHY SCALE
+   One consistent hierarchy for desktop, tablet and mobile.
+   ========================================================================== */
+:root{
+  --salido-body:clamp(15.5px,.18vw + 14.8px,17px);
+  --salido-small:.78rem;
+  --salido-h1:clamp(3.7rem,5.15vw,5.55rem);
+  --salido-h2:clamp(2.65rem,3.8vw,4.15rem);
+  --salido-h3:clamp(1.15rem,1.4vw,1.45rem);
+}
+body.concept-v3{font-size:var(--salido-body)!important;line-height:1.62}
+body.concept-v3 p{line-height:1.62}
+
+/* Navigation, labels and controls. */
+body.concept-v3 .nav a{font-size:.82rem!important;line-height:1.1!important}
+body.concept-v3 .btn,
+body.concept-v3 button,
+body.concept-v3 .schedule__actions a{font-size:.82rem!important}
+body.concept-v3 .eyebrow{font-size:.68rem!important;line-height:1.2!important;letter-spacing:.15em!important}
+body.concept-v3 label{font-size:.72rem;line-height:1.25}
+body.concept-v3 input,
+body.concept-v3 select,
+body.concept-v3 textarea{font-size:.94rem!important;line-height:1.35}
+
+/* Major editorial headings. */
+body.concept-v3 .hero .v1003-hero-title{font-size:var(--salido-h1)!important;line-height:.82!important;max-width:620px!important}
+body.concept-v3 .sec__head h2,
+body.concept-v3 .split__body h2,
+body.concept-v3 .getting__intro h2{font-size:var(--salido-h2)!important;line-height:.94!important;letter-spacing:-.045em!important}
+body.concept-v3 .sec__head .lede,
+body.concept-v3 .getting__intro .lede,
+body.concept-v3 .split__body>p{font-size:clamp(.94rem,.35vw + .86rem,1.04rem)!important;line-height:1.62!important}
+
+/* Notice board. */
+body.concept-v3 #notices .sec__head h2{font-size:clamp(3rem,4vw,4.35rem)!important;line-height:.9!important}
+body.concept-v3 #notices .notice__body h3{font-size:clamp(1.65rem,2vw,2.2rem)!important;line-height:1.08!important}
+body.concept-v3 #notices .notice__body p{font-size:.95rem!important;line-height:1.58!important}
+body.concept-v3 #notices .notice__meta,
+body.concept-v3 #notices .notice__cta{font-size:.78rem!important}
+
+/* Facilities, gallery and attraction cards. */
+body.concept-v3 #facilities .sec__head h2{font-size:clamp(2.5rem,3.35vw,3.65rem)!important;line-height:.96!important}
+body.concept-v3 #facilities .tile h3{font-size:1rem!important;line-height:1.25!important}
+body.concept-v3 #facilities .tile p{font-size:.82rem!important;line-height:1.48!important}
+body.concept-v3 .lux-gallery figcaption{font-size:1rem!important;line-height:1.25!important}
+body.concept-v3 .gallery-filter{font-size:.78rem!important}
+body.concept-v3 #attractions .spot__body h3{font-size:1.13rem!important;line-height:1.2!important}
+body.concept-v3 #attractions .spot__body p{font-size:.84rem!important;line-height:1.5!important}
+body.concept-v3 #attractions .spot__body>span,
+body.concept-v3 #attractions .spot__km{font-size:.72rem!important}
+
+/* Travel, weather and train planner. */
+body.concept-v3 #getting .schedule__head h3,
+body.concept-v3 #getting .schedule__panel h3{font-size:1.35rem!important;line-height:1.25!important}
+body.concept-v3 #getting .schedule__head p,
+body.concept-v3 #getting .schedule__panel>p{font-size:.83rem!important;line-height:1.55!important}
+body.concept-v3 #getting .schedule__tabs button{font-size:.78rem!important}
+body.concept-v3 #getting .tt li b{font-size:.96rem!important}
+body.concept-v3 #getting .tt li span{font-size:.7rem!important}
+
+/* Reservation and contact. */
+body.concept-v3 .reservation-v9__intro h2{font-size:clamp(3.25rem,4.7vw,5rem)!important;line-height:.8!important}
+body.concept-v3 .reservation-v9__intro>.reservation-v9__lede{font-size:.96rem!important;line-height:1.6!important}
+body.concept-v3 .reservation-v9__formhead h3{font-size:1.85rem!important;line-height:1.05!important}
+body.concept-v3 .reservation-v9__formhead p{font-size:.86rem!important}
+body.concept-v3 .reservation-v9__contacts b{font-size:.7rem!important}
+body.concept-v3 .reservation-v9__contacts span,
+body.concept-v3 .reservation-v9__contacts a{font-size:.86rem!important}
+body.concept-v3 .reservation-v9__benefits b{font-size:.74rem!important}
+body.concept-v3 .reservation-v9__benefits small{font-size:.66rem!important}
+
+/* Map and footer supporting content. */
+body.concept-v3 .map-card h3{font-size:1.8rem!important;line-height:1.05!important}
+body.concept-v3 .map-card p,
+body.concept-v3 .map-card li{font-size:.84rem!important;line-height:1.52!important}
+body.concept-v3 .map-card-reviews h4{font-size:1rem!important}
+body.concept-v3 .foot{font-size:.88rem}
+
+@media(max-width:860px){
+  :root{--salido-h1:clamp(3.15rem,11vw,4.45rem);--salido-h2:clamp(2.3rem,7.6vw,3.45rem)}
+  body.concept-v3 .nav a{font-size:.86rem!important}
+  body.concept-v3 #notices .sec__head h2{font-size:clamp(2.75rem,10vw,3.85rem)!important}
+  body.concept-v3 .reservation-v9__intro h2{font-size:clamp(3rem,10vw,4.25rem)!important}
+}
+@media(max-width:560px){
+  :root{--salido-body:15.5px;--salido-h1:clamp(2.85rem,13vw,3.85rem);--salido-h2:clamp(2.15rem,10vw,3rem)}
+  body.concept-v3 .hero .v1003-hero-title{line-height:.86!important}
+  body.concept-v3 .sec__head .lede,
+  body.concept-v3 .getting__intro .lede,
+  body.concept-v3 .split__body>p{font-size:.92rem!important}
+  body.concept-v3 #notices .sec__head h2{font-size:clamp(2.55rem,12vw,3.35rem)!important}
+  body.concept-v3 #notices .notice__body h3{font-size:1.55rem!important}
+  body.concept-v3 .reservation-v9__intro h2{font-size:clamp(2.85rem,13vw,3.75rem)!important}
+  body.concept-v3 .reservation-v9__formhead h3{font-size:1.55rem!important}
+  body.concept-v3 #getting .schedule__head h3,
+  body.concept-v3 #getting .schedule__panel h3{font-size:1.15rem!important}
+}
+/* Smaller headings stay crisp and modern. */
+html[lang="en"] body.concept-v3 h3,
+html[lang="en"] body.concept-v3 h4,
+html[lang="en"] body.concept-v3 .eyebrow{
+  font-family:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+}
+html[lang="en"] body.concept-v3 .reservation-v9__formhead h3{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-weight:500!important;
 }

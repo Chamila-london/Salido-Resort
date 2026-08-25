@@ -33,7 +33,7 @@
 <meta content="https://salido-resort.pages.dev/images/hero.webp" name="twitter:image"/>
 <link crossorigin="" href="https://unpkg.com" rel="preconnect"/><link href="https://www.google.com" rel="dns-prefetch"/>
 <link crossorigin="anonymous" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet"/><noscript><link crossorigin="anonymous" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/></noscript>
-<link href="css/style.css?v=22.1.0" rel="stylesheet"/>
+<link href="css/style.css?v=23.7.0" rel="stylesheet"/>
 <style>
 #zip-warning{display:none;position:fixed;inset:0;z-index:9999;background:#2E1A4A;color:#fff;
   padding:24px;text-align:center;flex-direction:column;align-items:center;justify-content:center;
@@ -398,9 +398,16 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 </div>
 <section class="schedule" aria-labelledby="schedule-title">
 <div class="schedule__head">
-<div><span class="schedule__kicker">Today’s travel schedule</span><h3 id="schedule-title">Colombo → Kandy</h3><p><span class="schedule__dot"></span> Scheduled departures · Confirm before travel</p></div>
+<div><span class="schedule__kicker">Train journey planner</span><h3 id="schedule-title">Colombo Fort → Kandy</h3><p><span class="schedule__dot"></span> Scheduled departures · Live status available on RDMNS</p></div>
 <div class="schedule__tools"><span id="schedule-checked">Checked today</span><button type="button" id="schedule-refresh" aria-label="Refresh schedule status">↻ Refresh</button></div>
 </div>
+<form class="train-search" id="train-search">
+<label><span>Direction</span><select id="train-direction"><option value="fort-kandy">Colombo Fort → Kandy</option><option value="kandy-fort">Kandy → Colombo Fort</option></select></label>
+<button class="train-swap" id="train-swap" type="button" aria-label="Reverse direction">⇄</button>
+<label><span>Travel date</span><input id="train-date" type="date" required></label>
+<button class="train-search__button" type="submit">Search schedule</button>
+</form>
+<p class="train-search__status" id="train-search-status" aria-live="polite"></p>
 <div class="schedule__tabs" role="tablist" aria-label="Transport type">
 <button class="is-active" id="schedule-train-tab" role="tab" aria-selected="true" aria-controls="schedule-train" data-schedule-tab="train">Train</button>
 <button id="schedule-bus-tab" role="tab" aria-selected="false" aria-controls="schedule-bus" data-schedule-tab="bus">Bus</button>
@@ -408,17 +415,17 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <div class="getting__grid schedule__panels">
 <article class="travel schedule__panel is-active" id="schedule-train" role="tabpanel" aria-labelledby="schedule-train-tab" data-schedule-panel="train">
 <div class="travel__ic"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="3"></rect><path d="M4 11h16"></path><path d="M12 3v8"></path><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path></svg></div>
-<h3 data-i18n="get.train.t">By train from Colombo</h3>
-<p data-i18n="get.train.p">The Colombo Fort → Kandy line is one of Asia's most scenic rides — 116 km through tea country, about 2½–3 hours. Sit on the right for the best views.</p>
-<ul class="tt">
-<li><b>05:55</b> Podi Menike <span data-i18n="get.train.s1">scenic blue train</span></li>
-<li><b>07:00</b> Intercity Express <span data-i18n="get.train.s2">fastest, ~2h25m</span></li>
-<li><b>08:30</b> Udarata Menike <span data-i18n="get.train.s3">scenic blue train</span></li>
-<li><b>15:35</b> Intercity <span data-i18n="get.train.s4">fast afternoon</span></li>
-<li><b>17:45</b> <span data-i18n="get.train.last">last train</span> <span data-i18n="get.train.s5">evening</span></li>
+<h3 id="train-route-title">By train: Colombo Fort → Kandy</h3>
+<p id="train-route-copy">Scheduled services for your selected travel date. Journey times and operations can change.</p>
+<ul class="tt" id="train-results">
+<li><b>05:55</b> Podi Menike <span>scheduled service</span></li>
+<li><b>07:00</b> Intercity Express <span>scheduled service</span></li>
+<li><b>08:30</b> Udarata Menike <span>scheduled service</span></li>
+<li><b>15:35</b> Intercity <span>scheduled service</span></li>
+<li><b>17:45</b> Evening train <span>scheduled service</span></li>
 </ul>
-<p class="travel__note">Times shown are scheduled departures, not live running times. Always verify delays and seat availability before leaving.</p>
-<div class="schedule__actions"><a class="schedule__primary" href="https://eservices.railway.gov.lk/schedule/homeAction.action?lang=en" rel="noopener" target="_blank">Check official timetable ↗</a><a href="https://seatreservation.railway.gov.lk/" rel="noopener" target="_blank">Reserve seats ↗</a></div>
+<p class="travel__note">The timetable shown here is travel guidance, not RDMNS live data. Use RDMNS for current delays, cancellations and train tracking.</p>
+<div class="schedule__actions"><a class="schedule__primary schedule__google" id="google-train-search" href="https://www.google.com/maps/dir/?api=1&amp;origin=Colombo%20Fort%20Railway%20Station&amp;destination=Kandy%20Railway%20Station&amp;travelmode=transit" rel="noopener" target="_blank">Search with Google Maps ↗</a><a class="schedule__rdmns" href="https://rdmns.lk/" rel="noopener" target="_blank">RDMNS live status ↗</a><a href="https://eservices.railway.gov.lk/schedule/homeAction.action?lang=en" rel="noopener" target="_blank">Official timetable ↗</a><a href="https://seatreservation.railway.gov.lk/" rel="noopener" target="_blank">Reserve seats ↗</a></div>
 </article>
 <article class="travel schedule__panel" id="schedule-bus" role="tabpanel" aria-labelledby="schedule-bus-tab" data-schedule-panel="bus" hidden>
 <div class="travel__ic"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M8 6v6M15 6v6M2 12h19.6"></path><path d="M18 18h3s.6-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"></path><circle cx="7" cy="18" r="2"></circle><path d="M9 18h5"></path><circle cx="16" cy="18" r="2"></circle></svg></div>
@@ -561,7 +568,7 @@ window.SALIDO_GOOGLE_MAPS_API_KEY = "";
 <a aria-label="Call Salido Resort" class="dock__call" href="tel:+94711596390"><svg aria-hidden="true" viewbox="0 0 24 24"><use href="#i-phone"></use></svg></a>
 </div>
 <script crossorigin="anonymous" defer="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script defer="" src="js/script.js?v=22.1.0"></script>
+<script defer="" src="js/script.js?v=23.7.0"></script>
 <script>
 (function(){
   function check(){

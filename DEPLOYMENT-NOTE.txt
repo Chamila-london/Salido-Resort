@@ -1,7 +1,16 @@
-SALIDO V22.1
+SALIDO V23.7 — LIVE PROFESSIONAL WEATHER
 
 Weather and travel release. Version numbers are consistent across the public
-site, Admin Studio, and health endpoint (V22.1).
+site, Admin Studio, and health endpoint (V22.4).
+
+V23.7 live weather update:
+- The compact Kandy weather card now visibly reflects live conditions with
+  restrained sunlight, drizzle, rain, showers, storm, fog, wind, and snow effects.
+- Added automatic day/night styling based on the live weather response.
+- Added a visible live-data status, manual refresh button, live clock, and
+  automatic weather refresh every 15 minutes.
+- The professional 3D weather artwork remains stationary for a premium look.
+- CSS/JS cache-bust updated to ?v=23.7.0.
 
 Fixes in this build:
 - Added a static 3D rain-cloud weather design with live Kandy conditions,
@@ -9,8 +18,18 @@ Fixes in this build:
 - Added Today’s Travel Schedule with accessible Train/Bus tabs, official
   timetable and reservation links, last-checked status, and honest scheduled
   (not real-time) labels where no dependable public feed exists.
-- V22.1 refines the live weather card to the approved Compact design: 430px
+- V22.3 refines the live weather card to the approved Compact design: 430px
   maximum width, a smaller 3D cloud, clearer hierarchy, and all five forecast days.
+- V22.3 adds condition-aware 3D artwork. The main weather image now switches
+  automatically between sunny, cloudy, rainy, and thunderstorm conditions using
+  the live Open-Meteo weather code.
+- V22.3 adds a two-way train journey search for Colombo Fort ↔ Kandy with a
+  date picker limited to today plus 30 days, official timetable/reservation
+  links, and a clearly labelled RDMNS live-status action. RDMNS data is not
+  copied because no authorized public API is currently documented.
+- V22.4 adds a free Google Maps transit search link that automatically follows
+  the selected Colombo Fort ↔ Kandy direction. Visitors select their departure
+  date and time after Google Maps opens; this link is not presented as live data.
 - Booking bar and contact enquiry are now real <form> elements, so Enter submits
   and the WhatsApp message is still built exactly as before.
 - Admin editor: HTML-escaping now covers quotes; a network/server hiccup no
@@ -19,7 +38,7 @@ Fixes in this build:
 - Weather humidity is rounded; the offline message is clearer.
 - Removed an unused preconnect and a duplicate gallery init; gallery tabs now
   reference their panel for screen readers.
-- CSS/JS cache-bust bumped to ?v=22.1.0.
+- CSS/JS cache-bust bumped to ?v=22.4.0.
 
 Deploy the CONTENTS of this folder to the repository root. Hard-refresh /admin/
 after deployment (Ctrl+Shift+R).

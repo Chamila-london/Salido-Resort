@@ -31,13 +31,21 @@
 
   /* Temporarily simplify costly visual effects while scrolling. */
   var scrollEndTimer = 0;
-  window.addEventListener('scroll', function(){
-    document.body.classList.add('is-scrolling');
+  var scrollingNow = false;
+  var finishScrolling = function(){
     window.clearTimeout(scrollEndTimer);
-    scrollEndTimer = window.setTimeout(function(){
-      document.body.classList.remove('is-scrolling');
-    }, 120);
+    scrollingNow = false;
+    document.body.classList.remove('is-scrolling');
+  };
+  window.addEventListener('scroll', function(){
+    if(!scrollingNow){
+      scrollingNow = true;
+      document.body.classList.add('is-scrolling');
+    }
+    window.clearTimeout(scrollEndTimer);
+    scrollEndTimer = window.setTimeout(finishScrolling, 150);
   }, {passive:true});
+  if('onscrollend' in window){ window.addEventListener('scrollend', finishScrolling, {passive:true}); }
 
 
   /* cinematic "live image" hero: gentle scroll parallax and pointer-responsive depth */
@@ -53,6 +61,8 @@
     function paintHero(){
       raf = 0;
       var rect = hero.getBoundingClientRect();
+      /* Do not repaint the 4K hero after it has left the viewport. */
+      if(rect.bottom < -80 || rect.top > window.innerHeight + 80) return;
       var progress = Math.max(-1, Math.min(1, -rect.top / Math.max(rect.height,1)));
       hero.style.setProperty('--hero-scroll', (progress * 18).toFixed(1) + 'px');
     }
@@ -79,6 +89,46 @@
     });
     nav.addEventListener('click', function(e){
       if(e.target.tagName === 'A'){ document.body.classList.remove('is-open'); burger.setAttribute('aria-expanded','false'); }
+    });
+  }
+
+  /* Reliable section navigation for the fixed header.
+     Native anchor scrolling was landing between sections because several older
+     scroll-margin rules and the sticky-header transition used different offsets. */
+  var sectionLinks = document.querySelectorAll('a[href^="#"]');
+  var scrollToSection = function(target, smooth){
+    if(!target) return;
+    var headerHeight = head ? head.getBoundingClientRect().height : 0;
+    /* Align the section's visible content—not the outside edge of its large
+       decorative padding—directly below the fixed navigation. */
+    var contentTop = target.querySelector && target.querySelector(':scope > .wrap');
+    var anchorPoint = contentTop || target;
+    var top = target.id === 'top'
+      ? 0
+      : Math.max(0, anchorPoint.getBoundingClientRect().top + window.scrollY - headerHeight - 14);
+    window.scrollTo({top:top, behavior:smooth ? 'smooth' : 'auto'});
+  };
+  sectionLinks.forEach(function(link){
+    link.addEventListener('click', function(e){
+      var hash = link.getAttribute('href');
+      if(!hash || hash === '#') return;
+      var target = document.querySelector(hash);
+      if(!target) return;
+      e.preventDefault();
+      document.body.classList.remove('is-open');
+      if(burger) burger.setAttribute('aria-expanded','false');
+      scrollToSection(target, true);
+      try{ history.pushState(null, '', hash); }catch(err){}
+    });
+  });
+  window.addEventListener('hashchange', function(){
+    var target = document.querySelector(window.location.hash || '#top');
+    if(target) window.requestAnimationFrame(function(){ scrollToSection(target, false); });
+  });
+  if(window.location.hash){
+    window.addEventListener('load', function(){
+      var target = document.querySelector(window.location.hash);
+      if(target) window.requestAnimationFrame(function(){ scrollToSection(target, false); });
     });
   }
 
@@ -506,7 +556,9 @@
     else if(qbSend){ qbSend.addEventListener('click', sendQuick); }
   }
 
-  /* live Kandy weather — Open-Meteo (free, no API key). Only loads when online. */
+  /* Live Kandy weather — Open-Meteo (free, no API key).
+     The 3D artwork stays still while restrained, condition-aware environmental
+     effects make the card visibly live. */
   var wx = document.getElementById('wx');
   if(wx){
     var WCODE = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',
@@ -519,12 +571,27 @@
       rain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 15"/><path d="M8 18v2M12 18v3M16 18v2"/></svg>',
       storm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 15"/><path d="m13 12-3 5h4l-3 5"/></svg>'
     };
-    var pick = function(c){ if(c===0||c===1) return 'sun'; if(c>=95) return 'storm';
-      if((c>=51&&c<=82)) return 'rain'; return 'cloud'; };
+    var pick = function(c){ if(c<=2) return 'sun'; if(c>=95) return 'storm';
+      if((c>=51&&c<=67)||(c>=80&&c<=82)) return 'rain'; return 'cloud'; };
+    var effect = function(c){
+      if(c<=2) return 'sun'; if(c===45||c===48) return 'fog';
+      if(c>=51&&c<=57) return 'drizzle'; if(c===61||c===63||c===66) return 'rain';
+      if(c===65||c===67) return 'heavy'; if((c>=71&&c<=77)||c===85||c===86) return 'snow';
+      if(c>=80&&c<=82) return 'showers'; if(c>=95) return 'storm'; return 'cloud';
+    };
+    var ICON3D = {
+      sun:'images/weather-sun-3d.png',
+      cloud:'images/weather-cloudy-3d.png',
+      rain:'images/weather-rain-3d.png',
+      storm:'images/weather-storm-3d.png'
+    };
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=7.2844504&longitude=80.6651848' +
-      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m' +
+      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,is_day' +
       '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=5&timezone=Asia%2FColombo';
-    fetch(url).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
+    var loadWeather = function(){
+      var oldRefresh = wx.querySelector('.wx__refresh');
+      if(oldRefresh){ oldRefresh.classList.add('is-loading'); oldRefresh.setAttribute('aria-busy','true'); }
+      fetch(url,{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
       var c = d.current, day = d.daily;
       var t = Math.round(c.temperature_2m),
           hi = Math.round(day.temperature_2m_max[0]),
@@ -542,18 +609,37 @@
         var name = new Date(date+'T12:00:00+05:30').toLocaleDateString('en-US',{weekday:'short',timeZone:'Asia/Colombo'}).toUpperCase();
         return '<span class="wx__day"><b>'+name+'</b><i>'+ICON[pick(day.weather_code[i])]+'</i><strong>'+Math.round(day.temperature_2m_max[i])+'\u00B0/'+Math.round(day.temperature_2m_min[i])+'\u00B0</strong></span>';
       }).join('');
+      var fx=effect(c.weather_code), isNight=Number(c.is_day)===0, windy=Number(c.wind_speed_10m)>=30;
       wx.innerHTML =
-        '<div class="wx__glass"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated">Updated ' + updated + '</span></div>' +
+        '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated">Updated ' + updated + '<button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather">↻</button></span></div>' +
         '<div class="wx__scene"><div class="wx__info"><span class="wx__date">'+localNow+'</span><span class="wx__clock">'+clock+'</span>'+
         '<span class="wx__meta">Feels like '+Math.round(c.apparent_temperature)+'\u00B0 · Wind '+compass+' '+Math.round(c.wind_speed_10m)+' km/h</span>'+
         '<span class="wx__meta">Sunrise '+sunrise+' · Sunset '+sunset+'</span></div>'+
-        '<img class="wx__cloud" src="images/weather-cloud-3d.png" alt="" aria-hidden="true">' +
+        '<span class="wx__halo" aria-hidden="true"></span><span class="wx__moon" aria-hidden="true"></span>'+
+        '<img class="wx__cloud wx__cloud--'+pick(c.weather_code)+'" src="'+ICON3D[pick(c.weather_code)]+'" alt="" aria-hidden="true">' +
+        '<span class="wx__rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>'+
+        '<span class="wx__fog" aria-hidden="true"><i></i><i></i><i></i></span><span class="wx__bolt" aria-hidden="true"></span>'+
+        '<span class="wx__wind" aria-hidden="true"><i></i><i></i><i></i></span><span class="wx__snow" aria-hidden="true"><i>❄</i><i>❄</i><i>❄</i><i>❄</i><i>❄</i></span>'+
         '<div class="wx__current"><span class="wx__temp">'+t+'\u00B0</span><span class="wx__cond">'+(WCODE[c.weather_code]||'\u2014')+'</span><small>'+Math.round(c.relative_humidity_2m)+'% humidity</small></div></div>'+
-        '<div class="wx__forecast">'+forecast+'</div></div>';
+        '<div class="wx__forecast">'+forecast+'</div><span class="wx__status"><i></i> Live data · refreshes every 15 min</span></div>';
       wx.classList.add('is-loaded');
+      var refresh=wx.querySelector('.wx__refresh');
+      if(refresh){ refresh.addEventListener('click',loadWeather); }
     }).catch(function(){
-      wx.innerHTML = '<span class="wx__off">Live Kandy weather is unavailable right now.</span>';
+      var refresh=wx.querySelector('.wx__refresh');
+      if(refresh){ refresh.classList.remove('is-loading'); refresh.removeAttribute('aria-busy'); }
+      if(!wx.classList.contains('is-loaded')){
+        wx.innerHTML = '<span class="wx__off">Live Kandy weather is unavailable right now. Check your internet connection and refresh the page.</span>';
+      }
     });
+    };
+    loadWeather();
+    window.setInterval(loadWeather,900000);
+    window.setInterval(function(){
+      var clockEl=wx.querySelector('.wx__clock'), dateEl=wx.querySelector('.wx__date');
+      if(clockEl){ clockEl.textContent=new Date().toLocaleTimeString('en-US',{timeZone:'Asia/Colombo',hour:'numeric',minute:'2-digit'}); }
+      if(dateEl){ dateEl.textContent=new Date().toLocaleString('en-US',{timeZone:'Asia/Colombo',weekday:'long',month:'short',day:'numeric'}); }
+    },30000);
   }
 
   /* Scheduled travel tabs. Official sources do not expose a dependable public real-time feed. */
@@ -569,6 +655,47 @@
   if(scheduleRefresh){ scheduleRefresh.addEventListener('click',function(){
     scheduleRefresh.classList.add('is-refreshing'); scheduleRefresh.textContent='↻ Checking…';
     window.setTimeout(function(){ scheduleRefresh.classList.remove('is-refreshing'); scheduleRefresh.textContent='✓ Schedule ready'; if(scheduleChecked) scheduleChecked.textContent='Checked just now'; },650);
+  }); }
+
+  /* Two-way, 30-day train search. Results remain clearly labelled as schedule
+     guidance until RDMNS provides an authorized public/partner API. */
+  var trainForm=document.getElementById('train-search'), trainDirection=document.getElementById('train-direction'),
+      trainDate=document.getElementById('train-date'), trainSwap=document.getElementById('train-swap'),
+      trainTitle=document.getElementById('train-route-title'), scheduleTitle=document.getElementById('schedule-title'),
+      trainCopy=document.getElementById('train-route-copy'), trainStatus=document.getElementById('train-search-status'),
+      trainResults=document.getElementById('train-results'), googleTrainSearch=document.getElementById('google-train-search');
+  var routeNames={'fort-kandy':'Colombo Fort → Kandy','kandy-fort':'Kandy → Colombo Fort'};
+  var mapStations={'fort-kandy':['Colombo Fort Railway Station','Kandy Railway Station'],'kandy-fort':['Kandy Railway Station','Colombo Fort Railway Station']};
+  var fortSchedule=[['05:55','Podi Menike'],['07:00','Intercity Express'],['08:30','Udarata Menike'],['15:35','Intercity'],['17:45','Evening train']];
+  function localISO(d){ var x=new Date(d.getTime()-d.getTimezoneOffset()*60000); return x.toISOString().slice(0,10); }
+  if(trainDate){
+    var today=new Date(), maxDate=new Date(today); maxDate.setDate(maxDate.getDate()+30);
+    trainDate.min=localISO(today); trainDate.max=localISO(maxDate); trainDate.value=localISO(today);
+  }
+  function updateTrainSearch(){
+    if(!trainDirection||!trainDate) return;
+    var route=routeNames[trainDirection.value], chosen=new Date(trainDate.value+'T12:00:00');
+    var dateLabel=chosen.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    if(scheduleTitle) scheduleTitle.textContent=route;
+    if(trainTitle) trainTitle.textContent='By train: '+route;
+    if(trainCopy) trainCopy.textContent='Schedule guidance for '+dateLabel+'. Confirm operations and live running status before travel.';
+    if(googleTrainSearch){
+      var stations=mapStations[trainDirection.value];
+      googleTrainSearch.href='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(stations[0])+'&destination='+encodeURIComponent(stations[1])+'&travelmode=transit';
+      googleTrainSearch.setAttribute('aria-label','Search Google Maps for '+route);
+    }
+    if(trainResults){
+      if(trainDirection.value==='fort-kandy'){
+        trainResults.innerHTML=fortSchedule.map(function(item){ return '<li><b>'+item[0]+'</b> '+item[1]+' <span>scheduled guidance</span></li>'; }).join('');
+      }else{
+        trainResults.innerHTML='<li class="train-results__notice"><b>Kandy → Colombo Fort</b><span>Open the official timetable for date-specific departures, then use RDMNS for live delays and cancellations.</span></li>';
+      }
+    }
+    if(trainStatus) trainStatus.textContent='Showing '+route+' for '+dateLabel+' · Google Maps opens this direction; choose the departure date and time there.';
+  }
+  if(trainForm){ trainForm.addEventListener('submit',function(e){ e.preventDefault(); updateTrainSearch(); }); }
+  if(trainSwap){ trainSwap.addEventListener('click',function(){
+    trainDirection.value=trainDirection.value==='fort-kandy'?'kandy-fort':'fort-kandy'; updateTrainSearch();
   }); }
 })();
 
@@ -626,7 +753,7 @@
   if(saved==='si' || saved==='ta'){ apply(saved); }
 
 
-  /* branded interactive map: dark resort style with satellite toggle */
+  /* branded interactive map: automatic Kandy day/night theme + satellite override */
   var mapNode = document.getElementById('resortMap');
   if(mapNode && window.L){
     mapNode.innerHTML='';
@@ -635,10 +762,50 @@
     var darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom:20, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
     });
+    var lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom:20, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
+    });
     var satelliteTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom:19, attribution:'Tiles &copy; Esri'
     });
-    darkTiles.addTo(resortMap);
+    var currentBaseLayer=null;
+    var currentTimeTheme='';
+    var satellite=false;
+    function kandyMinutesNow(){
+      var parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Colombo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+      var hour=0,minute=0;
+      parts.forEach(function(part){
+        if(part.type==='hour') hour=Number(part.value);
+        if(part.type==='minute') minute=Number(part.value);
+      });
+      return hour*60+minute;
+    }
+    function timeTheme(){
+      var minutes=kandyMinutesNow();
+      return minutes>=360 && minutes<1080 ? 'day' : 'night';
+    }
+    function setBaseLayer(layer){
+      if(currentBaseLayer===layer) return;
+      if(currentBaseLayer && resortMap.hasLayer(currentBaseLayer)) resortMap.removeLayer(currentBaseLayer);
+      currentBaseLayer=layer;
+      currentBaseLayer.addTo(resortMap);
+    }
+    function applyAutomaticMapTheme(){
+      var nextTheme=timeTheme();
+      currentTimeTheme=nextTheme;
+      if(satellite){
+        mapNode.classList.remove('map-theme-day','map-theme-night');
+        mapNode.classList.add('map-theme-satellite');
+        mapNode.setAttribute('data-time-theme','satellite');
+        return;
+      }
+      mapNode.classList.toggle('map-theme-day',nextTheme==='day');
+      mapNode.classList.toggle('map-theme-night',nextTheme==='night');
+      mapNode.classList.remove('map-theme-satellite');
+      mapNode.setAttribute('data-time-theme',nextTheme);
+      setBaseLayer(nextTheme==='day' ? lightTiles : darkTiles);
+    }
+    applyAutomaticMapTheme();
     var markerIcon = L.divIcon({
       className:'salido-map-icon',
       html:'<div class="v43-option-a" aria-hidden="true"><span class="v43-option-a__ping"></span><span class="v43-option-a__shadow"></span><span class="v43-option-a__pin"><span class="v43-option-a__core">S</span></span><span class="v43-option-a__card"><strong>Salido Resort</strong><small>Riverside Stay · Kandy</small></span></div>',
@@ -665,21 +832,33 @@
       mapObserver.observe(mapNode);
     }else{ revealResortMarker(); }
     var styleButton=document.getElementById('mapStyleToggle');
-    var satellite=false;
     function styleLabel(){
       if(!styleButton) return;
-      styleButton.textContent = satellite ? T('map.style.dark','Dark map') : T('map.style.sat','Satellite');
+      styleButton.textContent = satellite ? T('map.style.auto','Auto day/night') : T('map.style.sat','Satellite');
+      styleButton.setAttribute('aria-label',satellite ? 'Return to automatic day and night map' : 'Switch to satellite map');
+      styleButton.title=satellite ? 'Return to automatic Kandy time theme' : 'Current automatic theme: '+currentTimeTheme;
     }
     if(styleButton){
       styleButton.addEventListener('click',function(){
         satellite=!satellite;
-        if(satellite){ resortMap.removeLayer(darkTiles); satelliteTiles.addTo(resortMap); }
-        else { resortMap.removeLayer(satelliteTiles); darkTiles.addTo(resortMap); }
+        if(satellite){
+          mapNode.classList.remove('map-theme-day','map-theme-night');
+          mapNode.classList.add('map-theme-satellite');
+          setBaseLayer(satelliteTiles);
+        }else{
+          applyAutomaticMapTheme();
+        }
         styleLabel();
       });
       styleLabel();
       window.SALIDO_ON_LANG.push(styleLabel);
     }
+    /* Re-check Kandy local time without requiring a page reload. */
+    window.setInterval(function(){
+      var previous=currentTimeTheme;
+      applyAutomaticMapTheme();
+      if(previous!==currentTimeTheme) styleLabel();
+    },60000);
     function refreshMapSize(){ resortMap.invalidateSize({pan:false}); }
     setTimeout(refreshMapSize,120);
     setTimeout(refreshMapSize,500);
