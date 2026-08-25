@@ -572,7 +572,8 @@
       storm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 15"/><path d="m13 12-3 5h4l-3 5"/></svg>'
     };
     var pick = function(c){ if(c<=2) return 'sun'; if(c>=95) return 'storm';
-      if((c>=51&&c<=67)||(c>=80&&c<=82)) return 'rain'; return 'cloud'; };
+      /* Drizzle keeps the softer cloudy 3D artwork; only actual rain/showers use the rain artwork. */
+      if((c>=61&&c<=67)||(c>=80&&c<=82)) return 'rain'; return 'cloud'; };
     var effect = function(c){
       if(c<=2) return 'sun'; if(c===45||c===48) return 'fog';
       if(c>=51&&c<=57) return 'drizzle'; if(c===61||c===63||c===66) return 'rain';

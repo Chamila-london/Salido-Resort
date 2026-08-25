@@ -5699,3 +5699,16 @@ html[lang="en"] body.concept-v3 .reservation-v9__formhead h3{
   font-family:"Cormorant Garamond",Georgia,serif!important;
   font-weight:500!important;
 }
+
+
+/* ===== V23.8 — accurate, restrained drizzle presentation =====
+   Open-Meteo WMO 51/53/55 are drizzle, not full rain. Keep the live condition
+   but make precipitation visually light so the card does not imply a storm. */
+#getting [data-effect="drizzle"] .wx__rain{
+  width:72px!important; height:72px!important; top:27%!important; opacity:.42!important;
+}
+#getting [data-effect="drizzle"] .wx__rain i{
+  width:1px!important; height:10px!important; --wx-speed:1.8s!important;
+  box-shadow:0 0 3px rgba(80,210,255,.38)!important;
+}
+#getting [data-effect="drizzle"] .wx__rain i:nth-child(even){display:none!important}
