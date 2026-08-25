@@ -607,8 +607,8 @@
           lo = Math.round(day.temperature_2m_min[0]);
       /* c.time is a tz-less local string for Asia/Colombo (UTC+5:30, no DST);
          pin it to that offset so the label is correct for any viewer location */
-      var updated = new Date(c.time ? c.time + '+05:30' : Date.now())
-        .toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Colombo'});
+      /* Show the actual successful refresh time, not Open-Meteo's observation-slot time. */
+      var updated = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Colombo'});
       var localNow = new Date().toLocaleString('en-US',{timeZone:'Asia/Colombo',weekday:'long',month:'short',day:'numeric'});
       var clock = new Date().toLocaleTimeString('en-US',{timeZone:'Asia/Colombo',hour:'numeric',minute:'2-digit'});
       var compass = ['N','NE','E','SE','S','SW','W','NW'][Math.round((c.wind_direction_10m || 0)/45)%8];
@@ -620,7 +620,7 @@
       }).join('');
       var fx=effect(c.weather_code), isNight=Number(c.is_day)===0, windy=Number(c.wind_speed_10m)>=30;
       wx.innerHTML =
-        '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated"><span class="wx__updated-label">Updated ' + updated + '</span><button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather" title="Refresh live weather"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5"></path><path d="M4 18v-5h5"></path><path d="M6.1 9a7 7 0 0 1 11.8-2.6L20 11"></path><path d="M17.9 15a7 7 0 0 1-11.8 2.6L4 13"></path></svg></button></span></div>' +
+        '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated"><span class="wx__updated-label">Updated ' + updated + '</span><button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather" title="Refresh live weather"><span class="wx__refresh-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"></path><path d="M20 4v7h-7"></path></svg></button></span></div>' +
         '<div class="wx__scene"><div class="wx__info"><span class="wx__date">'+localNow+'</span><span class="wx__clock">'+clock+'</span>'+
         '<span class="wx__meta">Feels like '+Math.round(c.apparent_temperature)+'\u00B0 · Wind '+compass+' '+Math.round(c.wind_speed_10m)+' km/h</span>'+
         '<span class="wx__meta">Sunrise '+sunrise+' · Sunset '+sunset+'</span></div>'+
