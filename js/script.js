@@ -589,10 +589,18 @@
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=7.2844504&longitude=80.6651848' +
       '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,is_day' +
       '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=5&timezone=Asia%2FColombo';
-    var loadWeather = function(){
+    var loadWeather = function(fromUser){
       var oldRefresh = wx.querySelector('.wx__refresh');
-      if(oldRefresh){ oldRefresh.classList.add('is-loading'); oldRefresh.setAttribute('aria-busy','true'); }
-      fetch(url,{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
+      var oldUpdated = wx.querySelector('.wx__updated-label');
+      if(oldRefresh){
+        oldRefresh.classList.add('is-loading');
+        oldRefresh.setAttribute('aria-busy','true');
+        oldRefresh.setAttribute('disabled','disabled');
+      }
+      if(fromUser && oldUpdated){ oldUpdated.textContent = 'Updating live weather…'; }
+      /* Cache-buster ensures a manual refresh always makes a fresh network request. */
+      var requestUrl = url + '&_=' + Date.now();
+      fetch(requestUrl,{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
       var c = d.current, day = d.daily;
       var t = Math.round(c.temperature_2m),
           hi = Math.round(day.temperature_2m_max[0]),
@@ -612,7 +620,7 @@
       }).join('');
       var fx=effect(c.weather_code), isNight=Number(c.is_day)===0, windy=Number(c.wind_speed_10m)>=30;
       wx.innerHTML =
-        '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated">Updated ' + updated + '<button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather">↻</button></span></div>' +
+        '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated"><span class="wx__updated-label">Updated ' + updated + '</span><button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather" title="Refresh live weather"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5"></path><path d="M4 18v-5h5"></path><path d="M6.1 9a7 7 0 0 1 11.8-2.6L20 11"></path><path d="M17.9 15a7 7 0 0 1-11.8 2.6L4 13"></path></svg></button></span></div>' +
         '<div class="wx__scene"><div class="wx__info"><span class="wx__date">'+localNow+'</span><span class="wx__clock">'+clock+'</span>'+
         '<span class="wx__meta">Feels like '+Math.round(c.apparent_temperature)+'\u00B0 · Wind '+compass+' '+Math.round(c.wind_speed_10m)+' km/h</span>'+
         '<span class="wx__meta">Sunrise '+sunrise+' · Sunset '+sunset+'</span></div>'+
@@ -625,7 +633,7 @@
         '<div class="wx__forecast">'+forecast+'</div><span class="wx__status"><i></i> Live data · refreshes every 15 min</span></div>';
       wx.classList.add('is-loaded');
       var refresh=wx.querySelector('.wx__refresh');
-      if(refresh){ refresh.addEventListener('click',loadWeather); }
+      if(refresh){ refresh.addEventListener('click',function(){ loadWeather(true); }); }
     }).catch(function(){
       var refresh=wx.querySelector('.wx__refresh');
       if(refresh){ refresh.classList.remove('is-loading'); refresh.removeAttribute('aria-busy'); }
@@ -634,8 +642,8 @@
       }
     });
     };
-    loadWeather();
-    window.setInterval(loadWeather,900000);
+    loadWeather(false);
+    window.setInterval(function(){ loadWeather(false); },900000);
     window.setInterval(function(){
       var clockEl=wx.querySelector('.wx__clock'), dateEl=wx.querySelector('.wx__date');
       if(clockEl){ clockEl.textContent=new Date().toLocaleTimeString('en-US',{timeZone:'Asia/Colombo',hour:'numeric',minute:'2-digit'}); }
