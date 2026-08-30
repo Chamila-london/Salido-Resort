@@ -5566,7 +5566,7 @@ html[lang="en"] body.concept-v3 .reservation-v9__formhead h3{
 #resortMap.map-theme-day{background:#dcecf3}
 #resortMap.map-theme-day .leaflet-tile-pane{filter:saturate(.92) contrast(1.02) brightness(1.02)}
 #resortMap.map-theme-night{background:#151020}
-#resortMap.map-theme-night .leaflet-tile-pane{filter:saturate(.86) contrast(1.08) brightness(.94)}
+#resortMap.map-theme-night .leaflet-tile-pane{filter:invert(.88) hue-rotate(182deg) saturate(.72) contrast(1.08) brightness(.72)}
 #resortMap.map-theme-satellite .leaflet-tile-pane{filter:saturate(1.05) contrast(1.04)}
 .map__style{transition:background-color .25s ease,color .25s ease,transform .25s ease,box-shadow .25s ease!important}
 .map__style:hover{transform:translateY(-1px)}

@@ -618,14 +618,20 @@
         var name = new Date(date+'T12:00:00+05:30').toLocaleDateString('en-US',{weekday:'short',timeZone:'Asia/Colombo'}).toUpperCase();
         return '<span class="wx__day"><b>'+name+'</b><i>'+ICON[pick(day.weather_code[i])]+'</i><strong>'+Math.round(day.temperature_2m_max[i])+'\u00B0/'+Math.round(day.temperature_2m_min[i])+'\u00B0</strong></span>';
       }).join('');
-      var fx=effect(c.weather_code), isNight=Number(c.is_day)===0, windy=Number(c.wind_speed_10m)>=30;
+      var isNight=Number(c.is_day)===0,
+          weatherKind=pick(c.weather_code),
+          /* Never show sun artwork after sunset. Clear/mainly-clear nights use
+             the cloud layer with the dedicated moon rendered behind it. */
+          artworkKind=(isNight && weatherKind==='sun') ? 'cloud' : weatherKind,
+          fx=(isNight && effect(c.weather_code)==='sun') ? 'cloud' : effect(c.weather_code),
+          windy=Number(c.wind_speed_10m)>=30;
       wx.innerHTML =
         '<div class="wx__glass'+(isNight?' is-night':'')+(windy?' is-windy':'')+'" data-effect="'+fx+'"><div class="wx__top"><span class="wx__live"><i></i> Kandy</span><span class="wx__updated"><span class="wx__updated-label">Updated ' + updated + '</span><button class="wx__refresh" type="button" aria-label="Refresh live Kandy weather" title="Refresh live weather"><span class="wx__refresh-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"></path><path d="M20 4v7h-7"></path></svg></button></span></div>' +
         '<div class="wx__scene"><div class="wx__info"><span class="wx__date">'+localNow+'</span><span class="wx__clock">'+clock+'</span>'+
         '<span class="wx__meta">Feels like '+Math.round(c.apparent_temperature)+'\u00B0 · Wind '+compass+' '+Math.round(c.wind_speed_10m)+' km/h</span>'+
         '<span class="wx__meta">Sunrise '+sunrise+' · Sunset '+sunset+'</span></div>'+
         '<span class="wx__halo" aria-hidden="true"></span><span class="wx__moon" aria-hidden="true"></span>'+
-        '<img class="wx__cloud wx__cloud--'+pick(c.weather_code)+'" src="'+ICON3D[pick(c.weather_code)]+'" alt="" aria-hidden="true">' +
+        '<img class="wx__cloud wx__cloud--'+artworkKind+'" src="'+ICON3D[artworkKind]+'" alt="" aria-hidden="true">' +
         '<span class="wx__rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>'+
         '<span class="wx__fog" aria-hidden="true"><i></i><i></i><i></i></span><span class="wx__bolt" aria-hidden="true"></span>'+
         '<span class="wx__wind" aria-hidden="true"><i></i><i></i><i></i></span><span class="wx__snow" aria-hidden="true"><i>❄</i><i>❄</i><i>❄</i><i>❄</i><i>❄</i></span>'+
@@ -768,12 +774,15 @@
     mapNode.innerHTML='';
     var resortCoords = [7.2844504, 80.6651848];
     var resortMap = L.map(mapNode, {scrollWheelZoom:false, zoomControl:true, attributionControl:true}).setView(resortCoords, 15);
-    var darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom:20, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
-    });
-    var lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom:20, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
-    });
+    /* OpenStreetMap's standard tiles require no API key. Separate layer
+       instances let the existing automatic day/night transition remain intact. */
+    var osmTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    var osmTileOptions = {
+      maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+    };
+    var darkTiles = L.tileLayer(osmTileUrl, osmTileOptions);
+    var lightTiles = L.tileLayer(osmTileUrl, osmTileOptions);
     var satelliteTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom:19, attribution:'Tiles &copy; Esri'
     });
